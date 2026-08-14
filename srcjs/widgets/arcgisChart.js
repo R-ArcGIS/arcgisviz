@@ -8,7 +8,9 @@ import { createModel } from "@arcgis/charts-components";
 defineChartElements(window);
 
 // Arrays merge element-wise so a sparse series layers onto the default
-// series instead of replacing it.
+// series instead of replacing it. A null value deletes the key outright -
+// R's only way to unset a default (e.g. the default count aggregation on
+// series.query, which stat = "identity" has to be rid of).
 function deepMerge(target, source) {
   if (
     source === null ||
@@ -30,7 +32,11 @@ function deepMerge(target, source) {
 
   var out = Object.assign({}, target);
   Object.keys(source).forEach(function (key) {
-    out[key] = deepMerge(target[key], source[key]);
+    if (source[key] === null) {
+      delete out[key];
+    } else {
+      out[key] = deepMerge(target[key], source[key]);
+    }
   });
   return out;
 }

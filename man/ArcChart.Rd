@@ -6,3 +6,9 @@
 \description{
 ArcChart
 }
+\section{Properties}{
+
+\verb{@webchart} is computed from the mapping, not stored - assigning to it
+has no effect.
+}
+

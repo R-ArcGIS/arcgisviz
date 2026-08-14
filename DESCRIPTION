@@ -28,6 +28,7 @@ Collate:
     'arc-data.R'
     'enums-widget.R'
     'arcgis-chart-widget.R'
+    'zzz.R'
 Imports:
     S7,
     s7x,

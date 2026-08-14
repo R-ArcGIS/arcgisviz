@@ -20,7 +20,7 @@ test_that("as_chart_layer() produces the IFeatureLayer shape createModel reads",
 })
 
 test_that("the config carries the series type createModel derives the chart type from", {
-  cfg <- compact_config(s7x::as_vector(arc_scatter(test_df(), category, value)@webchart))
+  cfg <- s7x::as_vector(arc_scatter(test_df(), category, value)@webchart)
 
   # dist/chunks/model-types.js maps series type -> ModelType; there is no
   # separate chartType argument on this path.
@@ -30,7 +30,7 @@ test_that("the config carries the series type createModel derives the chart type
 })
 
 test_that("unset properties are dropped rather than sent as null", {
-  cfg <- compact_config(s7x::as_vector(arc_bar(test_df(), category, value)@webchart))
+  cfg <- s7x::as_vector(arc_col(test_df(), category, value)@webchart)
 
   # createModel() layers `config` over its own defaults, so an explicit
   # null would override a default instead of falling back to it.
@@ -38,14 +38,80 @@ test_that("unset properties are dropped rather than sent as null", {
   expect_false(any(vapply(cfg, is.null, logical(1))))
 })
 
-test_that("a Color is compacted back to the spec's [r,g,b,a] tuple", {
+test_that("stat = 'identity' sends a null query to delete the default", {
+  cfg <- s7x::as_vector(arc_col(test_df(), category, value)@webchart)
+
+  # The default bar series ships a count aggregation; only an explicit null
+  # gets rid of it, and BarAndLineNoAggregation needs it gone.
+  expect_identical(cfg$series[[1]]$query, json_null)
+  expect_identical(widget_json(cfg$series[[1]]$query), "null")
+  expect_identical(cfg$series[[1]]$y, "value")
+})
+
+test_that("an aggregating stat binds y to the outStatisticFieldName", {
+  chart <- arc_chart(test_df()) |>
+    set_type("bar") |>
+    set_x(category) |>
+    set_y(value) |>
+    set_stat("mean")
+  query <- s7x::as_vector(chart@webchart)$series[[1]]$query
+
+  # The spec types this string[]; a bare string breaks the JS `.map()`.
   expect_identical(
-    compact_config(s7x::as_vector(Color(r = 1, g = 2, b = 3, a = 255))),
+    widget_json(query$groupByFieldsForStatistics),
+    '["category"]'
+  )
+  expect_identical(query$outStatistics[[1]]$statisticType, "avg")
+  expect_identical(query$outStatistics[[1]]$onStatisticField, "value")
+  expect_identical(
+    query$outStatistics[[1]]$outStatisticFieldName,
+    "AVG_VALUE_0"
+  )
+
+  # The query engine returns the aggregate under its output name, so that -
+  # not the source column - is what the series has to plot.
+  expect_identical(s7x::as_vector(chart@webchart)$series[[1]]$y, "AVG_VALUE_0")
+})
+
+test_that("arc_bar() counts rows per x and needs no y", {
+  query <- s7x::as_vector(arc_bar(test_df(), category)@webchart)$series[[
+    1
+  ]]$query
+
+  expect_identical(query$outStatistics[[1]]$statisticType, "count")
+  expect_identical(query$outStatistics[[1]]$onStatisticField, oid_field)
+  expect_identical(
+    s7x::as_vector(arc_bar(test_df(), category)@webchart)$series[[1]]$y,
+    "COUNT_OBJECT_ID_0"
+  )
+
+  # The query engine rejects fields the layer doesn't have.
+  lyr <- as_chart_layer(test_df())
+  expect_identical(
+    lyr$featureCollection$layers[[1]]$layerDefinition$objectIdField,
+    oid_field
+  )
+})
+
+test_that("scatterplots ignore stat entirely", {
+  chart <- arc_chart(test_df()) |>
+    set_type("scatter") |>
+    set_x(category) |>
+    set_y(value) |>
+    set_stat("sum")
+
+  expect_identical(s7x::as_vector(chart@webchart)$series[[1]]$y, "value")
+  expect_identical(s7x::as_vector(chart@webchart)$series[[1]]$query, json_null)
+})
+
+test_that("a Color coerces to the spec's [r,g,b,a] tuple", {
+  expect_identical(
+    s7x::as_vector(Color(r = 1, g = 2, b = 3, a = 255)),
     c(1, 2, 3, 255)
   )
 
-  # A partly-unset Color isn't a color; it compacts away entirely.
-  expect_length(compact_config(s7x::as_vector(Color(r = 1))), 1)
+  # A partly-specified color isn't one - it drops out as unset.
+  expect_null(s7x::as_vector(Color(r = 1)))
 })
 
 test_that("the widget serializes with our own function, not htmlwidgets'", {

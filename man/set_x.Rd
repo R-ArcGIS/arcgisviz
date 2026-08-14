@@ -16,8 +16,7 @@ called.}
 \item{x, y}{A bare column name from \code{chart}'s data (tidy eval).}
 }
 \value{
-\code{chart}, with the field mapping set on its (single, current)
-series.
+\code{chart}, with the field mapping set.
 }
 \description{
 Map a column to a chart's x/y field

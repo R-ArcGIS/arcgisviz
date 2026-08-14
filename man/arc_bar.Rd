@@ -4,16 +4,18 @@
 \alias{arc_bar}
 \title{Bar chart}
 \usage{
-arc_bar(.data, x, y)
+arc_bar(.data, x)
 }
 \arguments{
 \item{.data}{A data frame (or similar) the chart's fields will come from.}
 
-\item{x, y}{Bare column names from \code{.data} (tidy eval).}
+\item{x}{A bare column name from \code{.data} (tidy eval).}
 }
 \value{
 An \code{ArcChart}.
 }
 \description{
-Bar chart
+Counts rows per \code{x}, the way \code{\link[ggplot2:geom_bar]{ggplot2::geom_bar()}} does. Use \code{\link[=arc_col]{arc_col()}}
+to plot values you have already summarised, or \code{\link[=set_stat]{set_stat()}} for any other
+aggregation.
 }

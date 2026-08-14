@@ -85,14 +85,31 @@ not yet modeled.
 
 ## Serialization
 
-`s7x::to_json(x, ..., pretty = FALSE)` works out of the box for any S7 config
-class in this package (`WebChart`, `WebChartBarChartSeries`, etc.) - it's a
-generic `S7_object` method in `s7x` (`as_vector(x)` +
-`yyjsonr::write_json_str(auto_unbox = TRUE, ...)`), not something
-`arcgisviz` implements itself. No extra code needed here; regression
-coverage lives in `s7x`, not this package's test suite. `from_json()` (JSON
--> S7 object) doesn't exist yet - harder problem, needs to know which class
-to construct into.
+`s7x::to_json(x, ..., pretty = FALSE)` works for any S7 config class in this
+package - it's `as_vector(x)` + `yyjsonr::write_json_str(auto_unbox = TRUE)`,
+a generic `S7_object` method in `s7x`.
+
+**`as_vector()` is the single extension point for the wire format.** It
+recurses through the generic (`as_vector_value()`, `s7x/R/as_vector.R:30`),
+so a method on a nested class fires during the parent's walk. `R/arc-data.R`
+registers three, and `to_json()` inherits all of them for free:
+
+- `WebChart` - drops unset (NA/NULL) properties via `compact_config()`.
+- the three `WebChart*Series` classes - emit `query: null` when the query is
+  unset, the client-side signal to delete a default.
+- `Color` - the spec's raw `[r,g,b,a]` tuple, undoing this package's
+  deliberate r/g/b/a exception. A partly-specified color returns `NULL` and
+  drops out.
+
+Two mechanics this depends on: `S7::super(x, S7::S7_object)` to reach the
+default method from an override (otherwise infinite recursion), and
+`.onLoad()`'s `S7::methods_register()` in `R/zzz.R` - without it, methods on
+another package's generic are registered at build time and lost on install.
+`S7::method(s7x::as_vector, X) <- f` does *not* work (the replacement form
+would assign back through `::`), hence the `@importFrom s7x as_vector`.
+
+`from_json()` (JSON -> S7 object) doesn't exist yet - harder problem, needs
+to know which class to construct into.
 
 ## Data transfer (R -> browser)
 
@@ -101,25 +118,40 @@ the exact `@arcgis/charts-components` dist files/functions each rule comes
 from, and `tests/testthat/test-data-transfer.R` asserts the shapes. The
 non-obvious parts:
 
-- `createModel()` takes `{ iLayer, config }` - **not** `{ iLayer, chartType }`.
-  `config` is a `ChartConfig<T>`, which is exactly our `WebChart` shape, so
-  the whole S7 type layer ships as-is. The chart type is derived from
-  `config.series[0].type` (`dist/chunks/model-types.js`), and a series list
-  with both a `lineSeries` and a `barSeries` is auto-detected as a combo
-  chart - so R never names the chart type on this path.
+- `createModel()` is called **twice**, and R sends both `chartType` and
+  `config`. A sparse config can't go to `createModel()` alone - a `WebChart`
+  needs a full axes/labels/symbol tree or the engine throws "There are no X
+  axes on chart" - and `getDefault*Chart()` needs a `CommonStrings`
+  localization bundle we can't construct. So: `createModel({ iLayer,
+  chartType })` harvests the model's own defaults, `deepMerge()` layers R's
+  sparse config over `defaults.config`, then `createModel({ iLayer, config })`
+  builds the real model from the complete config. Assigning `model.config`
+  post-setup instead re-adds series before axes and fails.
+- `deepMerge()` treats **`null` as delete**, not as a value. It's R's only
+  way to unset one of the model's defaults, since an absent key just leaves
+  the default in place. `stat = "identity"` needs it: the default bar/line
+  series ships a count aggregation (`$e()`, `dist/chunks/index.js`) and
+  `BarAndLineNoAggregation` requires `query.outStatistics` to be `undefined`
+  (`ga()`, `dist/chunks/index2.js:593`).
+- **Aggregation is `stat`, and it maps 1:1 onto ggplot2's.** `ga()` picks the
+  bar/line subtype purely from the query shape: no `outStatistics` ->
+  `BarAndLineNoAggregation` (`geom_col()`, `stat = "identity"`);
+  `groupByFieldsForStatistics` + `outStatistics` -> `BarAndLineMonoField`
+  (`geom_bar()`/`stat_summary()`). Under aggregation the series' `y` must
+  name the `outStatisticFieldName`, not the source column - which is why
+  `ArcChart` holds the *mapping* (`x`/`y`/`stat`) and `@webchart` is a
+  computed getter (`build_webchart()`), not a stored, eagerly-mutated object.
 - `iLayer` needs `layerType = "ArcGISFeatureLayer"` and carries the data at
   `featureCollection$layers[[1]]$featureSet` / `$layerDefinition`. The
   converter (`gi`, `dist/chunks/index2.js`) reads *only* those paths plus
   `fields`/`objectIdField`/`geometryType`/`spatialReference` - which is
   precisely what `arcgisutils::as_feature_collection()` emits.
-- Unset properties must be **dropped**, not sent as JSON `null`.
-  `s7x::as_vector()` materializes every property (16 of `WebChart`'s 20
-  top-level ones are NA/NULL for a minimal chart), and `createModel()`
-  layers `config` over its own defaults, so an explicit null overrides a
-  default instead of falling back to it. That's `compact_config()`.
-- `compact_config()` also converts `Color` back to the spec's raw
-  `[r,g,b,a]` tuple, undoing this package's deliberate r/g/b/a exception on
-  the way out.
+- Unset properties must be **dropped**, not sent as JSON `null` - the
+  default `as_vector()` method materializes every property (16 of
+  `WebChart`'s 20 top-level ones are NA/NULL for a minimal chart), and an
+  explicit null would override a default instead of falling back to it. See
+  "Serialization" above: this and the `Color` tuple conversion are both
+  `as_vector()` methods, not a bespoke pass.
 - **We serialize the widget payload ourselves.** The widget sets
   `attr(x, "TOJSON_FUNC") <- widget_json`, htmlwidgets' documented hook for
   replacing its serializer outright, so nothing depends on
@@ -161,6 +193,22 @@ comments aren't needed at all. Comment only what the code can't say - a
 non-obvious external contract, a surprising constraint, a spec citation
 (`web-chart.d.ts:1274`). Don't restate what the code does, don't justify
 the design, don't narrate the reasoning that led there.
+
+## R style: rlang first, cli for all messaging
+
+Reach for `{rlang}` before base R, always. `rlang::is_null()` not
+`is.null()`, `rlang::is_empty()` not `length(x) == 0`,
+`rlang::is_list()`/`is_atomic()`/`is_scalar_character()` not the `is.*()`
+equivalents, `rlang::arg_match0()` not `match.arg()`. Reference:
+<https://rlang.r-lib.org/llms.txt>.
+
+Every user-facing condition or message goes through `{cli}` -
+`cli::cli_abort()`, `cli::cli_warn()`, `cli::cli_inform()`. Never `stop()`,
+`warning()`, `message()`, or `paste0()`-built strings. Use inline markup
+(`{.arg x}`, `{.field {col}}`, `{.val {x}}`, `{.fn set_type}`), pluralize
+with `{?s}`, and pass `call = call` with a `call = rlang::caller_env()`
+argument so errors point at the user's frame. Load the `r-lib:cli` skill
+before writing any of it.
 
 ## Conventions worth knowing before editing `R/`
 

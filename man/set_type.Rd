@@ -12,7 +12,7 @@ set_type(chart, type)
 \item{type}{One of \code{"bar"}, \code{"scatter"}, \code{"line"}.}
 }
 \value{
-\code{chart}, with a fresh single series of the matching type.
+\code{chart}, with its series type set.
 }
 \description{
 Set a chart's type
