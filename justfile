@@ -10,6 +10,9 @@ lint:
 test:
     R -q -e "devtools::test()"
 
+document:
+    R -q -e "devtools::document()"
+
 readme:
     quarto render README.qmd --to gfm
 

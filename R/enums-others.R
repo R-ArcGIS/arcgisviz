@@ -1,63 +1,43 @@
 # Enums for ArcGIS Charts spec types with no shared WebChart*/Intl* name
-# prefix. Generated from data-raw/enums.json (see
-# data-raw/resolve-spec-types.R and data-raw/extract-enums.R for
-# provenance).
+# prefix. Source of truth is the spec bundled inside @arcgis/charts-components
+# (not the standalone, stale @arcgis/charts-model/@arcgis/charts-spec
+# packages - see CLAUDE.md):
+# node_modules/@arcgis/charts-components/dist/spec/rest-js-types.d.ts,
+# .../dist/spec/rest-js-object-literals.d.ts.
+#
+# Dropped from the old (charts-spec) version of this file because nothing in
+# the current WebChart config type tree references them: RESTStatisticType
+# (IStatisticDefinition.statisticType actually uses its own, differently
+# scoped inline union - see IStatisticDefinitionStatisticType below),
+# FieldType, DomainType (IField/domain modeling isn't referenced by
+# WebChart), LegendItemVisibilityOverlayType (that's part of the
+# <arcgis-chart> *event payload* spec - events.d.ts's OverlayTerms - not
+# the WebChart config shape at all).
 
+# Renamed from WebChartDataFiltersUnits (an invented name for a previously
+# anonymous inline type) - the current spec exports this directly as
+# RESTUnits (rest-js-object-literals.d.ts), used by WebChartQuery.units and
+# therefore WebChartDataFilters.units. @deprecated since 5.1 in the spec
+# itself but still the current property type, so still modeled.
 #' @export
-RESTStatisticType <- s7x::new_enum(
-  "RESTStatisticType",
+RESTUnits <- s7x::new_enum(
+  "RESTUnits",
   c(
-    "avg",
-    "centroid-aggregate",
-    "convex-hull-aggregate",
-    "count",
-    "envelope-aggregate",
-    "max",
-    "min",
-    "no_aggregation",
-    "percentile_cont",
-    "percentile_disc",
-    "stddev",
-    "sum",
-    "var"
+    "feet",
+    "kilometers",
+    "meters",
+    "miles",
+    "nautical-miles",
+    "us-nautical-miles"
   )
 )
 
+# Renamed from ISimpleLineSymbolStyle - rest-js-types.d.ts exports this
+# without an `I`-prefix (`SimpleLineSymbolStyle`); that's the literal type
+# of ISimpleLineSymbol$style itself.
 #' @export
-FieldType <- s7x::new_enum(
-  "FieldType",
-  c(
-    "esriFieldTypeBlob",
-    "esriFieldTypeDate",
-    "esriFieldTypeDouble",
-    "esriFieldTypeGUID",
-    "esriFieldTypeGeometry",
-    "esriFieldTypeGlobalID",
-    "esriFieldTypeInteger",
-    "esriFieldTypeOID",
-    "esriFieldTypeRaster",
-    "esriFieldTypeSingle",
-    "esriFieldTypeSmallInteger",
-    "esriFieldTypeString",
-    "esriFieldTypeXML"
-  )
-)
-
-#' @export
-DomainType <- s7x::new_enum(
-  "DomainType",
-  c("codedValue", "inherited", "range")
-)
-
-#' @export
-LegendItemVisibilityOverlayType <- s7x::new_enum(
-  "LegendItemVisibilityOverlayType",
-  c("Mean", "Median", "Normal Distribution", "Standard Deviation", "Trendline")
-)
-
-#' @export
-ISimpleLineSymbolStyle <- s7x::new_enum(
-  "ISimpleLineSymbolStyle",
+SimpleLineSymbolStyle <- s7x::new_enum(
+  "SimpleLineSymbolStyle",
   c(
     "esriSLSDash",
     "esriSLSDashDot",
@@ -68,9 +48,10 @@ ISimpleLineSymbolStyle <- s7x::new_enum(
   )
 )
 
+# Renamed from ISimpleFillSymbolStyle - see SimpleLineSymbolStyle above.
 #' @export
-ISimpleFillSymbolStyle <- s7x::new_enum(
-  "ISimpleFillSymbolStyle",
+SimpleFillSymbolStyle <- s7x::new_enum(
+  "SimpleFillSymbolStyle",
   c(
     "esriSFSBackwardDiagonal",
     "esriSFSCross",
@@ -83,9 +64,10 @@ ISimpleFillSymbolStyle <- s7x::new_enum(
   )
 )
 
+# Renamed from ISimpleMarkerSymbolStyle - see SimpleLineSymbolStyle above.
 #' @export
-ISimpleMarkerSymbolStyle <- s7x::new_enum(
-  "ISimpleMarkerSymbolStyle",
+SimpleMarkerSymbolStyle <- s7x::new_enum(
+  "SimpleMarkerSymbolStyle",
   c(
     "esriSMSCircle",
     "esriSMSCross",
@@ -96,9 +78,11 @@ ISimpleMarkerSymbolStyle <- s7x::new_enum(
   )
 )
 
+# Renamed from SizePolicyScaleType (singular) - chart-object-literals.d.ts
+# exports the plural SizePolicyScaleTypes.
 #' @export
-SizePolicyScaleType <- s7x::new_enum(
-  "SizePolicyScaleType",
+SizePolicyScaleTypes <- s7x::new_enum(
+  "SizePolicyScaleTypes",
   c("linear", "logarithmic")
 )
 
@@ -120,6 +104,12 @@ IFontDecoration <- s7x::new_enum(
   c("line-through", "none", "underline")
 )
 
+# NOTE: values changed from the old charts-spec version - the current
+# rest-js-types.d.ts inline union spells these "percentile-continuous"/
+# "percentile-discrete" (hyphenated words), not "percentile_cont"/
+# "percentile_disc". Also this is NOT the same set as chart-object-literals'
+# WebChartStatisticType (13 values incl. "no_aggregation") - that exported
+# const isn't what IStatisticDefinition$statisticType actually uses.
 #' @export
 IStatisticDefinitionStatisticType <- s7x::new_enum(
   "IStatisticDefinitionStatisticType",
@@ -131,8 +121,8 @@ IStatisticDefinitionStatisticType <- s7x::new_enum(
     "envelope-aggregate",
     "max",
     "min",
-    "percentile_cont",
-    "percentile_disc",
+    "percentile-continuous",
+    "percentile-discrete",
     "stddev",
     "sum",
     "var"

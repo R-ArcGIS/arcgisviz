@@ -5,6 +5,12 @@
 # types createModel() accepts. Deliberately named to match that export
 # exactly for traceability.
 
+#' ModelTypes
+#'
+#' The `@arcgis/charts-components` chart-type strings accepted by
+#' `createModel()`, e.g. `"barChart"`, `"lineChart"`, `"scatterplot"`.
+#'
+#' @name ModelTypes
 #' @export
 ModelTypes <- s7x::new_enum(
   "ModelTypes",

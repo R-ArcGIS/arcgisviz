@@ -1,8 +1,16 @@
 # S7 classes for statistics-definition spec types used by
-# WebChartSeriesQuery. Generated from data-raw/spec-type-registry.json.
+# WebChartSeriesQuery. Source of truth:
+# node_modules/@arcgis/charts-components/dist/spec/rest-js-types.d.ts
+# (IStatisticDefinition, its inline statisticParameters object type) and
+# .../dist/spec/web-chart.d.ts (WebChartQuery, Omit'd into
+# WebChartSeriesQuery). See CLAUDE.md. Structurally unchanged from the old
+# charts-spec-derived version except IStatisticDefinitionStatisticType's
+# variant spelling - see R/enums-others.R.
 
 library(S7)
 
+#' IStatisticDefinitionStatisticParameters
+#' @name IStatisticDefinitionStatisticParameters
 #' @export
 IStatisticDefinitionStatisticParameters := new_class(
   properties = list(
@@ -11,6 +19,8 @@ IStatisticDefinitionStatisticParameters := new_class(
   )
 )
 
+#' IStatisticDefinition
+#' @name IStatisticDefinition
 #' @export
 IStatisticDefinition := new_class(
   properties = list(
@@ -25,6 +35,8 @@ IStatisticDefinition := new_class(
   )
 )
 
+#' WebChartSeriesQuery
+#' @name WebChartSeriesQuery
 #' @export
 WebChartSeriesQuery := new_class(
   properties = list(

@@ -8,7 +8,6 @@ License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 8.1.0
 Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
@@ -21,9 +20,11 @@ Collate:
     'types-format-options.R'
     'types-statistics.R'
     'types-webchart.R'
+    'types-series-shared.R'
     'types-bar-chart.R'
     'types-scatter-plot.R'
     'types-line-chart.R'
+    'arc-chart.R'
     'enums-widget.R'
     'arcgis-chart-widget.R'
 Imports:
@@ -31,3 +32,4 @@ Imports:
     s7x,
     htmlwidgets
 URL: http://r.esri.com/arcgisviz/
+Config/roxygen2/version: 8.1.0

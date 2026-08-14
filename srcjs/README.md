@@ -1,7 +1,7 @@
 # srcjs
 
 Source for the `arcgisChart` htmlwidget. See
-[`docs/js-widget-architecture.md`](../docs/js-widget-architecture.md) for
+[`dev-docs/js-widget-architecture.md`](../dev-docs/js-widget-architecture.md) for
 the full data flow, deferred items, and build commands
 (`bun run development` / `production` / `watch`).
 

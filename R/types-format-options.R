@@ -1,8 +1,12 @@
 # S7 classes for the value-format types used by WebChartAxis/WebChartBarChartSeries.
-# Generated from data-raw/spec-type-registry.json.
+# Source of truth: node_modules/@arcgis/charts-components/dist/spec/web-chart.d.ts
+# (see CLAUDE.md). Unchanged from the old charts-spec-derived version -
+# these types are structurally identical in the current spec.
 
 library(S7)
 
+#' WebChartDateTimeUnitFormatOptions
+#' @name WebChartDateTimeUnitFormatOptions
 #' @export
 WebChartDateTimeUnitFormatOptions := new_class(
   properties = list(
@@ -27,6 +31,8 @@ WebChartDateTimeUnitFormatOptions := new_class(
   )
 )
 
+#' NumberFormatOptions
+#' @name NumberFormatOptions
 #' @export
 NumberFormatOptions := new_class(
   properties = list(
@@ -35,6 +41,8 @@ NumberFormatOptions := new_class(
   )
 )
 
+#' DateTimeFormatOptions
+#' @name DateTimeFormatOptions
 #' @export
 DateTimeFormatOptions := new_class(
   properties = list(

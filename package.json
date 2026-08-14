@@ -1,7 +1,6 @@
 {
   "dependencies": {
-    "@arcgis/charts-components": "^5.1.17",
-    "@arcgis/charts-model": "^4.32.15"
+    "@arcgis/charts-components": "^5.1.17"
   },
   "devDependencies": {
     "webpack": "^5.109.2",

@@ -1,11 +1,17 @@
 # S7 classes for ArcGIS Charts WebChart* spec object types with nested/ref'd
 # properties (built on top of the enums, Color, and simple types in
-# color.R/types-simple.R/types-format-options.R). Generated from
-# data-raw/spec-type-registry.json.
+# color.R/types-simple.R/types-format-options.R). Source of truth:
+# node_modules/@arcgis/charts-components/dist/spec/web-chart.d.ts and
+# .../dist/spec/chart-object-literals.d.ts (see CLAUDE.md).
 #
-# Deferred (see data-raw/resolve-spec-types.R deferred_types): geometry
-# types. WebChartDataFilters$geometry is typed as class_any until those
-# land.
+# WebChartOrderOptions and WebChartMultiAxesDataOrder's orderType are
+# anonymous/single-literal in the current spec (WebChart$orderOptions has
+# no named export anymore) - kept as named classes here for the same
+# reason IStatisticDefinitionStatisticParameters is (R/types-statistics.R):
+# reuse and a stable topic to document.
+#
+# Deferred (see CLAUDE.md): geometry types, live FeatureLayer wiring.
+# WebChartDataFilters$geometry is typed as class_any until those land.
 #
 # Optional properties (not in the schema's `required` array): scalar/enum
 # ones need no special handling - NA already satisfies class_string,
@@ -17,16 +23,20 @@
 
 library(S7)
 
+#' ISimpleFillSymbol
+#' @name ISimpleFillSymbol
 #' @export
 ISimpleFillSymbol := new_class(
   properties = list(
     type = s7x::class_string,
-    style = ISimpleFillSymbolStyle,
+    style = SimpleFillSymbolStyle,
     color = s7x::property_union(Color, NULL, default = NULL),
     outline = s7x::property_union(ISimpleLineSymbol, NULL, default = NULL)
   )
 )
 
+#' WebChartTextSymbol
+#' @name WebChartTextSymbol
 #' @export
 WebChartTextSymbol := new_class(
   properties = list(
@@ -50,6 +60,8 @@ WebChartTextSymbol := new_class(
   )
 )
 
+#' WebChartText
+#' @name WebChartText
 #' @export
 WebChartText := new_class(
   properties = list(
@@ -59,6 +71,8 @@ WebChartText := new_class(
   )
 )
 
+#' WebChartCursorCrosshair
+#' @name WebChartCursorCrosshair
 #' @export
 WebChartCursorCrosshair := new_class(
   properties = list(
@@ -69,6 +83,8 @@ WebChartCursorCrosshair := new_class(
   )
 )
 
+#' WebChartLegend
+#' @name WebChartLegend
 #' @export
 WebChartLegend := new_class(
   properties = list(
@@ -82,6 +98,8 @@ WebChartLegend := new_class(
   )
 )
 
+#' WebChartGuide
+#' @name WebChartGuide
 #' @export
 WebChartGuide := new_class(
   properties = list(
@@ -97,6 +115,8 @@ WebChartGuide := new_class(
   )
 )
 
+#' WebChartAxis
+#' @name WebChartAxis
 #' @export
 WebChartAxis := new_class(
   properties = list(
@@ -124,37 +144,72 @@ WebChartAxis := new_class(
     integerOnlyValues = s7x::class_boolean,
     displayCursorTooltip = s7x::class_boolean,
     buffer = s7x::class_boolean,
-    tickSpacing = s7x::class_double
+    tickSpacing = s7x::class_double,
+    dateBaseInterval = s7x::property_union(
+      TimeIntervalInfo,
+      NULL,
+      default = NULL
+    )
   )
 )
 
+#' WebChartDirectionalDataOrder
+#' @name WebChartDirectionalDataOrder
 #' @export
 WebChartDirectionalDataOrder := new_class(
   properties = list(
-    orderType = WebChartOrderDataByTypes,
+    orderType = WebChartDirectionalDataOrderOrderType,
     orderBy = WebChartSortOrderKinds,
     preferLabel = s7x::class_boolean
   )
 )
 
+#' WebChartMultiAxesDataOrder
+#' @name WebChartMultiAxesDataOrder
+#' @export
+WebChartMultiAxesDataOrder := new_class(
+  properties = list(
+    orderType = s7x::class_string,
+    orderByX = s7x::property_union(
+      S7::class_character,
+      WebChartSortOrderKinds,
+      NULL,
+      default = NULL
+    ),
+    orderByY = s7x::property_union(
+      S7::class_character,
+      WebChartSortOrderKinds,
+      NULL,
+      default = NULL
+    )
+  )
+)
+
+#' WebChartDataFilters
+#' @name WebChartDataFilters
 #' @export
 WebChartDataFilters := new_class(
   properties = list(
     distance = s7x::class_double,
     gdbVersion = s7x::class_string,
     geometry = class_any,
+    objectIds = class_list,
+    spatialRelationship = WebChartQuerySpatialRelationship,
     timeExtent = class_list,
-    units = WebChartDataFiltersUnits,
+    units = RESTUnits,
     where = s7x::class_string
   )
 )
 
+#' WebChartOrderOptions
+#' @name WebChartOrderOptions
 #' @export
 WebChartOrderOptions := new_class(
   properties = list(
     series = s7x::property_union(WebChartOrderSeriesBy, NULL, default = NULL),
     data = s7x::property_union(
       WebChartDirectionalDataOrder,
+      WebChartMultiAxesDataOrder,
       WebChartPredefinedLabelsDataOrder,
       NULL,
       default = NULL

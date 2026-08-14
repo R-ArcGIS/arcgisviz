@@ -1,8 +1,9 @@
-# Enums for ArcGIS Charts WebChart* spec types. Generated from
-# data-raw/enums.json (see data-raw/resolve-spec-types.R and
-# data-raw/extract-enums.R for provenance). Coincidentally-identical
-# variant sets that shared no named type in the spec were merged into one
-# enum; see the commit/PR notes for which originals were folded together.
+# Enums for ArcGIS Charts WebChart* config types. Source of truth is the
+# spec bundled inside @arcgis/charts-components (not the standalone, stale
+# @arcgis/charts-model/@arcgis/charts-spec packages - see CLAUDE.md):
+# node_modules/@arcgis/charts-components/dist/spec/chart-object-literals.d.ts
+# and .../dist/spec/web-chart.d.ts (for inline literal-union properties with
+# no named export - those get a ParentType+propertyPath name here).
 
 #' @export
 WebChartStackedKinds <- s7x::new_enum(
@@ -16,17 +17,21 @@ WebChartLegendPositions <- s7x::new_enum(
   c("bottom", "left", "right", "top")
 )
 
+# Renamed from the old WebChartTimeIntervalUnits ("esriTimeUnitsDays" etc) -
+# the current spec uses plain unit words instead, and nests this inside
+# WebChartTemporalBinning$unit rather than flat series properties.
 #' @export
-WebChartTimeIntervalUnits <- s7x::new_enum(
-  "WebChartTimeIntervalUnits",
+WebChartTemporalBinningUnits <- s7x::new_enum(
+  "WebChartTemporalBinningUnits",
   c(
-    "esriTimeUnitsDays",
-    "esriTimeUnitsHours",
-    "esriTimeUnitsMinutes",
-    "esriTimeUnitsMonths",
-    "esriTimeUnitsSeconds",
-    "esriTimeUnitsWeeks",
-    "esriTimeUnitsYears"
+    "days",
+    "hours",
+    "minutes",
+    "months",
+    "quarters",
+    "seconds",
+    "weeks",
+    "years"
   )
 )
 
@@ -43,29 +48,16 @@ WebChartNullPolicyTypes <- s7x::new_enum(
 )
 
 #' @export
-WebChartOrderDataByTypes <- s7x::new_enum(
-  "WebChartOrderDataByTypes",
-  c(
-    "arcgis-charts-category",
-    "arcgis-charts-mean",
-    "arcgis-charts-median",
-    "arcgis-charts-y-value"
-  )
-)
-
-#' @export
 WebChartSortOrderKinds <- s7x::new_enum(
   "WebChartSortOrderKinds",
   c("ASC", "DESC")
 )
 
-# Merged: WebChart.horizontalAxisLabelsBehavior + WebChart.verticalAxisLabelsBehavior
-# (identical 4-value variant set at the type level, per the JSON schema;
-# the two properties differ in which subset is practically meaningful,
-# but that's a business-rule constraint, not a type-level one)
+# Renamed from the old WebChartAxisLabelsBehavior - same 4 values, current
+# spec calls the exported const WebChartLabelBehavior.
 #' @export
-WebChartAxisLabelsBehavior <- s7x::new_enum(
-  "WebChartAxisLabelsBehavior",
+WebChartLabelBehavior <- s7x::new_enum(
+  "WebChartLabelBehavior",
   c("hide", "rotate", "stagger", "wrap")
 )
 
@@ -81,15 +73,36 @@ WebChartTextSymbolHorizontalAlignment <- s7x::new_enum(
   c("center", "justify", "left", "right")
 )
 
+# WebChartDirectionalDataOrder.orderType is an inline 4-value literal union
+# in web-chart.d.ts (not the same as the unused, unreferenced
+# WebChartOrderDataByTypes 5-value exported const - that one is dead code
+# from our end, nothing in WebChart actually has that type).
 #' @export
-WebChartDataFiltersUnits <- s7x::new_enum(
-  "WebChartDataFiltersUnits",
+WebChartDirectionalDataOrderOrderType <- s7x::new_enum(
+  "WebChartDirectionalDataOrderOrderType",
   c(
-    "feet",
-    "kilometers",
-    "meters",
-    "miles",
-    "nautical-miles",
-    "us-nautical-miles"
+    "arcgis-charts-category",
+    "arcgis-charts-mean",
+    "arcgis-charts-median",
+    "arcgis-charts-y-value"
+  )
+)
+
+# WebChartQuery.spatialRelationship is an inline literal union, needed for
+# WebChartDataFilters (Pick<WebChartQuery, ... "spatialRelationship" ...>).
+#' @export
+WebChartQuerySpatialRelationship <- s7x::new_enum(
+  "WebChartQuerySpatialRelationship",
+  c(
+    "contains",
+    "crosses",
+    "disjoint",
+    "envelope-intersects",
+    "index-intersects",
+    "intersects",
+    "overlaps",
+    "relation",
+    "touches",
+    "within"
   )
 )

@@ -1,5 +1,11 @@
 library(S7)
 
+#' Color
+#'
+#' An RGBA color, as `r`/`g`/`b`/`a` components rather than the spec's raw
+#' `[r,g,b,a]` tuple.
+#'
+#' @name Color
 #' @export
 Color := new_class(
   properties = list(

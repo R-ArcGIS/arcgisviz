@@ -1,6 +1,6 @@
 # htmlwidgets binding for the <arcgis-chart> web component from
 # @arcgis/charts-components. See srcjs/README.md for the JS-side
-# architecture and docs/js-widget-architecture.md for the full data flow.
+# architecture and dev-docs/js-widget-architecture.md for the full data flow.
 #
 # Serialization of our S7 WebChart/WebChartBarChartSeries config classes
 # into this widget's payload is deferred (see s7x to_json()/from_json(),
