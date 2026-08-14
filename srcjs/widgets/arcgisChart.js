@@ -50,14 +50,19 @@ HTMLWidgets.widget({
     return {
       renderValue: async function (x) {
         try {
-          var model = await createModel({
+          // Build defaults first, merge R's sparse config over them, then
+          // create the real model from the complete config. Assigning
+          // `model.config` post-setup instead re-adds series before axes
+          // ("There are no X axes on chart").
+          var defaults = await createModel({
             iLayer: x.iLayer,
             chartType: x.chartType,
           });
 
-          if (x.config) {
-            model.config = deepMerge(model.config, x.config);
-          }
+          var model = await createModel({
+            iLayer: x.iLayer,
+            config: deepMerge(defaults.config, x.config),
+          });
 
           // `layer` is a getter (WithLayer); there is no getLayer() method.
           chartEl.layer = model.layer;
