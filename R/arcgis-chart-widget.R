@@ -19,7 +19,8 @@
 #' @param i_layer A list giving the JSON layer definition (`IFeatureLayer`),
 #'   e.g. built with `arcgisutils::as_layer()`.
 #' @param chart_type One of the `@arcgis/charts-components` `ModelTypes`
-#'   strings, e.g. `"barChart"`, `"lineChart"`, `"scatterplot"`.
+#'   strings, e.g. `"barChart"`, `"lineChart"`, `"scatterplot"`. Validated
+#'   against [ModelTypes()].
 #' @param x_field,y_field Field names to assign to the chart's x/y axes.
 #' @param width,height Widget sizing, passed to [htmlwidgets::createWidget()].
 #' @param element_id Optional DOM element ID for the widget.
@@ -34,9 +35,11 @@ arcgis_chart <- function(
   height = NULL,
   element_id = NULL
 ) {
+  chart_type <- ModelTypes(chart_type)
+
   x <- list(
     iLayer = i_layer,
-    chartType = chart_type,
+    chartType = as.character(chart_type),
     xField = x_field,
     yField = y_field
   )

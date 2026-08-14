@@ -23,6 +23,7 @@ Collate:
     'types-webchart.R'
     'types-bar-chart.R'
     'types-scatter-plot.R'
+    'enums-widget.R'
     'arcgis-chart-widget.R'
 Imports:
     S7,
