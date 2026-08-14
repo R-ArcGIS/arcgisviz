@@ -67,21 +67,34 @@ from the JSON file.
 
 `<arcgis-chart>` takes a live `layer` (a `FeatureLayer` instance) and
 `model` (a `BarChartModel`/etc. instance) as *properties*, not a plain
-JSON config. `createModel({ iLayer, chartType })` (from
+JSON config. `createModel({ iLayer, config })` (from
 `@arcgis/charts-components`) builds the `FeatureLayer` internally from the
-JSON `iLayer` you pass it (no live service needed for a
-`type: "featureCollection"` layer) - get it back with `model.getLayer()`
-to hand to `<arcgis-chart>`. Don't try to construct a `FeatureLayer`
-yourself from the `iLayer` JSON; `createModel` already does it and
-`model.getLayer()` is the documented way to retrieve it.
+JSON `iLayer` you pass it (no live service needed for a feature
+collection) - get it back with `model.getLayer()` to hand to
+`<arcgis-chart>`. Don't try to construct a `FeatureLayer` yourself from the
+`iLayer` JSON; `createModel` already does it and `model.getLayer()` is the
+documented way to retrieve it.
 
-`chartType` values come from `@arcgis/charts-components`' `ModelTypes`
-(`model/interfaces/common.d.ts`): `"barChart"`, `"lineChart"`,
-`"comboBarLineChart"`, `"boxPlot"`, `"pieChart"`, `"scatterplot"`,
-`"histogram"`, `"gauge"`, `"radarChart"`, `"heatChart"`. These are
-deliberately different strings from the config-level series `type`
-discriminators (e.g. `WebChartBarChartSeries.type = "barSeries"`) - don't
-confuse the two when wiring a new chart type through.
+`createModel()` accepts five prop combinations
+(`dist/model/shared/setup-utils.d.ts`); this widget uses
+`ILayerAndSourcelessConfig` = `{ iLayer, config }`, where `config` is a
+`ChartConfig<T>` - i.e. exactly the `WebChart` shape the R type layer
+builds. **There is no `chartType` on this path**: the model type is derived
+from `config.series[0].type` (`dist/chunks/model-types.js`), and a series
+list containing both a `lineSeries` and a `barSeries` is auto-detected as a
+combo chart (`dist/chunks/series-types.js`). The older
+`{ iLayer, chartType }` form still exists in the SDK but produces a
+defaults-only model, throwing away the config - don't go back to it.
+
+`ModelTypes` strings (`"barChart"`, `"scatterplot"`, …) are therefore only
+relevant if you ever use that defaults-only path. They're deliberately
+different strings from the config-level series `type` discriminators (e.g.
+`WebChartBarChartSeries.type = "barSeries"`) - don't confuse the two.
+
+R-side payload construction (the `iLayer` shape `createModel` actually
+reads, why unset config properties must be dropped rather than sent as
+`null`, and the `TOJSON_ARGS` data-frame gotcha) lives in `R/arc-data.R` -
+see its header comment and the "Data transfer" section of `CLAUDE.md`.
 
 ## Verifying a change (no browser available here)
 
@@ -89,17 +102,23 @@ There's no browser automation in this environment. The verification
 ceiling is:
 
 ```r
-library(S7); library(s7x); library(arcgisutils)
 devtools::load_all(quiet = TRUE)
-df <- data.frame(x = c("a","b"), y = c(1, 2))
-lyr <- arcgisutils::as_layer(df, name = "test", title = "Test")
-w <- arcgis_chart(i_layer = lyr, chart_type = "barChart", x_field = "x", y_field = "y")
+df <- data.frame(category = c("a","b"), value = c(1, 2))
+w <- as_widget(arc_bar(df, category, value))
 out <- tempfile(fileext = ".html")
 htmlwidgets::saveWidget(w, out, selfcontained = FALSE)
 # then grep the output for the expected <script>/<link> tags and the
 # embedded x payload - see dev-docs/js-widget-architecture.md for what a
 # correct output looks like.
 ```
+
+Note `htmlwidgets:::toJSON(w)` (the whole widget, not `w$x`) is what
+respects the widget's `TOJSON_FUNC` attribute - inspecting `w$x` alone
+silently serializes with htmlwidgets' own defaults and will mislead you.
+This widget installs its own yyjsonr serializer (`widget_json()` in
+`R/arc-data.R`) via that hook; prefer our own serialization over a host
+package's wherever the option exists.
+`tests/testthat/test-data-transfer.R` already locks in the payload shapes.
 
 This confirms the R -> JSON -> htmlwidget dependency-resolution pipeline
 end-to-end, and that webpack produced valid, loadable JS. It does **not**

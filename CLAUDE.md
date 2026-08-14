@@ -75,10 +75,13 @@ zero new code since `WebChart$series` is an untyped `class_list`) have
 complete S7 type stacks (config classes + enums), rebuilt against
 `@arcgis/charts-components`'s bundled spec (see above) and verified to
 construct end-to-end with realistic, minimally-specified data (see
-`tests/testthat/test-type-defaults.R`). The htmlwidget (`arcgis_chart()`)
-is unverified/known-broken right now (`srcjs/widgets/arcgisChart.js`) and
-not current work. Box plot, pie, gauge, histogram, and radar chart types
-are not yet modeled.
+`tests/testthat/test-type-defaults.R`). On top of that sits a public API
+that exposes no S7 objects (`R/arc-chart.R`: `arc_chart() |> set_type() |>
+set_x() |> set_y()`, plus `arc_bar()`/`arc_scatter()`/`arc_line()` sugar,
+tidy-eval bare column names, friendly kebab-case type names) and a data
+-transfer layer (`R/arc-data.R`) that turns a data frame + config into the
+widget payload. Box plot, pie, gauge, histogram, and radar chart types are
+not yet modeled.
 
 ## Serialization
 
@@ -90,6 +93,49 @@ generic `S7_object` method in `s7x` (`as_vector(x)` +
 coverage lives in `s7x`, not this package's test suite. `from_json()` (JSON
 -> S7 object) doesn't exist yet - harder problem, needs to know which class
 to construct into.
+
+## Data transfer (R -> browser)
+
+`R/arc-data.R` builds the `createModel()` payload; its header comment cites
+the exact `@arcgis/charts-components` dist files/functions each rule comes
+from, and `tests/testthat/test-data-transfer.R` asserts the shapes. The
+non-obvious parts:
+
+- `createModel()` takes `{ iLayer, config }` - **not** `{ iLayer, chartType }`.
+  `config` is a `ChartConfig<T>`, which is exactly our `WebChart` shape, so
+  the whole S7 type layer ships as-is. The chart type is derived from
+  `config.series[0].type` (`dist/chunks/model-types.js`), and a series list
+  with both a `lineSeries` and a `barSeries` is auto-detected as a combo
+  chart - so R never names the chart type on this path.
+- `iLayer` needs `layerType = "ArcGISFeatureLayer"` and carries the data at
+  `featureCollection$layers[[1]]$featureSet` / `$layerDefinition`. The
+  converter (`gi`, `dist/chunks/index2.js`) reads *only* those paths plus
+  `fields`/`objectIdField`/`geometryType`/`spatialReference` - which is
+  precisely what `arcgisutils::as_feature_collection()` emits.
+- Unset properties must be **dropped**, not sent as JSON `null`.
+  `s7x::as_vector()` materializes every property (16 of `WebChart`'s 20
+  top-level ones are NA/NULL for a minimal chart), and `createModel()`
+  layers `config` over its own defaults, so an explicit null overrides a
+  default instead of falling back to it. That's `compact_config()`.
+- `compact_config()` also converts `Color` back to the spec's raw
+  `[r,g,b,a]` tuple, undoing this package's deliberate r/g/b/a exception on
+  the way out.
+- **We serialize the widget payload ourselves.** The widget sets
+  `attr(x, "TOJSON_FUNC") <- widget_json`, htmlwidgets' documented hook for
+  replacing its serializer outright, so nothing depends on
+  htmlwidgets'/jsonlite's defaults. `widget_json()` is yyjsonr-based (same
+  engine as `s7x::to_json()`), and yyjsonr's defaults are the correct ones
+  here where jsonlite's are not: `dataframe = "rows"` (jsonlite defaults to
+  "columns", which silently breaks `layerDefinition$fields` - the JS does
+  `fields.map(Field.fromJSON)` and needs an array of objects) and
+  `str_specials`/`num_specials = "null"` for NA. Prefer our own
+  serialization over a host package's wherever the option exists.
+  htmlwidgets hands the function the whole payload (`x`, `evals`,
+  `jsHooks`), not just `x`, and expects a JSON string back.
+- Single-shot only: the whole collection goes over in one payload.
+  `arcgisutils::as_esri_features()` is the per-feature JSON a future
+  batched path would stream (cf. the SDK's large-collection sample, which
+  does that via `applyEdits()` on a *live* layer), but nothing needs it yet.
 
 ## Deliberately deferred (don't "fix" these without asking)
 

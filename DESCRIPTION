@@ -25,6 +25,7 @@ Collate:
     'types-scatter-plot.R'
     'types-line-chart.R'
     'arc-chart.R'
+    'arc-data.R'
     'enums-widget.R'
     'arcgis-chart-widget.R'
 Imports:

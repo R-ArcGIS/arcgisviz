@@ -5,9 +5,9 @@ import { createModel } from "@arcgis/charts-components";
 // Registers the <arcgis-chart> custom element (lazy-loads its chunk on
 // first use). See srcjs/README.md for the overall architecture: R builds
 // a self-contained `iLayer` (feature collection) JSON via arcgisutils and
-// hands it to this widget along with a chartType + field mappings.
-// Serialization of our full S7 WebChart config is deferred - for now we
-// only set the x/y field mappings via the model's documented setters.
+// the full chart `config` (the WebChart shape) from its S7 type layer, and
+// hands both to createModel(). The chart type is derived from
+// config.series[0].type - there is no separate chartType to pass.
 defineChartElements(window);
 
 HTMLWidgets.widget({
@@ -27,15 +27,8 @@ HTMLWidgets.widget({
         try {
           var model = await createModel({
             iLayer: x.iLayer,
-            chartType: x.chartType,
+            config: x.config,
           });
-
-          if (x.xField) {
-            await model.setXAxisField(x.xField);
-          }
-          if (x.yField) {
-            await model.setYAxisField(x.yField);
-          }
 
           chartEl.layer = model.getLayer();
           chartEl.model = model;

@@ -2,47 +2,46 @@
 # @arcgis/charts-components. See srcjs/README.md for the JS-side
 # architecture and dev-docs/js-widget-architecture.md for the full data flow.
 #
-# Serialization of our S7 WebChart/WebChartBarChartSeries config classes
-# into this widget's payload is deferred (see s7x to_json()/from_json(),
-# not yet implemented). For now `i_layer` is a plain list - the JSON
-# layer definition produced by arcgisutils (e.g. a `type = "featureCollection"`
-# layer) - and only the x/y field mappings are set on the model directly.
+# This is the low-level widget constructor: both arguments are already-plain
+# lists. Building them from a data frame and an S7 config is R/arc-data.R's
+# job (`as_chart_layer()` / `as_widget()`), which also documents the
+# createModel() contract this payload has to satisfy.
 
 #' Render an ArcGIS chart
 #'
 #' Creates an htmlwidget wrapping the `<arcgis-chart>` web component. The
 #' chart's model and layer are created client-side (in the browser) from
-#' `i_layer` via the JS `createModel()` function - no live ArcGIS Server
-#' feature service is required when `i_layer` is a self-contained feature
-#' collection (see `arcgisutils::as_layer()`/`as_feature_collection()`).
+#' `i_layer` and `config` via the JS `createModel()` function - no live
+#' ArcGIS Server feature service is required when `i_layer` is a
+#' self-contained feature collection (see [as_chart_layer()]).
+#'
+#' Most users want [arc_bar()]/[arc_scatter()]/[arc_line()] instead, which
+#' build both arguments for you.
 #'
 #' @param i_layer A list giving the JSON layer definition (`IFeatureLayer`),
-#'   e.g. built with `arcgisutils::as_layer()`.
-#' @param chart_type One of the `@arcgis/charts-components` `ModelTypes`
-#'   strings, e.g. `"barChart"`, `"lineChart"`, `"scatterplot"`. Validated
-#'   against [ModelTypes()].
-#' @param x_field,y_field Field names to assign to the chart's x/y axes.
+#'   e.g. built with [as_chart_layer()].
+#' @param config A list giving the chart config (`ChartConfig`, i.e. the
+#'   `WebChart` shape). The chart type is derived from its first series'
+#'   `type`, so no separate chart-type argument is needed.
 #' @param width,height Widget sizing, passed to [htmlwidgets::createWidget()].
 #' @param element_id Optional DOM element ID for the widget.
 #'
 #' @export
 arcgis_chart <- function(
   i_layer,
-  chart_type = "barChart",
-  x_field = NULL,
-  y_field = NULL,
+  config,
   width = NULL,
   height = NULL,
   element_id = NULL
 ) {
-  chart_type <- ModelTypes(chart_type)
-
   x <- list(
     iLayer = i_layer,
-    chartType = as.character(chart_type),
-    xField = x_field,
-    yField = y_field
+    config = config
   )
+
+  # Serialize with our own yyjsonr-based function rather than htmlwidgets'
+  # jsonlite defaults - see `widget_json()` in R/arc-data.R.
+  attr(x, "TOJSON_FUNC") <- widget_json
 
   htmlwidgets::createWidget(
     name = "arcgisChart",

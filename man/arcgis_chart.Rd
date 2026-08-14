@@ -4,25 +4,15 @@
 \alias{arcgis_chart}
 \title{Render an ArcGIS chart}
 \usage{
-arcgis_chart(
-  i_layer,
-  chart_type = "barChart",
-  x_field = NULL,
-  y_field = NULL,
-  width = NULL,
-  height = NULL,
-  element_id = NULL
-)
+arcgis_chart(i_layer, config, width = NULL, height = NULL, element_id = NULL)
 }
 \arguments{
 \item{i_layer}{A list giving the JSON layer definition (\code{IFeatureLayer}),
-e.g. built with \code{arcgisutils::as_layer()}.}
+e.g. built with \code{\link[=as_chart_layer]{as_chart_layer()}}.}
 
-\item{chart_type}{One of the \verb{@arcgis/charts-components} \code{ModelTypes}
-strings, e.g. \code{"barChart"}, \code{"lineChart"}, \code{"scatterplot"}. Validated
-against \code{\link[=ModelTypes]{ModelTypes()}}.}
-
-\item{x_field, y_field}{Field names to assign to the chart's x/y axes.}
+\item{config}{A list giving the chart config (\code{ChartConfig}, i.e. the
+\code{WebChart} shape). The chart type is derived from its first series'
+\code{type}, so no separate chart-type argument is needed.}
 
 \item{width, height}{Widget sizing, passed to \code{\link[htmlwidgets:createWidget]{htmlwidgets::createWidget()}}.}
 
@@ -31,7 +21,11 @@ against \code{\link[=ModelTypes]{ModelTypes()}}.}
 \description{
 Creates an htmlwidget wrapping the \verb{<arcgis-chart>} web component. The
 chart's model and layer are created client-side (in the browser) from
-\code{i_layer} via the JS \code{createModel()} function - no live ArcGIS Server
-feature service is required when \code{i_layer} is a self-contained feature
-collection (see \code{arcgisutils::as_layer()}/\code{as_feature_collection()}).
+\code{i_layer} and \code{config} via the JS \code{createModel()} function - no live
+ArcGIS Server feature service is required when \code{i_layer} is a
+self-contained feature collection (see \code{\link[=as_chart_layer]{as_chart_layer()}}).
+}
+\details{
+Most users want \code{\link[=arc_bar]{arc_bar()}}/\code{\link[=arc_scatter]{arc_scatter()}}/\code{\link[=arc_line]{arc_line()}} instead, which
+build both arguments for you.
 }
