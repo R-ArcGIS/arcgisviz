@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@arcgis/charts-model": "^4.32.15"
+  }
+}

@@ -1,0 +1,339 @@
+{
+  "named_enums": {
+    "RESTStatisticType": {
+      "values": ["avg", "centroid-aggregate", "convex-hull-aggregate", "count", "envelope-aggregate", "max", "min", "no_aggregation", "percentile_cont", "percentile_disc", "stddev", "sum", "var"],
+      "nullable": false,
+      "description": null
+    },
+    "WebChartStackedKinds": {
+      "values": ["sideBySide", "stacked", "stacked100"],
+      "nullable": false,
+      "description": null
+    },
+    "WebChartLegendPositions": {
+      "values": ["bottom", "left", "right", "top"],
+      "nullable": false,
+      "description": null
+    },
+    "WebChartTimeIntervalUnits": {
+      "values": ["esriTimeUnitsDays", "esriTimeUnitsHours", "esriTimeUnitsMinutes", "esriTimeUnitsMonths", "esriTimeUnitsSeconds", "esriTimeUnitsWeeks", "esriTimeUnitsYears"],
+      "nullable": false,
+      "description": "Represents the different types of time intervals that can be applied to a chart using the time binning feature."
+    },
+    "WebChartTimeAggregationTypes": {
+      "values": ["equalIntervalsFromEndTime", "equalIntervalsFromStartTime"],
+      "nullable": false,
+      "description": "Represents the different types of time aggregation that can be applied to a chart using the time binning feature."
+    },
+    "WebChartNullPolicyTypes": {
+      "values": ["interpolate", "null", "zero"],
+      "nullable": false,
+      "description": "Represents the different types of null policy that can be applied to a chart using the time binning feature."
+    },
+    "FieldType": {
+      "values": ["esriFieldTypeBlob", "esriFieldTypeDate", "esriFieldTypeDouble", "esriFieldTypeGUID", "esriFieldTypeGeometry", "esriFieldTypeGlobalID", "esriFieldTypeInteger", "esriFieldTypeOID", "esriFieldTypeRaster", "esriFieldTypeSingle", "esriFieldTypeSmallInteger", "esriFieldTypeString", "esriFieldTypeXML"],
+      "nullable": false,
+      "description": "Field type."
+    },
+    "DomainType": {
+      "values": ["codedValue", "inherited", "range"],
+      "nullable": false,
+      "description": "Domain types"
+    },
+    "WebChartOrderDataByTypes": {
+      "values": ["arcgis-charts-category", "arcgis-charts-mean", "arcgis-charts-median", "arcgis-charts-y-value"],
+      "nullable": false,
+      "description": "The types of order assocated with chart data."
+    },
+    "WebChartSortOrderKinds": {
+      "values": ["ASC", "DESC"],
+      "nullable": false,
+      "description": null
+    }
+  },
+  "inline_enum_usages": [
+    {
+      "path": "WebChart.horizontalAxisLabelsBehavior",
+      "values": ["hide", "rotate", "stagger", "wrap"],
+      "nullable": false,
+      "description": "Represents the way the labels should behave when the horizontal axis can't display them all.\nThe available options are: \"none\", \"rotate\", \"stagger\" and \"wrap\".\nFor XY Chart only. Histogram can handle \"none\" and \"rotate\" only.\nThe default value for the horizontal axis is \"rotate\"."
+    },
+    {
+      "path": "WebChart.verticalAxisLabelsBehavior",
+      "values": ["hide", "rotate", "stagger", "wrap"],
+      "nullable": false,
+      "description": "Represents the way the labels should behave when the vertical axis can't display them all. For XY Chart only.\nThe available options are: \"none\" and \"wrap\".\nThe default value for the vertical axis is \"wrap\"."
+    },
+    {
+      "path": "WebChart.stackedType",
+      "values": ["sideBySide", "stacked", "stacked100"],
+      "nullable": false,
+      "description": "Specifies how the bars/lines should be placed when multiple series are rendered in the same chart, say when \"split by\" operation is executed on any field or\nwhen multiple attributes/fields corresponding to the same set of classes are to be visualized.\n\nCurrently this property is only used for bar and line series.",
+      "matches_named": "WebChartStackedKinds"
+    },
+    {
+      "path": "WebChartBarChartSeries.timeIntervalUnits",
+      "values": ["esriTimeUnitsDays", "esriTimeUnitsHours", "esriTimeUnitsMinutes", "esriTimeUnitsMonths", "esriTimeUnitsSeconds", "esriTimeUnitsWeeks", "esriTimeUnitsYears"],
+      "nullable": false,
+      "description": "The time unit that corresponds to the `timeIntervalSize`. Valid options include seconds, minutes, hours, days, weeks, months, and years.",
+      "matches_named": "WebChartTimeIntervalUnits"
+    },
+    {
+      "path": "WebChartBarChartSeries.timeAggregationType",
+      "values": ["equalIntervalsFromEndTime", "equalIntervalsFromStartTime"],
+      "nullable": false,
+      "description": "The time interval alignment type. Valid options include `equalIntervalsFromStartTime` and `equalIntervalsFromEndTime`.",
+      "matches_named": "WebChartTimeAggregationTypes"
+    },
+    {
+      "path": "WebChartBarChartSeries.nullPolicy",
+      "values": ["interpolate", "null", "zero"],
+      "nullable": false,
+      "description": "How summarized bins returning a null value are displayed. Supported options are:\n- `null`, `zero`, and `interpolate` for line series\n- `null` and `zero` for bar series",
+      "matches_named": "WebChartNullPolicyTypes"
+    },
+    {
+      "path": "WebChartTextSymbol.verticalAlignment",
+      "values": ["baseline", "bottom", "middle", "top"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "WebChartTextSymbol.horizontalAlignment",
+      "values": ["center", "justify", "left", "right"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "LegendItemVisibility.overlayType",
+      "values": ["Mean", "Median", "Normal Distribution", "Standard Deviation", "Trendline"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "WebChartDataFilters.units",
+      "values": ["feet", "kilometers", "meters", "miles", "nautical-miles", "us-nautical-miles"],
+      "nullable": false,
+      "description": "The unit for calculating the buffer distance when `distance` and `geometry` are provided.\nIf not specified, the unit is derived from the geometry spatial reference."
+    },
+    {
+      "path": "ISimpleLineSymbol.style",
+      "values": ["esriSLSDash", "esriSLSDashDot", "esriSLSDashDotDot", "esriSLSDot", "esriSLSNull", "esriSLSSolid"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "ISimpleFillSymbol.style",
+      "values": ["esriSFSBackwardDiagonal", "esriSFSCross", "esriSFSDiagonalCross", "esriSFSForwardDiagonal", "esriSFSHorizontal", "esriSFSNull", "esriSFSSolid", "esriSFSVertical"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "WebChartLegend.position",
+      "values": ["bottom", "left", "right", "top"],
+      "nullable": false,
+      "description": "Positions the legends at `\"right\"`, `\"left\"`, `\"top\"`, or `\"bottom\"` of the chart.",
+      "matches_named": "WebChartLegendPositions"
+    },
+    {
+      "path": "WebChartPieChartLegend.position",
+      "values": ["bottom", "left", "right", "top"],
+      "nullable": false,
+      "description": "Positions the legends at `\"right\"`, `\"left\"`, `\"top\"`, or `\"bottom\"` of the chart.",
+      "matches_named": "WebChartLegendPositions"
+    },
+    {
+      "path": "WebChartOrderSeriesBy.orderBy",
+      "values": ["ASC", "DESC"],
+      "nullable": false,
+      "description": "The direction of the order.",
+      "matches_named": "WebChartSortOrderKinds"
+    },
+    {
+      "path": "Intl.DateTimeFormatOptions.localeMatcher",
+      "values": ["best fit", "lookup"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.DateTimeFormatOptions.weekday",
+      "values": ["long", "narrow", "short"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.DateTimeFormatOptions.era",
+      "values": ["long", "narrow", "short"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.DateTimeFormatOptions.year",
+      "values": ["2-digit", "numeric"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.DateTimeFormatOptions.month",
+      "values": ["2-digit", "long", "narrow", "numeric", "short"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.DateTimeFormatOptions.day",
+      "values": ["2-digit", "numeric"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.DateTimeFormatOptions.hour",
+      "values": ["2-digit", "numeric"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.DateTimeFormatOptions.minute",
+      "values": ["2-digit", "numeric"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.DateTimeFormatOptions.second",
+      "values": ["2-digit", "numeric"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.DateTimeFormatOptions.timeZoneName",
+      "values": ["long", "longGeneric", "longOffset", "short", "shortGeneric", "shortOffset"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.DateTimeFormatOptions.formatMatcher",
+      "values": ["basic", "best fit"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.DateTimeFormatOptions.dayPeriod",
+      "values": ["long", "narrow", "short"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.DateTimeFormatOptions.dateStyle",
+      "values": ["full", "long", "medium", "short"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.DateTimeFormatOptions.timeStyle",
+      "values": ["full", "long", "medium", "short"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.DateTimeFormatOptions.hourCycle",
+      "values": ["h11", "h12", "h23", "h24"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.DateTimeFormatOptions.fractionalSecondDigits",
+      "values": [1, 2, 3],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.NumberFormatOptions.localeMatcher",
+      "values": ["best fit", "lookup"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.NumberFormatOptions.style",
+      "values": ["currency", "decimal", "percent", "unit"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.NumberFormatOptions.currencyDisplay",
+      "values": ["code", "name", "narrowSymbol", "symbol"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.NumberFormatOptions.compactDisplay",
+      "values": ["long", "short"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.NumberFormatOptions.notation",
+      "values": ["compact", "engineering", "scientific", "standard"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.NumberFormatOptions.signDisplay",
+      "values": ["always", "auto", "exceptZero", "never"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.NumberFormatOptions.unitDisplay",
+      "values": ["long", "narrow", "short"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "Intl.NumberFormatOptions.currencySign",
+      "values": ["accounting", "standard"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "IFont.style",
+      "values": ["italic", "normal", "oblique"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "IFont.weight",
+      "values": ["bold", "bolder", "lighter", "normal"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "IFont.decoration",
+      "values": ["line-through", "none", "underline"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "IStatisticDefinition.statisticType",
+      "values": ["avg", "centroid-aggregate", "convex-hull-aggregate", "count", "envelope-aggregate", "max", "min", "percentile_cont", "percentile_disc", "stddev", "sum", "var"],
+      "nullable": false,
+      "description": "Statistical operation to perform (count, sum, min, max, avg, stddev, var, percentile_cont, percentile_disc, EnvelopeAggregate, CentroidAggregate, ConvexHullAggregate)."
+    },
+    {
+      "path": "IStatisticDefinition.statisticParameters.orderBy",
+      "values": ["asc", "desc"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "ISimpleMarkerSymbol.style",
+      "values": ["esriSMSCircle", "esriSMSCross", "esriSMSDiamond", "esriSMSSquare", "esriSMSTriangle", "esriSMSX"],
+      "nullable": false,
+      "description": null
+    },
+    {
+      "path": "SizePolicy.scaleType",
+      "values": ["linear", "logarithmic"],
+      "nullable": false,
+      "description": "The type of scale to apply to the markers (linear or logarithmic)"
+    }
+  ]
+}

@@ -1,0 +1,3730 @@
+{
+  "WebChart": {
+    "kind": "object",
+    "properties": {
+      "version": {
+        "kind": "const",
+        "value": "18.1.0",
+        "description": "Version of the specification. Used to identify when a saved config was created."
+      },
+      "type": {
+        "kind": "const",
+        "value": "chart",
+        "description": "Represents a unique string identifier for the Chart object. For Chart object, it is **chart**."
+      },
+      "id": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Can be used to uniquely identify a chart. The consumer app can choose whether to use it or not."
+      },
+      "dataFilters": {
+        "kind": "ref",
+        "ref": "WebChartDataFilters",
+        "description": "Used to filter the chart's data while in Layer mode."
+      },
+      "title": {
+        "kind": "ref",
+        "ref": "WebChartText",
+        "description": "Specifies heading/title of the chart."
+      },
+      "subTitle": {
+        "kind": "ref",
+        "ref": "WebChartText",
+        "description": "Specifies sub-heading/subtitle of the chart."
+      },
+      "footer": {
+        "kind": "ref",
+        "ref": "WebChartText",
+        "description": "Specifies footer of the chart"
+      },
+      "background": {
+        "kind": "tuple",
+        "items": [
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          }
+        ],
+        "minItems": 4,
+        "maxItems": 4,
+        "nullable": false,
+        "description": "Specifies the background color of the chart."
+      },
+      "theme": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "A unique string that specifies the styling theme currently applied to the chart. This property needs to finalized and not in active use currently."
+      },
+      "cursorCrosshair": {
+        "kind": "ref",
+        "ref": "WebChartCursorCrosshair",
+        "description": "Specifies cursor's crosshair information for the chart. Only for XY charts."
+      },
+      "legend": {
+        "kind": "anyOf",
+        "alternatives": [
+          {
+            "kind": "ref",
+            "ref": "WebChartLegend"
+          },
+          {
+            "kind": "ref",
+            "ref": "WebChartPieChartLegend"
+          }
+        ],
+        "description": "Specifies the Legend information for the chart."
+      },
+      "axes": {
+        "kind": "tuple",
+        "items": [
+          {
+            "kind": "ref",
+            "ref": "WebChartAxis",
+            "description": null
+          },
+          {
+            "kind": "ref",
+            "ref": "WebChartAxis",
+            "description": null
+          },
+          {
+            "kind": "ref",
+            "ref": "WebChartAxis",
+            "description": null
+          }
+        ],
+        "minItems": 1,
+        "maxItems": 3,
+        "nullable": false,
+        "description": "Represents an array of **at least 1 or at most 3** Chart Axis accompanying the chart. The axes property is optional because Pie chart does not use any axis.\nThe third axis config is used when a series `assignToSecondValueAxis` is set to `true`.\nSome of the axis features won't apply to the third axis (e.g. labels behaviors)."
+      },
+      "horizontalAxisLabelsBehavior": {
+        "kind": "enum",
+        "values": [
+          "hide",
+          "rotate",
+          "stagger",
+          "wrap"
+        ],
+        "nullable": false,
+        "description": "Represents the way the labels should behave when the horizontal axis can't display them all.\nThe available options are: \"none\", \"rotate\", \"stagger\" and \"wrap\".\nFor XY Chart only. Histogram can handle \"none\" and \"rotate\" only.\nThe default value for the horizontal axis is \"rotate\"."
+      },
+      "verticalAxisLabelsBehavior": {
+        "kind": "enum",
+        "values": [
+          "hide",
+          "rotate",
+          "stagger",
+          "wrap"
+        ],
+        "nullable": false,
+        "description": "Represents the way the labels should behave when the vertical axis can't display them all. For XY Chart only.\nThe available options are: \"none\" and \"wrap\".\nThe default value for the vertical axis is \"wrap\"."
+      },
+      "series": {
+        "kind": "array",
+        "items": {
+          "kind": "ref",
+          "ref": "WebChartSeriesType",
+          "description": null
+        },
+        "minItems": 1,
+        "maxItems": null,
+        "nullable": false,
+        "description": "Represents an array of various chart series to be plot inside the chart.\nEmpty array is not allowed."
+      },
+      "rotated": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies whether or not the chart is rotated. Applied to Bar, Line, and Combo Bar and Line charts."
+      },
+      "stackedType": {
+        "kind": "enum",
+        "values": [
+          "sideBySide",
+          "stacked",
+          "stacked100"
+        ],
+        "nullable": false,
+        "description": "Specifies how the bars/lines should be placed when multiple series are rendered in the same chart, say when \"split by\" operation is executed on any field or\nwhen multiple attributes/fields corresponding to the same set of classes are to be visualized.\n\nCurrently this property is only used for bar and line series."
+      },
+      "colorMatch": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies whether to first try matching the colors from the layer renderer or the chart renderer\nfor coloring the chart elements, like markers, line segments, columns, etc.\n\nTo do so, this property needs to be set to `true`.\n\nWhen there is no matching color found (for when `colorMatch = true`) or when `colorMatch = false`,\nthe colors from the config, and then from the color ramps will be used, in that order."
+      },
+      "chartRenderer": {
+        "kind": "unknown",
+        "raw": {
+          "description": "Renderer to use to style the series when the chart uses the color match mode.\nConsidered before the layer's renderer.",
+          "title": "chartRenderer"
+        }
+      },
+      "orderOptions": {
+        "kind": "object",
+        "properties": {
+          "series": {
+            "kind": "ref",
+            "ref": "WebChartOrderSeriesBy",
+            "description": "How series should be ordered and dislayed in a multi-series chart.\nIf not provided the series will be displayed as they are ordered in the config."
+          },
+          "data": {
+            "kind": "anyOf",
+            "alternatives": [
+              {
+                "kind": "ref",
+                "ref": "WebChartDirectionalDataOrder"
+              },
+              {
+                "kind": "ref",
+                "ref": "WebChartPredefinedLabelsDataOrder"
+              }
+            ],
+            "description": "How data for a chart should be ordered. It is recommended to use this property over its sibling `orderByFields` to order the chart data.\n\nIf not provided, the data will be displayed as it was retrieved from the server. No additional ordering will be applied."
+          },
+          "orderByFields": {
+            "kind": "array",
+            "items": {
+              "kind": "primitive",
+              "type": "string",
+              "nullable": false,
+              "minimum": null,
+              "maximum": null,
+              "multipleOf": null,
+              "default": null,
+              "pattern": null,
+              "format": null,
+              "description": null
+            },
+            "minItems": null,
+            "maxItems": null,
+            "nullable": false,
+            "description": "The orderByFields to be sent with the query when retrieving data for the chart.  It represents the desired sorting order of the output result from the server.\n\nMore info present in [JSAPI docs](https://developers.arcgis.com/javascript/latest/api-reference/esri-tasks-support-Query.html#orderByFields).\nThe format of any entry in this array is `field_name sorting_order`. When `sorting_order` is not defined, it is assumed to be ascending"
+          }
+        },
+        "required": null,
+        "nullable": false,
+        "description": "Chart order options (data and series)"
+      },
+      "iLayer": {
+        "kind": "ref",
+        "ref": "IFeatureLayer",
+        "description": "Property representing the layer to be used by the chart."
+      }
+    },
+    "required": [
+      "series",
+      "type",
+      "version"
+    ],
+    "nullable": false,
+    "description": "Gives a JSON representation of the Chart object when using a `iLayer`.",
+    "title": "WebChart"
+  },
+  "WebChartBarChartSeries": {
+    "kind": "object",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "barSeries",
+        "description": "Represents a unique string identifier for the BarChartSeries object. For BarSeries object, it is \"barSeries\"."
+      },
+      "y": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies which field represents the y-coordinates of this series. Empty string or one with just white spaces is not allowed. At least 1 or more word characters (a-z, A-Z, _) are needed."
+      },
+      "fillSymbol": {
+        "kind": "ref",
+        "ref": "ISimpleFillSymbol",
+        "description": "Contains styling info on how the columns/bars should be rendered"
+      },
+      "hideOversizedStackedLabels": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "When true or undefined (default), the labels displayed within a small column or stack are hidden to avoid cluttering.\nWhen false, all the data labels are displayed."
+      },
+      "id": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "A unique string used to differentiate the series on a chart."
+      },
+      "visible": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Hides or shows the series. If the series is has **visible** set to `false`, the corresponding legend is grayed out in the legend box."
+      },
+      "dataTooltipVisible": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Hides or shows data tooltips.\nApplies to all charts but Gauge."
+      },
+      "dataTooltipReverseColor": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Indicates whether to apply the hovered element's color to the background (false) or the outline (true).\nApplies to all charts but Gauge."
+      },
+      "dataTooltipValueFormat": {
+        "kind": "ref",
+        "ref": "NumberFormatOptions",
+        "description": "Defines how to render numeric values in tooltips."
+      },
+      "dataTooltipPercentFormat": {
+        "kind": "ref",
+        "ref": "NumberFormatOptions",
+        "description": "Defines how to render percent values in tooltips.\nCurrently used for stacked 100% bar and line charts, as well as pie charts."
+      },
+      "dataTooltipDateFormat": {
+        "kind": "ref",
+        "ref": "DateTimeFormatOptions",
+        "description": "Defines how to render dates in tooltips.\nCurrently used for bar and line charts using a date x-axis with no time binning."
+      },
+      "name": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies the name of the series. It would be reflected in the chart [legends](#legend)"
+      },
+      "query": {
+        "kind": "ref",
+        "ref": "WebChartSeriesQuery",
+        "description": "Specifies a query object associated with a particular series containing info on what data to fetch for that series."
+      },
+      "x": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies which field represents the x-coordinates of this series. Empty string or one with just white spaces is not allowed. At least 1 or more word characters (a-z, A-Z, _) are needed."
+      },
+      "dataLabels": {
+        "kind": "ref",
+        "ref": "WebChartText",
+        "description": "Specifies how the data labels should be rendered."
+      },
+      "assignToSecondValueAxis": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies whether the series should be assigned to the second value axis, when the `axes` property defines it.\nSupported by bar and line series."
+      },
+      "binTemporalData": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Whether to use the time properties to bin the temporal data.\nIf set to `false` the `timeIntervalSize` and `timeIntervalUnits` properties can be used to set the date axis base interval."
+      },
+      "timeIntervalUnits": {
+        "kind": "enum",
+        "values": [
+          "esriTimeUnitsDays",
+          "esriTimeUnitsHours",
+          "esriTimeUnitsMinutes",
+          "esriTimeUnitsMonths",
+          "esriTimeUnitsSeconds",
+          "esriTimeUnitsWeeks",
+          "esriTimeUnitsYears"
+        ],
+        "nullable": false,
+        "description": "The time unit that corresponds to the `timeIntervalSize`. Valid options include seconds, minutes, hours, days, weeks, months, and years."
+      },
+      "timeIntervalSize": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "The span of time that will be binned or aggregated together. This property must be used in conjunction with `timeIntervalUnits`."
+      },
+      "timeAggregationType": {
+        "kind": "enum",
+        "values": [
+          "equalIntervalsFromEndTime",
+          "equalIntervalsFromStartTime"
+        ],
+        "nullable": false,
+        "description": "The time interval alignment type. Valid options include `equalIntervalsFromStartTime` and `equalIntervalsFromEndTime`."
+      },
+      "trimIncompleteTimeInterval": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Determines whether incomplete time intervals at the start or end of the data span (depending on the `timeAggregationType`) will be removed from the chart.\nIncomplete intervals on a chart can cause misleading results in which the period in question is under- or overreported due to a different amount of time in the interval.\nSetting `true` indicates to trim these incomplete intervals. Setting `false` does not trim incomplete intervals."
+      },
+      "nullPolicy": {
+        "kind": "enum",
+        "values": [
+          "interpolate",
+          "null",
+          "zero"
+        ],
+        "nullable": false,
+        "description": "How summarized bins returning a null value are displayed. Supported options are:\n- `null`, `zero`, and `interpolate` for line series\n- `null` and `zero` for bar series"
+      }
+    },
+    "required": [
+      "id",
+      "name",
+      "type",
+      "x",
+      "y"
+    ],
+    "nullable": false,
+    "description": "[Bar chart](https://pro.arcgis.com/en/pro-app/help/analysis/geoprocessing/charts/bar-chart.htm) shows the categorical distribution of String/DateTime data.",
+    "title": "WebChartBarChartSeries"
+  },
+  "WebChartTextSymbol": {
+    "kind": "object",
+    "title": "WebChartTextSymbol",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "esriTS",
+        "description": null
+      },
+      "style": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "text": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "color": {
+        "kind": "tuple",
+        "items": [
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          }
+        ],
+        "minItems": 4,
+        "maxItems": 4,
+        "nullable": false,
+        "description": null
+      },
+      "backgroundColor": {
+        "kind": "tuple",
+        "items": [
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          }
+        ],
+        "minItems": 4,
+        "maxItems": 4,
+        "nullable": false,
+        "description": null
+      },
+      "borderLineSize": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "borderLineColor": {
+        "kind": "tuple",
+        "items": [
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          }
+        ],
+        "minItems": 4,
+        "maxItems": 4,
+        "nullable": false,
+        "description": null
+      },
+      "haloSize": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "haloColor": {
+        "kind": "tuple",
+        "items": [
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          }
+        ],
+        "minItems": 4,
+        "maxItems": 4,
+        "nullable": false,
+        "description": null
+      },
+      "verticalAlignment": {
+        "kind": "enum",
+        "values": [
+          "baseline",
+          "bottom",
+          "middle",
+          "top"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "horizontalAlignment": {
+        "kind": "enum",
+        "values": [
+          "center",
+          "justify",
+          "left",
+          "right"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "rightToLeft": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "kerning": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "font": {
+        "kind": "ref",
+        "ref": "IFont",
+        "description": null
+      },
+      "angle": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "xoffset": {
+        "kind": "primitive",
+        "type": ["string", "number"],
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Horizontal offset. Can be a number for a fixed value in pixels, or a string as \"25%\" for a value\nrelative to the label's container width."
+      },
+      "yoffset": {
+        "kind": "primitive",
+        "type": ["string", "number"],
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Horizontal offset. Can be a number for a fixed value in pixels, or a string as \"25%\" for a value\nrelative to the label's container height."
+      }
+    },
+    "required": [
+      "type"
+    ],
+    "description": "Represents a text symbol."
+  },
+  "LegendItemVisibility": {
+    "kind": "object",
+    "properties": {
+      "visible": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "seriesId": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "overlayType": {
+        "kind": "enum",
+        "values": [
+          "Mean",
+          "Median",
+          "Normal Distribution",
+          "Standard Deviation",
+          "Trendline"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "sliceId": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "sliceData": {
+        "kind": "ref",
+        "ref": "WebChartDataItem",
+        "description": "JSON representation of a typical data item"
+      }
+    },
+    "required": [
+      "visible"
+    ],
+    "nullable": false,
+    "description": "Represents the payload of the event sent when an item is toggled in the chart's legend (slice or series).",
+    "title": "LegendItemVisibility"
+  },
+  "SupportedLayer": {
+    "kind": "anyOf",
+    "alternatives": [
+      {
+        "kind": "ref",
+        "ref": "__esri.FeatureLayer"
+      },
+      {
+        "kind": "ref",
+        "ref": "__esri.SubtypeSublayer"
+      }
+    ],
+    "description": "Supported layer type for ArcGIS charts.",
+    "title": "SupportedLayer"
+  },
+  "RESTStatisticType": {
+    "kind": "enum",
+    "values": [
+      "avg",
+      "centroid-aggregate",
+      "convex-hull-aggregate",
+      "count",
+      "envelope-aggregate",
+      "max",
+      "min",
+      "no_aggregation",
+      "percentile_cont",
+      "percentile_disc",
+      "stddev",
+      "sum",
+      "var"
+    ],
+    "nullable": false,
+    "description": null,
+    "title": "RESTStatisticType"
+  },
+  "WebChartDataFilters": {
+    "kind": "object",
+    "properties": {
+      "distance": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies a search distance for the `geometry`. To be associated with the `units` property. For compatible layers only."
+      },
+      "gdbVersion": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies the geodatabase version to display for feature service queries."
+      },
+      "geometry": {
+        "kind": "anyOf",
+        "alternatives": [
+          {
+            "kind": "ref",
+            "ref": "IPoint"
+          },
+          {
+            "kind": "ref",
+            "ref": "IPolyline"
+          },
+          {
+            "kind": "ref",
+            "ref": "IPolygon"
+          },
+          {
+            "kind": "ref",
+            "ref": "IPolygonWithCurves"
+          },
+          {
+            "kind": "ref",
+            "ref": "IEnvelope"
+          },
+          {
+            "kind": "ref",
+            "ref": "IExtent"
+          }
+        ],
+        "description": "The geometry to apply to the spatial filter. A buffer can be applied to it by setting the properties `distance` and `units`."
+      },
+      "timeExtent": {
+        "kind": "tuple",
+        "items": [
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          }
+        ],
+        "minItems": 2,
+        "maxItems": 2,
+        "nullable": false,
+        "description": "A time extent ([timestamp, timestamp]) for a temporal query against time-aware layers."
+      },
+      "units": {
+        "kind": "enum",
+        "values": [
+          "feet",
+          "kilometers",
+          "meters",
+          "miles",
+          "nautical-miles",
+          "us-nautical-miles"
+        ],
+        "nullable": false,
+        "description": "The unit for calculating the buffer distance when `distance` and `geometry` are provided.\nIf not specified, the unit is derived from the geometry spatial reference."
+      },
+      "where": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Acts as a filter on the base data for attribute-based filtering, expect for bar/line charts for which is is used to handle the split-by field values."
+      }
+    },
+    "required": null,
+    "nullable": false,
+    "description": "JSON representation of filters applied to the data",
+    "title": "WebChartDataFilters"
+  },
+  "WebChartStackedKinds": {
+    "kind": "enum",
+    "values": [
+      "sideBySide",
+      "stacked",
+      "stacked100"
+    ],
+    "nullable": false,
+    "description": null,
+    "title": "WebChartStackedKinds"
+  },
+  "CategoryFormatOptions": {
+    "kind": "object",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "category",
+        "description": "Represents a unique string identifier for the CategoryFormatOptions object. For CategoryFormatOptions object, it is \"category\". It can help us to differentiate category axis from other types of axes, viz., date-time axis and numeric (value) axis."
+      },
+      "characterLimit": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": true,
+        "minimum": 1,
+        "maximum": null,
+        "multipleOf": 1,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Represents a positive integer which represents the limit on the number of characters to be displayed for all the category strings. The truncated string are appended with `...`. If property is not present or `null`, no truncation is done."
+      }
+    },
+    "required": [
+      "type"
+    ],
+    "nullable": false,
+    "description": "Defines how the category axis data (Categories) should be formatted.",
+    "title": "CategoryFormatOptions"
+  },
+  "DateTimeFormatOptions": {
+    "kind": "object",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "date",
+        "description": "Represents a unique string identifier for the NumberFormatOptions object. For NumberFormatOptions object, it is \"date\". It can help us to differentiate date-time axis from other types of axes viz., numeric (value) axis and category axis."
+      },
+      "intlOptions": {
+        "kind": "ref",
+        "ref": "Intl.DateTimeFormatOptions",
+        "description": "Represent the JS native [Intl.DateTimeFormatOptions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormatt), which is based on [CLDR](http://cldr.unicode.org/translation/date-time-1/date-time-patterns) specifications."
+      },
+      "formatPerDateTimeUnit": {
+        "kind": "ref",
+        "ref": "WebChartDateTimeUnitFormatOptions",
+        "description": "Represents how to format specific date and time units when displayed on the axis, independently from the `intlOptions`."
+      }
+    },
+    "required": [
+      "intlOptions",
+      "type"
+    ],
+    "nullable": false,
+    "description": "Defines how the DateTime axis data should be formatted.",
+    "title": "DateTimeFormatOptions"
+  },
+  "NumberFormatOptions": {
+    "kind": "object",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "number",
+        "description": "Represents a unique string identifier for the NumberFormatOptions object. For NumberFormatOptions object, it is \"number\". It can help us to differentiate numerical (value) axis from other types of axes viz., date-time axis and category axis."
+      },
+      "intlOptions": {
+        "kind": "ref",
+        "ref": "Intl.NumberFormatOptions",
+        "description": "Represents the JS native [Intl.NumberFormatOptions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/NumberFormat), which is based on [CLDR](http://cldr.unicode.org/translation/numbers-currency/number-patterns) specifications."
+      }
+    },
+    "required": [
+      "intlOptions",
+      "type"
+    ],
+    "nullable": false,
+    "description": "Defines how the numerical(value) axis data should be formatted.",
+    "title": "NumberFormatOptions"
+  },
+  "WebChartAxisScrollBar": {
+    "kind": "object",
+    "properties": {
+      "visible": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Scrollbar visibility"
+      },
+      "width": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Scrollbar width in pixels"
+      },
+      "color": {
+        "kind": "tuple",
+        "items": [
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          }
+        ],
+        "minItems": 4,
+        "maxItems": 4,
+        "nullable": false,
+        "description": "Scrollbar color"
+      },
+      "gripSize": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Grip size in pixels"
+      },
+      "margin": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Margin between the scrollbar and the series container in pixels"
+      }
+    },
+    "required": null,
+    "nullable": false,
+    "description": "Describes the properties of an axis scrollbar",
+    "title": "WebChartAxisScrollBar"
+  },
+  "ISimpleLineSymbol": {
+    "kind": "object",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "esriSLS",
+        "description": null
+      },
+      "style": {
+        "kind": "enum",
+        "values": [
+          "esriSLSDash",
+          "esriSLSDashDot",
+          "esriSLSDashDotDot",
+          "esriSLSDot",
+          "esriSLSNull",
+          "esriSLSSolid"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "color": {
+        "kind": "tuple",
+        "items": [
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          }
+        ],
+        "minItems": 4,
+        "maxItems": 4,
+        "nullable": false,
+        "description": null
+      },
+      "width": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      }
+    },
+    "required": [
+      "type"
+    ],
+    "nullable": false,
+    "description": null,
+    "title": "ISimpleLineSymbol"
+  },
+  "ISimpleFillSymbol": {
+    "kind": "object",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "esriSFS",
+        "description": null
+      },
+      "style": {
+        "kind": "enum",
+        "values": [
+          "esriSFSBackwardDiagonal",
+          "esriSFSCross",
+          "esriSFSDiagonalCross",
+          "esriSFSForwardDiagonal",
+          "esriSFSHorizontal",
+          "esriSFSNull",
+          "esriSFSSolid",
+          "esriSFSVertical"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "color": {
+        "kind": "tuple",
+        "items": [
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          }
+        ],
+        "minItems": 4,
+        "maxItems": 4,
+        "nullable": false,
+        "description": null
+      },
+      "outline": {
+        "kind": "ref",
+        "ref": "ISimpleLineSymbol",
+        "description": null
+      }
+    },
+    "required": [
+      "type"
+    ],
+    "nullable": false,
+    "description": null,
+    "title": "ISimpleFillSymbol"
+  },
+  "WebChartLegendPositions": {
+    "kind": "enum",
+    "values": [
+      "bottom",
+      "left",
+      "right",
+      "top"
+    ],
+    "nullable": false,
+    "description": null,
+    "title": "WebChartLegendPositions"
+  },
+  "WebChartTimeIntervalUnits": {
+    "kind": "enum",
+    "values": [
+      "esriTimeUnitsDays",
+      "esriTimeUnitsHours",
+      "esriTimeUnitsMinutes",
+      "esriTimeUnitsMonths",
+      "esriTimeUnitsSeconds",
+      "esriTimeUnitsWeeks",
+      "esriTimeUnitsYears"
+    ],
+    "nullable": false,
+    "description": "Represents the different types of time intervals that can be applied to a chart using the time binning feature.",
+    "title": "WebChartTimeIntervalUnits"
+  },
+  "WebChartTimeAggregationTypes": {
+    "kind": "enum",
+    "values": [
+      "equalIntervalsFromEndTime",
+      "equalIntervalsFromStartTime"
+    ],
+    "nullable": false,
+    "description": "Represents the different types of time aggregation that can be applied to a chart using the time binning feature.",
+    "title": "WebChartTimeAggregationTypes"
+  },
+  "WebChartNullPolicyTypes": {
+    "kind": "enum",
+    "values": [
+      "interpolate",
+      "null",
+      "zero"
+    ],
+    "nullable": false,
+    "description": "Represents the different types of null policy that can be applied to a chart using the time binning feature.",
+    "title": "WebChartNullPolicyTypes"
+  },
+  "IField": {
+    "kind": "object",
+    "properties": {
+      "name": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "A string defining the field name."
+      },
+      "type": {
+        "kind": "ref",
+        "ref": "FieldType",
+        "description": "A string defining the field type."
+      },
+      "alias": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "A string defining the field alias."
+      },
+      "domain": {
+        "kind": "object",
+        "properties": {
+          "type": {
+            "kind": "ref",
+            "ref": "DomainType",
+            "description": "A string defining the domain type."
+          },
+          "name": {
+            "kind": "primitive",
+            "type": "string",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": "A string defining the field name."
+          },
+          "range": {
+            "kind": "tuple",
+            "items": [
+              {
+                "kind": "primitive",
+                "type": "number",
+                "nullable": false,
+                "minimum": null,
+                "maximum": null,
+                "multipleOf": null,
+                "default": null,
+                "pattern": null,
+                "format": null,
+                "description": null
+              },
+              {
+                "kind": "primitive",
+                "type": "number",
+                "nullable": false,
+                "minimum": null,
+                "maximum": null,
+                "multipleOf": null,
+                "default": null,
+                "pattern": null,
+                "format": null,
+                "description": null
+              }
+            ],
+            "minItems": 2,
+            "maxItems": 2,
+            "nullable": false,
+            "description": "A 2 element array defining the range of possible values."
+          },
+          "codedValues": {
+            "kind": "array",
+            "items": {
+              "kind": "object",
+              "properties": {
+                "name": {
+                  "kind": "primitive",
+                  "type": "string",
+                  "nullable": false,
+                  "minimum": null,
+                  "maximum": null,
+                  "multipleOf": null,
+                  "default": null,
+                  "pattern": null,
+                  "format": null,
+                  "description": "User-friendly name for what the code means."
+                },
+                "code": {
+                  "kind": "primitive",
+                  "type": ["string", "number"],
+                  "nullable": false,
+                  "minimum": null,
+                  "maximum": null,
+                  "multipleOf": null,
+                  "default": null,
+                  "pattern": null,
+                  "format": null,
+                  "description": "The value stored in the feature attribute."
+                }
+              },
+              "required": [
+                "code",
+                "name"
+              ],
+              "nullable": false,
+              "description": "CodedValue type"
+            },
+            "minItems": null,
+            "maxItems": null,
+            "nullable": false,
+            "description": "An array of CodedValues for domains of type codedValue."
+          },
+          "description": {
+            "kind": "primitive",
+            "type": "string",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": "Description of the domain"
+          },
+          "mergePolicy": {
+            "kind": "primitive",
+            "type": "string",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": "Merge policy"
+          },
+          "splitPolicy": {
+            "kind": "primitive",
+            "type": "string",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": "Split Policy"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "nullable": false,
+        "description": "The domain objects if applicable."
+      },
+      "editable": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "A Boolean defining whether this field is editable."
+      },
+      "exactMatch": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "A Boolean defining whether or not the field is an exact match."
+      },
+      "length": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "A number defining how many characters are allowed in a string. field."
+      },
+      "nullable": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "A Boolean defining whether this field can have a null value."
+      },
+      "defaultValue": {
+        "kind": "unknown",
+        "raw": {
+          "description": "The value written in for new records by default.",
+          "title": "defaultValue"
+        }
+      }
+    },
+    "required": [
+      "name",
+      "type"
+    ],
+    "nullable": false,
+    "description": "Contains information about an attribute field.\n\n`IField` can also be imported from the following packages:\n\n```js\nimport { IField } from \"@esri/arcgis-rest-feature-layer\";\n```",
+    "title": "IField"
+  },
+  "WebChartAxis": {
+    "kind": "object",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "chartAxis",
+        "description": "Represents a unique string identifier for the WebChartAxis object. For ChartAxis object, it is \"chartAxis\"."
+      },
+      "visible": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Determines the visibility of the content."
+      },
+      "isLogarithmic": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies whether the axis has a logarithmic scale or not."
+      },
+      "title": {
+        "kind": "ref",
+        "ref": "WebChartText",
+        "description": "Contains styling info on how the title of the axis should be rendered"
+      },
+      "valueFormat": {
+        "kind": "anyOf",
+        "alternatives": [
+          {
+            "kind": "ref",
+            "ref": "NumberFormatOptions"
+          },
+          {
+            "kind": "ref",
+            "ref": "DateTimeFormatOptions"
+          },
+          {
+            "kind": "ref",
+            "ref": "CategoryFormatOptions"
+          }
+        ],
+        "description": "Specifies how numerical/categorical/date-time values should be formatted."
+      },
+      "minimum": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": true,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "The minimum value which the axis should represent, when it is not defined or null, then the minimum value for the corresponding axis is automatically calculated."
+      },
+      "maximum": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": true,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "The maximum value which the axis should represent, when it is not defined or null, then the maximum value for the corresponding axis is automatically calculated."
+      },
+      "grid": {
+        "kind": "ref",
+        "ref": "ISimpleLineSymbol",
+        "description": "Dictates how the grid lines associated with a particular axis should be rendered."
+      },
+      "guides": {
+        "kind": "array",
+        "items": {
+          "kind": "ref",
+          "ref": "WebChartGuide",
+          "description": null
+        },
+        "minItems": null,
+        "maxItems": null,
+        "nullable": false,
+        "description": "Represent an array of guides that should be rendered onto the axis."
+      },
+      "lineSymbol": {
+        "kind": "ref",
+        "ref": "ISimpleLineSymbol",
+        "description": "Contains styling info on how the axis line should be rendered.\nIf not provided a default style is applied."
+      },
+      "labels": {
+        "kind": "ref",
+        "ref": "WebChartText",
+        "description": "Contains styling info on how the axis labels should be rendered."
+      },
+      "scrollbar": {
+        "kind": "ref",
+        "ref": "WebChartAxisScrollBar",
+        "description": "Represents the axis scrollbar style and visibility"
+      },
+      "displayZeroLine": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Represents an option to hide/un-hide the zero line on value axis"
+      },
+      "integerOnlyValues": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Represents an option to show `integer-only` values for a value axis"
+      },
+      "displayCursorTooltip": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies whether cursor tooltip should be displayed."
+      },
+      "buffer": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Allows setting a buffer to a **value axis** to provide some space around the series."
+      },
+      "tickSpacing": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": 1,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "The desired minimum distance between two adjacent axis ticks. The actual distance may fluctuate depending on the chart's size.\nWhen not provided a default value is assigned according to the axis type and axis labels behavior."
+      }
+    },
+    "required": [
+      "labels",
+      "type",
+      "valueFormat"
+    ],
+    "nullable": false,
+    "description": "JSON representation of the chart's axis object",
+    "title": "WebChartAxis"
+  },
+  "WebChartText": {
+    "kind": "object",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "chartText",
+        "description": "Represents a unique string identifier for the ChartText object. For ChartText object, it is \"chartText\"."
+      },
+      "visible": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Determines the visibility of the content."
+      },
+      "content": {
+        "kind": "ref",
+        "ref": "WebChartTextSymbol",
+        "description": "Contains the styling info and text content. Details on **esriTS** are [here](https://developers.arcgis.com/documentation/common-data-types/symbol-objects.htm)."
+      }
+    },
+    "required": [
+      "content",
+      "type"
+    ],
+    "nullable": false,
+    "description": "Stores info on how some text is rendered on the chart and whether it is visible or not.",
+    "title": "WebChartText"
+  },
+  "WebChartLegend": {
+    "kind": "object",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "chartLegend",
+        "description": "Represents a unique string identifier for the ChartLegend object. For ChartLegend object, it is \"chartLegend\"."
+      },
+      "visible": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Determines the visibility of the content."
+      },
+      "title": {
+        "kind": "ref",
+        "ref": "WebChartText",
+        "description": "Contains styling info on how the title of the legend box should be rendered"
+      },
+      "body": {
+        "kind": "ref",
+        "ref": "WebChartTextSymbol",
+        "description": "Contains styling info on how legend body (excluding the **title**) should be rendered.\nWill use default styling if not provided."
+      },
+      "position": {
+        "kind": "enum",
+        "values": [
+          "bottom",
+          "left",
+          "right",
+          "top"
+        ],
+        "nullable": false,
+        "description": "Positions the legends at `\"right\"`, `\"left\"`, `\"top\"`, or `\"bottom\"` of the chart."
+      },
+      "maxHeight": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": true,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Legend's maximum height. If not set the legend will occupy the same height as the series container or pie chart."
+      },
+      "roundMarkers": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Allows the legend markers to be displayed as circles. If the property is to:\n- `false` or `undefined` they will be rounded rectangles\n- `true` they will be circles"
+      }
+    },
+    "required": [
+      "type"
+    ],
+    "nullable": false,
+    "description": "JSON representation of the Chart's legend box",
+    "title": "WebChartLegend"
+  },
+  "WebChartPieChartLegend": {
+    "kind": "object",
+    "properties": {
+      "displayNumericValue": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Indicates whether the numeric value associated to a slice is to be displayed in the legend.\nIf both displayNumericValue & displayPercentage are true on a same label, they will be displayed as `percentage (value)`"
+      },
+      "displayPercentage": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Indicates whether the percentage to a slice is to be displayed in the legend.\nIf both displayNumericValue & displayPercentage are true on a same label, they will be displayed as `percentage (value)`"
+      },
+      "labelMaxWidth": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": 200,
+        "pattern": null,
+        "format": null,
+        "description": "Maximum width in pixels of the label displaying the slice name. If the label is larger than the maximum width, it will automatically wrap."
+      },
+      "valueLabelMaxWidth": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": 200,
+        "pattern": null,
+        "format": null,
+        "description": "Maximum width in pixels of the label displaying the slice name. If the label is larger than the maximum width, it will automatically wrap."
+      },
+      "type": {
+        "kind": "const",
+        "value": "chartLegend",
+        "description": "Represents a unique string identifier for the ChartLegend object. For ChartLegend object, it is \"chartLegend\"."
+      },
+      "visible": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Determines the visibility of the content."
+      },
+      "title": {
+        "kind": "ref",
+        "ref": "WebChartText",
+        "description": "Contains styling info on how the title of the legend box should be rendered"
+      },
+      "body": {
+        "kind": "ref",
+        "ref": "WebChartTextSymbol",
+        "description": "Contains styling info on how legend body (excluding the **title**) should be rendered.\nWill use default styling if not provided."
+      },
+      "position": {
+        "kind": "enum",
+        "values": [
+          "bottom",
+          "left",
+          "right",
+          "top"
+        ],
+        "nullable": false,
+        "description": "Positions the legends at `\"right\"`, `\"left\"`, `\"top\"`, or `\"bottom\"` of the chart."
+      },
+      "maxHeight": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": true,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Legend's maximum height. If not set the legend will occupy the same height as the series container or pie chart."
+      },
+      "roundMarkers": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Allows the legend markers to be displayed as circles. If the property is to:\n- `false` or `undefined` they will be rounded rectangles\n- `true` they will be circles"
+      }
+    },
+    "required": [
+      "type"
+    ],
+    "nullable": false,
+    "description": "Specific legend for the Pie chart",
+    "title": "WebChartPieChartLegend"
+  },
+  "WebChartCursorCrosshair": {
+    "kind": "object",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "cursorCrosshair",
+        "description": "Represents a unique string identifier for the chart cursor's crosshair."
+      },
+      "style": {
+        "kind": "ref",
+        "ref": "ISimpleLineSymbol",
+        "description": "Contains styling info on how the chart cursor's crosshair should be rendered."
+      },
+      "verticalLineVisible": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Indicates whether the vertical crosshair line should be displayed"
+      },
+      "horizontalLineVisible": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Indicates whether the horizontal crosshair line should be displayed"
+      }
+    },
+    "required": [
+      "type"
+    ],
+    "nullable": false,
+    "description": "JSON representation of the cursor's crosshair for a chart.",
+    "title": "WebChartCursorCrosshair"
+  },
+  "WebChartDataItem": {
+    "kind": "open_object",
+    "nullable": false,
+    "description": "JSON representation of a typical data item",
+    "title": "WebChartDataItem"
+  },
+  "WebChartSeriesQuery": {
+    "kind": "object",
+    "properties": {
+      "outFields": {
+        "kind": "array",
+        "items": {
+          "kind": "primitive",
+          "type": "string",
+          "nullable": false,
+          "minimum": null,
+          "maximum": null,
+          "multipleOf": null,
+          "default": null,
+          "pattern": null,
+          "format": null,
+          "description": null
+        },
+        "minItems": null,
+        "maxItems": null,
+        "nullable": false,
+        "description": "Attribute fields to include in the FeatureSet. Will have an effect on chart with no aggregation."
+      },
+      "where": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Acts as a filter on the base data for attribute-based filtering, expect for bar/line charts for which is is used to handle the split-by field values."
+      },
+      "groupByFieldsForStatistics": {
+        "kind": "array",
+        "items": {
+          "kind": "primitive",
+          "type": "string",
+          "nullable": false,
+          "minimum": null,
+          "maximum": null,
+          "multipleOf": null,
+          "default": null,
+          "pattern": null,
+          "format": null,
+          "description": null
+        },
+        "minItems": null,
+        "maxItems": 1,
+        "nullable": false,
+        "description": "An array of fields which determine how the base data is grouped. Only one **groupBy** Field is supported, but ArcGIS JSAPI [supports multiple groupBy fields](https://developers.arcgis.com/javascript/latest/api-reference/esri-tasks-support-Query.html#groupByFieldsForStatistics). While splitting by multiple group-by fields is possible, it is not being done because of the number of series it will give rise to (equal to the length of the Cartesian product set) possibly making the visualization hard to interpret."
+      },
+      "outStatistics": {
+        "kind": "array",
+        "items": {
+          "kind": "ref",
+          "ref": "IStatisticDefinition",
+          "description": null
+        },
+        "minItems": null,
+        "maxItems": null,
+        "nullable": false,
+        "description": "Represents an array of statistics definitions which dictate how a particular field should be aggregated. Refer to [JSAPI Statistics Definition class](https://developers.arcgis.com/javascript/latest/api-reference/esri-tasks-support-StatisticDefinition.html) for more info."
+      },
+      "returnDistinctValues": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "If true then the query returns distinct values based on the field(s) specified in outFields. Available for count-based aggregations only."
+      },
+      "fetchNullValues": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Indicates whether to fetch null values for them to be counted or displayed as categories on the chart."
+      }
+    },
+    "required": null,
+    "nullable": false,
+    "description": "Subset of the WebChartQuery, used at the series level",
+    "title": "WebChartSeriesQuery"
+  },
+  "WebChartSeriesType": {
+    "kind": "anyOf",
+    "alternatives": [
+      {
+        "kind": "ref",
+        "ref": "WebChartBarChartSeries"
+      },
+      {
+        "kind": "ref",
+        "ref": "WebChartHistogramSeries"
+      },
+      {
+        "kind": "ref",
+        "ref": "WebChartScatterPlotSeries"
+      },
+      {
+        "kind": "ref",
+        "ref": "WebChartPieChartSeries"
+      },
+      {
+        "kind": "ref",
+        "ref": "WebChartGaugeSeries"
+      },
+      {
+        "kind": "ref",
+        "ref": "WebChartLineChartSeries"
+      },
+      {
+        "kind": "ref",
+        "ref": "WebChartBoxPlotSeries"
+      },
+      {
+        "kind": "ref",
+        "ref": "WebChartRadarChartSeries"
+      }
+    ],
+    "description": "Type containing all the series types available",
+    "title": "WebChartSeriesType"
+  },
+  "WebChartDateTimeUnitFormatOptions": {
+    "kind": "object",
+    "properties": {
+      "year": {
+        "kind": "ref",
+        "ref": "Intl.DateTimeFormatOptions",
+        "description": null
+      },
+      "month": {
+        "kind": "ref",
+        "ref": "Intl.DateTimeFormatOptions",
+        "description": null
+      },
+      "day": {
+        "kind": "ref",
+        "ref": "Intl.DateTimeFormatOptions",
+        "description": null
+      },
+      "hour": {
+        "kind": "ref",
+        "ref": "Intl.DateTimeFormatOptions",
+        "description": null
+      },
+      "minute": {
+        "kind": "ref",
+        "ref": "Intl.DateTimeFormatOptions",
+        "description": null
+      },
+      "second": {
+        "kind": "ref",
+        "ref": "Intl.DateTimeFormatOptions",
+        "description": null
+      }
+    },
+    "required": null,
+    "nullable": false,
+    "description": "Interface used by the axis `valueFormat` property to describe how to format specific date and time units when displayed on the axis.\nFor instance:\n\"year\": { year: \"numeric\" }\n\"month\": { month: \"numeric\" }\n\"day\": { day: \"2-digit\" }\n\"hour\": { day: \"numeric\" }\n\"minute\": { minute: \"numeric\" }\n\"second\": { second: \"numeric\" }\nReference: https://tc39.es/ecma402/#sec-datetimeformat-abstracts",
+    "title": "WebChartDateTimeUnitFormatOptions"
+  },
+  "WebChartDirectionalDataOrder": {
+    "kind": "object",
+    "properties": {
+      "orderType": {
+        "kind": "ref",
+        "ref": "WebChartOrderDataByTypes",
+        "description": "The type of order, eg by category, by mean, by median, or by y value."
+      },
+      "orderBy": {
+        "kind": "ref",
+        "ref": "WebChartSortOrderKinds",
+        "description": "The direction of the order, either ascending or descending."
+      },
+      "preferLabel": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Indicates whether to order data by the label or the value.\n\nFor example, when a field has domain coded values or supbtypes, setting this property to `false` will order the data by the field value.\nOtherwise the domain description, subtypes description, or the alias of the field will be used to sort the data."
+      }
+    },
+    "required": [
+      "orderBy",
+      "orderType"
+    ],
+    "nullable": false,
+    "description": "A data order option that the items are to be ordered either ascending or descending.\nIt can be used for any type of order, like by category, by mean, by median, etc.",
+    "title": "WebChartDirectionalDataOrder"
+  },
+  "WebChartOrderSeriesBy": {
+    "kind": "object",
+    "properties": {
+      "preferLabel": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "When the value is set to true, we want to order the split-by series based on the series' names (alias, custom label, or description).\n\nWhen the value is set to false, we want to order the split-by series based on the series' split-by values."
+      },
+      "orderBy": {
+        "kind": "enum",
+        "values": [
+          "ASC",
+          "DESC"
+        ],
+        "nullable": false,
+        "description": "The direction of the order."
+      }
+    },
+    "required": null,
+    "nullable": false,
+    "description": "Order options for split-by series.",
+    "title": "WebChartOrderSeriesBy"
+  },
+  "WebChartPredefinedLabelsDataOrder": {
+    "kind": "object",
+    "properties": {
+      "orderType": {
+        "kind": "const",
+        "value": "arcgis-charts-category",
+        "description": "The type of order, which is by category."
+      },
+      "orderBy": {
+        "kind": "array",
+        "items": {
+          "kind": "primitive",
+          "type": "string",
+          "nullable": false,
+          "minimum": null,
+          "maximum": null,
+          "multipleOf": null,
+          "default": null,
+          "pattern": null,
+          "format": null,
+          "description": null
+        },
+        "minItems": null,
+        "maxItems": null,
+        "nullable": false,
+        "description": "The predefined list of labels to order the data by.\n\nWhen the value of the `preferLabel` property is set to `false`, the `orderBy` list should be a list of\ncoded domain values or field names; otherwise, it should be a list of domain descriptions, subtypes descriptions, or field aliases."
+      },
+      "preferLabel": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Indicates whether to order data by the label or the value.\n\nFor example, when a field has domain coded values or supbtypes, setting this property to `false` will order the data by the field value.\nOtherwise the domain description, subtypes description, or the alias of the field will be used to sort the data.\n\nWhen the value is set to `true` or undefined, the `orderBy` property should contain a list of labels like domain descriptions, subtypes descriptions, or field aliases.\nWhen the value is set to `false`, the `orderBy` property should contain a list of coded domain values or field names, in order for the data to be sorted correctly."
+      }
+    },
+    "required": [
+      "orderBy",
+      "orderType"
+    ],
+    "nullable": false,
+    "description": "A data order option for the items to be ordered by `category` based on a predefined list of labels.",
+    "title": "WebChartPredefinedLabelsDataOrder"
+  },
+  "Intl.DateTimeFormatOptions": {
+    "kind": "object",
+    "properties": {
+      "localeMatcher": {
+        "kind": "enum",
+        "values": [
+          "best fit",
+          "lookup"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "weekday": {
+        "kind": "enum",
+        "values": [
+          "long",
+          "narrow",
+          "short"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "era": {
+        "kind": "enum",
+        "values": [
+          "long",
+          "narrow",
+          "short"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "year": {
+        "kind": "enum",
+        "values": [
+          "2-digit",
+          "numeric"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "month": {
+        "kind": "enum",
+        "values": [
+          "2-digit",
+          "long",
+          "narrow",
+          "numeric",
+          "short"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "day": {
+        "kind": "enum",
+        "values": [
+          "2-digit",
+          "numeric"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "hour": {
+        "kind": "enum",
+        "values": [
+          "2-digit",
+          "numeric"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "minute": {
+        "kind": "enum",
+        "values": [
+          "2-digit",
+          "numeric"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "second": {
+        "kind": "enum",
+        "values": [
+          "2-digit",
+          "numeric"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "timeZoneName": {
+        "kind": "enum",
+        "values": [
+          "long",
+          "longGeneric",
+          "longOffset",
+          "short",
+          "shortGeneric",
+          "shortOffset"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "formatMatcher": {
+        "kind": "enum",
+        "values": [
+          "basic",
+          "best fit"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "hour12": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "timeZone": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "calendar": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "dayPeriod": {
+        "kind": "enum",
+        "values": [
+          "long",
+          "narrow",
+          "short"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "numberingSystem": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "dateStyle": {
+        "kind": "enum",
+        "values": [
+          "full",
+          "long",
+          "medium",
+          "short"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "timeStyle": {
+        "kind": "enum",
+        "values": [
+          "full",
+          "long",
+          "medium",
+          "short"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "hourCycle": {
+        "kind": "enum",
+        "values": [
+          "h11",
+          "h12",
+          "h23",
+          "h24"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "fractionalSecondDigits": {
+        "kind": "enum",
+        "values": [
+          1,
+          2,
+          3
+        ],
+        "nullable": false,
+        "description": null
+      }
+    },
+    "required": null,
+    "nullable": false,
+    "description": null,
+    "title": "Intl.DateTimeFormatOptions"
+  },
+  "Intl.NumberFormatOptions": {
+    "kind": "object",
+    "properties": {
+      "localeMatcher": {
+        "kind": "enum",
+        "values": [
+          "best fit",
+          "lookup"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "style": {
+        "kind": "enum",
+        "values": [
+          "currency",
+          "decimal",
+          "percent",
+          "unit"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "currency": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "currencyDisplay": {
+        "kind": "enum",
+        "values": [
+          "code",
+          "name",
+          "narrowSymbol",
+          "symbol"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "useGrouping": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "minimumIntegerDigits": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "minimumFractionDigits": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "maximumFractionDigits": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "minimumSignificantDigits": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "maximumSignificantDigits": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "numberingSystem": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "compactDisplay": {
+        "kind": "enum",
+        "values": [
+          "long",
+          "short"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "notation": {
+        "kind": "enum",
+        "values": [
+          "compact",
+          "engineering",
+          "scientific",
+          "standard"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "signDisplay": {
+        "kind": "enum",
+        "values": [
+          "always",
+          "auto",
+          "exceptZero",
+          "never"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "unit": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "unitDisplay": {
+        "kind": "enum",
+        "values": [
+          "long",
+          "narrow",
+          "short"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "currencySign": {
+        "kind": "enum",
+        "values": [
+          "accounting",
+          "standard"
+        ],
+        "nullable": false,
+        "description": null
+      }
+    },
+    "required": null,
+    "nullable": false,
+    "description": null,
+    "title": "Intl.NumberFormatOptions"
+  },
+  "FieldType": {
+    "kind": "enum",
+    "values": [
+      "esriFieldTypeBlob",
+      "esriFieldTypeDate",
+      "esriFieldTypeDouble",
+      "esriFieldTypeGUID",
+      "esriFieldTypeGeometry",
+      "esriFieldTypeGlobalID",
+      "esriFieldTypeInteger",
+      "esriFieldTypeOID",
+      "esriFieldTypeRaster",
+      "esriFieldTypeSingle",
+      "esriFieldTypeSmallInteger",
+      "esriFieldTypeString",
+      "esriFieldTypeXML"
+    ],
+    "nullable": false,
+    "description": "Field type.",
+    "title": "FieldType"
+  },
+  "DomainType": {
+    "kind": "enum",
+    "values": [
+      "codedValue",
+      "inherited",
+      "range"
+    ],
+    "nullable": false,
+    "description": "Domain types",
+    "title": "DomainType"
+  },
+  "IFont": {
+    "kind": "object",
+    "properties": {
+      "family": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "size": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "style": {
+        "kind": "enum",
+        "values": [
+          "italic",
+          "normal",
+          "oblique"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "weight": {
+        "kind": "enum",
+        "values": [
+          "bold",
+          "bolder",
+          "lighter",
+          "normal"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "decoration": {
+        "kind": "enum",
+        "values": [
+          "line-through",
+          "none",
+          "underline"
+        ],
+        "nullable": false,
+        "description": null
+      }
+    },
+    "required": null,
+    "nullable": false,
+    "description": null,
+    "title": "IFont"
+  },
+  "WebChartGuide": {
+    "kind": "object",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "chartGuide",
+        "description": "Represents a unique string identifier for the Guide object. For Guide class, it is \"chartGuide\"."
+      },
+      "start": {
+        "kind": "anyOf",
+        "alternatives": [
+          {
+            "kind": "primitive",
+            "type": "string",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": "date-time",
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": ["string", "number"],
+            "nullable": true,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          }
+        ],
+        "description": "Determines the value where the guide should begin."
+      },
+      "end": {
+        "kind": "anyOf",
+        "alternatives": [
+          {
+            "kind": "primitive",
+            "type": "string",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": "date-time",
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": ["string", "number"],
+            "nullable": true,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          }
+        ],
+        "description": "Determines the value where the guide should end. If it is not specified, we get a line guide, otherwise we get a fill/rectangular guide."
+      },
+      "style": {
+        "kind": "anyOf",
+        "alternatives": [
+          {
+            "kind": "ref",
+            "ref": "ISimpleLineSymbol"
+          },
+          {
+            "kind": "ref",
+            "ref": "ISimpleFillSymbol"
+          }
+        ],
+        "description": "Determines how the guide should be rendered. Line guide requires [esriSLS](https://developers.arcgis.com/documentation/common-data-types/symbol-objects.htm) format, and fill guide requires [esriSFS](https://developers.arcgis.com/documentation/common-data-types/symbol-objects.htm) format."
+      },
+      "name": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "A unique string identifier which is used to refer to a particular guide. It is displayed in the Chart Authoring UI to differentiate between different guides."
+      },
+      "label": {
+        "kind": "ref",
+        "ref": "WebChartTextSymbol",
+        "description": "Defines a text label for the given guide. It is displayed on the chart next to the concerned guide and is styled using **esriTS** format."
+      },
+      "visible": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Determines the visibility of the content."
+      },
+      "above": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Determines whether the guide should be rendered on top of (overlapping) the series or under the series."
+      },
+      "tooltipReverseColor": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Indicates whether to apply the hovered element's color to the guide's tooltip background (false) or its outline (true)."
+      }
+    },
+    "required": [
+      "name",
+      "start",
+      "style",
+      "type"
+    ],
+    "nullable": false,
+    "description": "JSON representation of the chart's guide object. Can be used to represent both line and fill guides.",
+    "title": "WebChartGuide"
+  },
+  "IStatisticDefinition": {
+    "kind": "object",
+    "properties": {
+      "statisticType": {
+        "kind": "enum",
+        "values": [
+          "avg",
+          "centroid-aggregate",
+          "convex-hull-aggregate",
+          "count",
+          "envelope-aggregate",
+          "max",
+          "min",
+          "percentile_cont",
+          "percentile_disc",
+          "stddev",
+          "sum",
+          "var"
+        ],
+        "nullable": false,
+        "description": "Statistical operation to perform (count, sum, min, max, avg, stddev, var, percentile_cont, percentile_disc, EnvelopeAggregate, CentroidAggregate, ConvexHullAggregate)."
+      },
+      "statisticParameters": {
+        "kind": "object",
+        "properties": {
+          "value": {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          "orderBy": {
+            "kind": "enum",
+            "values": [
+              "asc",
+              "desc"
+            ],
+            "nullable": false,
+            "description": null
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "nullable": false,
+        "description": "Parameters to be used along with statisticType. Currently, only applicable for percentile_cont (continuous percentile) and percentile_disc (discrete percentile)."
+      },
+      "onStatisticField": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Field on which to perform the statistical operation."
+      },
+      "outStatisticFieldName": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Field name for the returned statistic field. If outStatisticFieldName is empty or missing, the server will assign one. A valid field name can only contain alphanumeric characters and an underscore. If the outStatisticFieldName is a reserved keyword of the underlying DBMS, the operation can fail. Try specifying an alternative outStatisticFieldName."
+      }
+    },
+    "required": [
+      "onStatisticField",
+      "statisticType"
+    ],
+    "nullable": false,
+    "description": null,
+    "title": "IStatisticDefinition"
+  },
+  "WebChartOrderDataByTypes": {
+    "kind": "enum",
+    "values": [
+      "arcgis-charts-category",
+      "arcgis-charts-mean",
+      "arcgis-charts-median",
+      "arcgis-charts-y-value"
+    ],
+    "nullable": false,
+    "description": "The types of order assocated with chart data.",
+    "title": "WebChartOrderDataByTypes"
+  },
+  "WebChartSortOrderKinds": {
+    "kind": "enum",
+    "values": [
+      "ASC",
+      "DESC"
+    ],
+    "nullable": false,
+    "description": null,
+    "title": "WebChartSortOrderKinds"
+  },
+  "WebChartScatterPlotSeries": {
+    "kind": "object",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "scatterSeries",
+        "description": "Represents a unique string identifier for the ScatterSeries object. For ScatterSeries object, it is \"scatterSeries\"."
+      },
+      "y": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Empty string or one with just white spaces is not allowed. At least 1 or more word characters (a-z, A-Z, _) are needed."
+      },
+      "markerSymbol": {
+        "kind": "ref",
+        "ref": "ISimpleMarkerSymbol",
+        "description": "Specifies how each data point in the scatter plot should be rendered. The type is `\"esriSMS\"` and it is adopted from the [REST API Types](https://developers.arcgis.com/documentation/common-data-types/symbol-objects.htm#GUID-C8D40B32-5F4B-45EB-8048-6D5A8763E13B)."
+      },
+      "overlays": {
+        "kind": "ref",
+        "ref": "ScatterPlotOverlays",
+        "description": "Specifies all the chart overlays. The scatter plot implements only 1 overlay, **trendLine**.\nThe overlays won't show if the property is not defined."
+      },
+      "sizePolicy": {
+        "kind": "ref",
+        "ref": "SizePolicy",
+        "description": "Specifies rules to use the scatter plot as bubble plot, by changing dynamically the markers size according to a specific field value"
+      },
+      "id": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "A unique string used to differentiate the series on a chart."
+      },
+      "visible": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Hides or shows the series. If the series is has **visible** set to `false`, the corresponding legend is grayed out in the legend box."
+      },
+      "dataTooltipVisible": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Hides or shows data tooltips.\nApplies to all charts but Gauge."
+      },
+      "dataTooltipReverseColor": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Indicates whether to apply the hovered element's color to the background (false) or the outline (true).\nApplies to all charts but Gauge."
+      },
+      "dataTooltipValueFormat": {
+        "kind": "ref",
+        "ref": "NumberFormatOptions",
+        "description": "Defines how to render numeric values in tooltips."
+      },
+      "dataTooltipPercentFormat": {
+        "kind": "ref",
+        "ref": "NumberFormatOptions",
+        "description": "Defines how to render percent values in tooltips.\nCurrently used for stacked 100% bar and line charts, as well as pie charts."
+      },
+      "dataTooltipDateFormat": {
+        "kind": "ref",
+        "ref": "DateTimeFormatOptions",
+        "description": "Defines how to render dates in tooltips.\nCurrently used for bar and line charts using a date x-axis with no time binning."
+      },
+      "name": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies the name of the series. It would be reflected in the chart [legends](#legend)"
+      },
+      "query": {
+        "kind": "ref",
+        "ref": "WebChartSeriesQuery",
+        "description": "Specifies a query object associated with a particular series containing info on what data to fetch for that series."
+      },
+      "x": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies which field represents the x-coordinates of this series. Empty string or one with just white spaces is not allowed. At least 1 or more word characters (a-z, A-Z, _) are needed."
+      },
+      "dataLabels": {
+        "kind": "ref",
+        "ref": "WebChartText",
+        "description": "Specifies how the data labels should be rendered."
+      },
+      "assignToSecondValueAxis": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies whether the series should be assigned to the second value axis, when the `axes` property defines it.\nSupported by bar and line series."
+      }
+    },
+    "required": [
+      "id",
+      "name",
+      "type",
+      "x",
+      "y"
+    ],
+    "nullable": false,
+    "description": "[Scatter plot](https://pro.arcgis.com/en/pro-app/help/analysis/geoprocessing/charts/scatter-plot.htm) shows the relationship between two numerical fields.",
+    "title": "WebChartScatterPlotSeries"
+  },
+  "ISimpleMarkerSymbol": {
+    "kind": "object",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "esriSMS",
+        "description": null
+      },
+      "style": {
+        "kind": "enum",
+        "values": [
+          "esriSMSCircle",
+          "esriSMSCross",
+          "esriSMSDiamond",
+          "esriSMSSquare",
+          "esriSMSTriangle",
+          "esriSMSX"
+        ],
+        "nullable": false,
+        "description": null
+      },
+      "color": {
+        "kind": "tuple",
+        "items": [
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          }
+        ],
+        "minItems": 4,
+        "maxItems": 4,
+        "nullable": false,
+        "description": null
+      },
+      "size": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "outline": {
+        "kind": "ref",
+        "ref": "ISimpleLineSymbol",
+        "description": null
+      },
+      "angle": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "xoffset": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      },
+      "yoffset": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": null
+      }
+    },
+    "required": [
+      "type"
+    ],
+    "nullable": false,
+    "description": null,
+    "title": "ISimpleMarkerSymbol"
+  },
+  "SizePolicy": {
+    "kind": "object",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "sizeScale",
+        "description": "Represents a unique string identifier for the sizePolicy object. For sizePolicy object, it is \"sizeScale\"."
+      },
+      "scaleType": {
+        "kind": "enum",
+        "values": [
+          "linear",
+          "logarithmic"
+        ],
+        "nullable": false,
+        "description": "The type of scale to apply to the markers (linear or logarithmic)"
+      },
+      "field": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "The field which determines the markers size"
+      },
+      "minSize": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": 1,
+        "default": 5,
+        "pattern": null,
+        "format": null,
+        "description": "The minimum marker size"
+      },
+      "maxSize": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": 1,
+        "default": 30,
+        "pattern": null,
+        "format": null,
+        "description": "The maximum marker size"
+      }
+    },
+    "required": [
+      "field",
+      "type"
+    ],
+    "nullable": false,
+    "description": null,
+    "title": "SizePolicy"
+  },
+  "ScatterPlotOverlays": {
+    "kind": "object",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "chartOverlays",
+        "description": "Represents a unique string identifier for the ScatterPlotOverlays object. For ScatterPlotOverlays object, it is \"chartOverlays\"."
+      },
+      "trendLine": {
+        "kind": "ref",
+        "ref": "WebChartOverlay",
+        "description": "Specifies the trendline overlay for scatter plot.\nThe trendline won't show if the property is not defined."
+      }
+    },
+    "required": [
+      "type"
+    ],
+    "nullable": false,
+    "description": "Object containing Scatter Plot overlays",
+    "title": "ScatterPlotOverlays"
+  },
+  "WebChartOverlay": {
+    "kind": "object",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "chartOverlay",
+        "description": "Represents a unique string identifier for the ChartOverlay object. For ChartOverlay object, it is \"chartOverlay\"."
+      },
+      "created": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Determines whether the overlay is created under the hood. It may or may not be visible."
+      },
+      "visible": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Determines the visibility of the content."
+      },
+      "symbol": {
+        "kind": "ref",
+        "ref": "ISimpleLineSymbol",
+        "description": "Contains styling info on how the overlay should be rendered\nIf not provided a default style is applied."
+      }
+    },
+    "required": [
+      "type"
+    ],
+    "nullable": false,
+    "description": "JSON representation of the chart's overlays like trendline scatter plot, and median in histogram",
+    "title": "WebChartOverlay"
+  }
+}

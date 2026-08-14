@@ -1,0 +1,28 @@
+Package: arcgisviz
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
+Description: What the package does (one paragraph).
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 8.1.0
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Collate:
+    'color.R'
+    'enums-web-chart.R'
+    'enums-intl-date-time.R'
+    'enums-others.R'
+    'types-simple.R'
+    'types-format-options.R'
+    'types-statistics.R'
+    'types-webchart.R'
+    'types-bar-chart.R'
+    'types-scatter-plot.R'
+Imports: 
+    S7,
+    s7x
