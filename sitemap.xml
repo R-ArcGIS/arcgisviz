@@ -45,6 +45,7 @@
 <url><loc>http://r.esri.com/arcgisviz/reference/WebChartTextSymbol.html</loc></url>
 <url><loc>http://r.esri.com/arcgisviz/reference/arc_bar.html</loc></url>
 <url><loc>http://r.esri.com/arcgisviz/reference/arc_chart.html</loc></url>
+<url><loc>http://r.esri.com/arcgisviz/reference/arc_col.html</loc></url>
 <url><loc>http://r.esri.com/arcgisviz/reference/arc_line.html</loc></url>
 <url><loc>http://r.esri.com/arcgisviz/reference/arc_scatter.html</loc></url>
 <url><loc>http://r.esri.com/arcgisviz/reference/arcgisChartOutput.html</loc></url>
@@ -52,6 +53,7 @@
 <url><loc>http://r.esri.com/arcgisviz/reference/as_chart_layer.html</loc></url>
 <url><loc>http://r.esri.com/arcgisviz/reference/as_widget.html</loc></url>
 <url><loc>http://r.esri.com/arcgisviz/reference/index.html</loc></url>
+<url><loc>http://r.esri.com/arcgisviz/reference/set_stat.html</loc></url>
 <url><loc>http://r.esri.com/arcgisviz/reference/set_type.html</loc></url>
 <url><loc>http://r.esri.com/arcgisviz/reference/set_x.html</loc></url>
 </urlset>

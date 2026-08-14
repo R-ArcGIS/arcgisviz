@@ -25,4 +25,4 @@ set_y(chart, y)
 
 ## Value
 
-`chart`, with the field mapping set on its (single, current) series.
+`chart`, with the field mapping set.

@@ -21,4 +21,4 @@ set_type(chart, type)
 
 ## Value
 
-`chart`, with a fresh single series of the matching type.
+`chart`, with its series type set.

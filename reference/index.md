@@ -126,6 +126,9 @@
 - [`arc_chart()`](http://r.esri.com/arcgisviz/reference/arc_chart.md) :
   Start a chart
 
+- [`arc_col()`](http://r.esri.com/arcgisviz/reference/arc_col.md) :
+  Column chart
+
 - [`arc_line()`](http://r.esri.com/arcgisviz/reference/arc_line.md) :
   Line chart
 
@@ -146,6 +149,9 @@
 
 - [`as_widget()`](http://r.esri.com/arcgisviz/reference/as_widget.md) :
   Convert a chart to an htmlwidget
+
+- [`set_stat()`](http://r.esri.com/arcgisviz/reference/set_stat.md) :
+  Set a chart's statistical transformation
 
 - [`set_type()`](http://r.esri.com/arcgisviz/reference/set_type.md) :
   Set a chart's type
