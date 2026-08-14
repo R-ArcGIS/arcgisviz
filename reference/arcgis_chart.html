@@ -49,7 +49,14 @@ self-contained feature collection (see <code><a href="as_chart_layer.html">as_ch
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">arcgis_chart</span><span class="op">(</span><span class="va">i_layer</span>, <span class="va">config</span>, width <span class="op">=</span> <span class="cn">NULL</span>, height <span class="op">=</span> <span class="cn">NULL</span>, element_id <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">arcgis_chart</span><span class="op">(</span></span>
+<span>  <span class="va">i_layer</span>,</span>
+<span>  <span class="va">chart_type</span>,</span>
+<span>  <span class="va">config</span>,</span>
+<span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  height <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  element_id <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -61,10 +68,15 @@ self-contained feature collection (see <code><a href="as_chart_layer.html">as_ch
 e.g. built with <code><a href="as_chart_layer.html">as_chart_layer()</a></code>.</p></dd>
 
 
+<dt id="arg-chart-type">chart_type<a class="anchor" aria-label="anchor" href="#arg-chart-type"></a></dt>
+<dd><p>A <code>ModelTypes</code> string, e.g. <code>"barChart"</code>. Used to build
+the default model that <code>config</code> is merged over.</p></dd>
+
+
 <dt id="arg-config">config<a class="anchor" aria-label="anchor" href="#arg-config"></a></dt>
 <dd><p>A list giving the chart config (<code>ChartConfig</code>, i.e. the
-<code>WebChart</code> shape). The chart type is derived from its first series'
-<code>type</code>, so no separate chart-type argument is needed.</p></dd>
+<code>WebChart</code> shape). May be sparse - it is merged over the defaults
+client-side.</p></dd>
 
 
 <dt id="arg-width-height">width, height<a class="anchor" aria-label="anchor" href="#arg-width-height"></a></dt>

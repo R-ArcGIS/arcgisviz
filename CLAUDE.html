@@ -86,6 +86,10 @@
 <strong>Other chart types’ series shapes</strong> (pie, gauge, histogram, box plot, radar, heat) - <code>web-chart.d.ts</code> has all of these in one file now (no per-chart-type <code>.d.ts</code> sprawl to resolve), so adding one is just reading the relevant interface(s) there and following the <code>arcgis-spec-types</code> skill’s conventions - not fundamentally blocked on anything, just not done yet.</li>
 </ul></div>
 <div class="section level2">
+<h2 id="comments">Comments<a class="anchor" aria-label="anchor" href="#comments"></a></h2>
+<p>Keep them terse. More than ~5 lines in one block is too much, and most comments aren’t needed at all. Comment only what the code can’t say - a non-obvious external contract, a surprising constraint, a spec citation (<code>web-chart.d.ts:1274</code>). Don’t restate what the code does, don’t justify the design, don’t narrate the reasoning that led there.</p>
+</div>
+<div class="section level2">
 <h2 id="conventions-worth-knowing-before-editing-r">Conventions worth knowing before editing <code>R/</code>
 <a class="anchor" aria-label="anchor" href="#conventions-worth-knowing-before-editing-r"></a></h2>
 <ul><li>S7 classes: <code>Foo := new_class(properties = list(...))</code> - no name string as the first arg (breaks <code>:=</code>’s inference, silently binds to <code>parent</code> instead and errors). <code>s7x::</code> is always fully-qualified in package code.</li>

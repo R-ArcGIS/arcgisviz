@@ -10,7 +10,14 @@ self-contained feature collection (see
 ## Usage
 
 ``` r
-arcgis_chart(i_layer, config, width = NULL, height = NULL, element_id = NULL)
+arcgis_chart(
+  i_layer,
+  chart_type,
+  config,
+  width = NULL,
+  height = NULL,
+  element_id = NULL
+)
 ```
 
 ## Arguments
@@ -21,11 +28,15 @@ arcgis_chart(i_layer, config, width = NULL, height = NULL, element_id = NULL)
   with
   [`as_chart_layer()`](http://r.esri.com/arcgisviz/reference/as_chart_layer.md).
 
+- chart_type:
+
+  A `ModelTypes` string, e.g. `"barChart"`. Used to build the default
+  model that `config` is merged over.
+
 - config:
 
   A list giving the chart config (`ChartConfig`, i.e. the `WebChart`
-  shape). The chart type is derived from its first series' `type`, so no
-  separate chart-type argument is needed.
+  shape). May be sparse - it is merged over the defaults client-side.
 
 - width, height:
 

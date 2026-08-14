@@ -164,6 +164,14 @@ shapes. The non-obvious parts:
   `arcgis-spec-types` skill’s conventions - not fundamentally blocked on
   anything, just not done yet.
 
+## Comments
+
+Keep them terse. More than ~5 lines in one block is too much, and most
+comments aren’t needed at all. Comment only what the code can’t say - a
+non-obvious external contract, a surprising constraint, a spec citation
+(`web-chart.d.ts:1274`). Don’t restate what the code does, don’t justify
+the design, don’t narrate the reasoning that led there.
+
 ## Conventions worth knowing before editing `R/`
 
 - S7 classes: `Foo := new_class(properties = list(...))` - no name
