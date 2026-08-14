@@ -85,7 +85,11 @@ target_types <- c(
   "ISimpleMarkerSymbol",
   "SizePolicy",
   "ScatterPlotOverlays",
-  "WebChartOverlay"
+  "WebChartOverlay",
+  # line-chart-model.json additions
+  "WebChartLineChartSeries",
+  "RESTSimpleLineSymbolStyle",
+  "RESTSimpleMarkerSymbolStyle"
 )
 
 # TODO: give these dedicated attention later. FeatureLayer/FeatureCollection
@@ -94,9 +98,9 @@ target_types <- c(
 # itself. Geometry types are handled separately elsewhere already. The
 # other WebChart*Series types only show up because WebChart.series /
 # WebChartSeriesType is a union across every chart type the spec
-# supports; they belong to their own future model files (line, pie,
-# gauge, histogram, box plot, radar), not bar-chart-model or
-# scatter-plot-model.
+# supports; they belong to their own future model files (pie, gauge,
+# histogram, box plot, radar), not bar-chart-model, scatter-plot-model,
+# or line-chart-model.
 deferred_types <- c(
   # FeatureLayer / FeatureCollection definition types
   "IFeatureLayer",
@@ -116,7 +120,6 @@ deferred_types <- c(
   "WebChartBoxPlotSeries",
   "WebChartGaugeSeries",
   "WebChartHistogramSeries",
-  "WebChartLineChartSeries",
   "WebChartPieChartSeries",
   "WebChartRadarChartSeries"
 )

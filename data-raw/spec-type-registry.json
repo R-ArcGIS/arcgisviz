@@ -3726,5 +3726,383 @@
     "nullable": false,
     "description": "JSON representation of the chart's overlays like trendline scatter plot, and median in histogram",
     "title": "WebChartOverlay"
+  },
+  "WebChartLineChartSeries": {
+    "kind": "object",
+    "properties": {
+      "type": {
+        "kind": "const",
+        "value": "lineSeries",
+        "description": "Represents a unique string identifier for the LineSeries object. For LineSeries object, it is \"lineSeries\"."
+      },
+      "y": {
+        "kind": "anyOf",
+        "alternatives": [
+          {
+            "kind": "array",
+            "items": {
+              "kind": "primitive",
+              "type": "string",
+              "nullable": false,
+              "minimum": null,
+              "maximum": null,
+              "multipleOf": null,
+              "default": null,
+              "pattern": null,
+              "format": null,
+              "description": null
+            },
+            "minItems": null,
+            "maxItems": null,
+            "nullable": false,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "string",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          }
+        ],
+        "description": "Specifies the numeric field(s) used by the series. The array type is useful when used for a box plot."
+      },
+      "lineSymbol": {
+        "kind": "ref",
+        "ref": "ISimpleLineSymbol",
+        "description": "Contains styling info on how the line/line segments should be rendered"
+      },
+      "lineSmoothed": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies whether line segments should be smoothed."
+      },
+      "showArea": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Indicates whether line series show area."
+      },
+      "markerVisible": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Indicates whether to show or hide the markers/bullets of the line series."
+      },
+      "markerSymbol": {
+        "kind": "ref",
+        "ref": "ISimpleMarkerSymbol",
+        "description": "Contains styling info on how the marker should be rendered"
+      },
+      "areaColor": {
+        "kind": "tuple",
+        "items": [
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          },
+          {
+            "kind": "primitive",
+            "type": "number",
+            "nullable": false,
+            "minimum": null,
+            "maximum": null,
+            "multipleOf": null,
+            "default": null,
+            "pattern": null,
+            "format": null,
+            "description": null
+          }
+        ],
+        "minItems": 4,
+        "maxItems": 4,
+        "nullable": false,
+        "description": "Specifies the color of the filled area for line chart.\nareaColor will be applied only if showArea is true, and is defaulted to the line color if not provided."
+      },
+      "stackNegativeValuesToBaseline": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies how negative values are treated in stacked series.\nIf true, negative values will be stacked on the base line.\nIf false, negative values will be stacked in relation to their previous values in the stack."
+      },
+      "id": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "A unique string used to differentiate the series on a chart."
+      },
+      "visible": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Hides or shows the series. If the series is has **visible** set to `false`, the corresponding legend is grayed out in the legend box."
+      },
+      "dataTooltipVisible": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Hides or shows data tooltips.\nApplies to all charts but Gauge."
+      },
+      "dataTooltipReverseColor": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Indicates whether to apply the hovered element's color to the background (false) or the outline (true).\nApplies to all charts but Gauge."
+      },
+      "dataTooltipValueFormat": {
+        "kind": "ref",
+        "ref": "NumberFormatOptions",
+        "description": "Defines how to render numeric values in tooltips."
+      },
+      "dataTooltipPercentFormat": {
+        "kind": "ref",
+        "ref": "NumberFormatOptions",
+        "description": "Defines how to render percent values in tooltips.\nCurrently used for stacked 100% bar and line charts, as well as pie charts."
+      },
+      "dataTooltipDateFormat": {
+        "kind": "ref",
+        "ref": "DateTimeFormatOptions",
+        "description": "Defines how to render dates in tooltips.\nCurrently used for bar and line charts using a date x-axis with no time binning."
+      },
+      "name": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies the name of the series. It would be reflected in the chart [legends](#legend)"
+      },
+      "query": {
+        "kind": "ref",
+        "ref": "WebChartSeriesQuery",
+        "description": "Specifies a query object associated with a particular series containing info on what data to fetch for that series."
+      },
+      "x": {
+        "kind": "primitive",
+        "type": "string",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies which field represents the x-coordinates of this series. Empty string or one with just white spaces is not allowed. At least 1 or more word characters (a-z, A-Z, _) are needed."
+      },
+      "dataLabels": {
+        "kind": "ref",
+        "ref": "WebChartText",
+        "description": "Specifies how the data labels should be rendered."
+      },
+      "assignToSecondValueAxis": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": false,
+        "pattern": null,
+        "format": null,
+        "description": "Specifies whether the series should be assigned to the second value axis, when the `axes` property defines it.\nSupported by bar and line series."
+      },
+      "binTemporalData": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Whether to use the time properties to bin the temporal data.\nIf set to `false` the `timeIntervalSize` and `timeIntervalUnits` properties can be used to set the date axis base interval."
+      },
+      "timeIntervalUnits": {
+        "kind": "enum",
+        "values": [
+          "esriTimeUnitsDays",
+          "esriTimeUnitsHours",
+          "esriTimeUnitsMinutes",
+          "esriTimeUnitsMonths",
+          "esriTimeUnitsSeconds",
+          "esriTimeUnitsWeeks",
+          "esriTimeUnitsYears"
+        ],
+        "nullable": false,
+        "description": "The time unit that corresponds to the `timeIntervalSize`. Valid options include seconds, minutes, hours, days, weeks, months, and years."
+      },
+      "timeIntervalSize": {
+        "kind": "primitive",
+        "type": "number",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": null,
+        "pattern": null,
+        "format": null,
+        "description": "The span of time that will be binned or aggregated together. This property must be used in conjunction with `timeIntervalUnits`."
+      },
+      "timeAggregationType": {
+        "kind": "enum",
+        "values": [
+          "equalIntervalsFromEndTime",
+          "equalIntervalsFromStartTime"
+        ],
+        "nullable": false,
+        "description": "The time interval alignment type. Valid options include `equalIntervalsFromStartTime` and `equalIntervalsFromEndTime`."
+      },
+      "trimIncompleteTimeInterval": {
+        "kind": "primitive",
+        "type": "boolean",
+        "nullable": false,
+        "minimum": null,
+        "maximum": null,
+        "multipleOf": null,
+        "default": true,
+        "pattern": null,
+        "format": null,
+        "description": "Determines whether incomplete time intervals at the start or end of the data span (depending on the `timeAggregationType`) will be removed from the chart.\nIncomplete intervals on a chart can cause misleading results in which the period in question is under- or overreported due to a different amount of time in the interval.\nSetting `true` indicates to trim these incomplete intervals. Setting `false` does not trim incomplete intervals."
+      },
+      "nullPolicy": {
+        "kind": "enum",
+        "values": [
+          "interpolate",
+          "null",
+          "zero"
+        ],
+        "nullable": false,
+        "description": "How summarized bins returning a null value are displayed. Supported options are:\n- `null`, `zero`, and `interpolate` for line series\n- `null` and `zero` for bar series"
+      }
+    },
+    "required": [
+      "id",
+      "name",
+      "type",
+      "x",
+      "y"
+    ],
+    "nullable": false,
+    "description": "JSON representation of the Line Chart series",
+    "title": "WebChartLineChartSeries"
+  },
+  "RESTSimpleLineSymbolStyle": {
+    "kind": "enum",
+    "values": [
+      "esriSLSDash",
+      "esriSLSDashDot",
+      "esriSLSDashDotDot",
+      "esriSLSDot",
+      "esriSLSNull",
+      "esriSLSSolid"
+    ],
+    "nullable": false,
+    "description": null,
+    "title": "RESTSimpleLineSymbolStyle"
+  },
+  "RESTSimpleMarkerSymbolStyle": {
+    "kind": "enum",
+    "values": [
+      "esriSMSCircle",
+      "esriSMSCross",
+      "esriSMSDiamond",
+      "esriSMSSquare",
+      "esriSMSTriangle",
+      "esriSMSX"
+    ],
+    "nullable": false,
+    "description": null,
+    "title": "RESTSimpleMarkerSymbolStyle"
   }
 }

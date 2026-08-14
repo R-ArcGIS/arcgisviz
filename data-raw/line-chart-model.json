@@ -1,0 +1,1780 @@
+{
+  "className": "LineChartModel",
+  "package": "@arcgis/charts-model",
+  "description": "Model class for a line chart. Provides get/set methods for configuring the chart, its axes, series (line style, markers, area fill, smoothing, stacking), legend, guides, data labels, and temporal binning.",
+  "extends": "SerialChartModel",
+  "mixins": [
+    "ModelWithXYAxes",
+    "ModelWithLegend",
+    "ModelWithColorMatch",
+    "ModelWithRotation",
+    "ModelWithDataLabels",
+    "ModelWithXGuides",
+    "ModelWithYGuides",
+    "ModelWithTemporalBinning"
+  ],
+  "inheritanceChain": ["EventTarget", "ChartModel", "SerialChartModel", "LineChartModel"],
+  "mixinChain": {
+    "ModelWithXYAxes": ["ChartModel", "ModelWithBasicXAxis", "ModelWithXYAxes"],
+    "ModelWithLegend": ["ChartModel", "ModelWithLegend"],
+    "ModelWithColorMatch": ["ChartModel", "ModelWithColorMatch"],
+    "ModelWithRotation": ["ChartModel", "ModelWithRotation"],
+    "ModelWithDataLabels": ["ChartModel", "ModelWithDataLabels"],
+    "ModelWithXGuides": ["ChartModel", "ModelWithGuides", "ModelWithXGuides"],
+    "ModelWithYGuides": ["ChartModel", "ModelWithGuides", "ModelWithYGuides"],
+    "ModelWithTemporalBinning": ["ChartModel", "ModelWithTemporalBinning"]
+  },
+  "sourceFiles": {
+    "ChartModel": "chart-model/chart-model.d.ts",
+    "SerialChartModel": "serial-chart-model/serial-chart-model.d.ts",
+    "LineChartModel": "line-chart-model/line-chart-model.d.ts",
+    "ModelWithBasicXAxis": "mixins/model-with-basic-x-axis.d.ts",
+    "ModelWithXYAxes": "mixins/model-with-xy-axes.d.ts",
+    "ModelWithLegend": "mixins/model-with-legend.d.ts",
+    "ModelWithColorMatch": "mixins/model-with-color-match.d.ts",
+    "ModelWithRotation": "mixins/model-with-rotation.d.ts",
+    "ModelWithDataLabels": "mixins/model-with-data-labels.d.ts",
+    "ModelWithGuides": "mixins/model-with-guides.d.ts",
+    "ModelWithXGuides": "mixins/model-with-x-guides.d.ts",
+    "ModelWithYGuides": "mixins/model-with-y-guides.d.ts",
+    "ModelWithTemporalBinning": "mixins/model-with-temporal-binning.d.ts"
+  },
+  "properties": [
+    {
+      "name": "_config",
+      "type": "ChartConfig<WebChartLineChartSeries, WebChart>",
+      "visibility": "protected",
+      "definedIn": "LineChartModel",
+      "overriddenFrom": ["ChartModel"],
+      "description": "Current configuration used for the line chart."
+    },
+    {
+      "name": "defaultSeries",
+      "type": "WebChartLineChartSeries | undefined",
+      "visibility": "protected",
+      "definedIn": "LineChartModel",
+      "description": "Default series for the line chart. Used in resetting the series styling."
+    },
+    {
+      "name": "_chartType",
+      "type": "\"lineSeries\"",
+      "visibility": "protected",
+      "definedIn": "LineChartModel",
+      "overriddenFrom": ["ChartModel", "SerialChartModel", "ModelWithXYAxes"],
+      "description": "Literal chart type discriminator for line charts."
+    },
+    {
+      "name": "layerInfo",
+      "type": "LayerInfo",
+      "visibility": "protected",
+      "definedIn": "LineChartModel",
+      "overriddenFrom": ["ChartModel"],
+      "description": "Grouping of layer-related properties to be passed to external functions more compactly."
+    },
+    {
+      "name": "resolveSetup",
+      "type": "() => void",
+      "visibility": "protected",
+      "definedIn": "ChartModel",
+      "description": "Function that resolves the setup promise."
+    },
+    {
+      "name": "dataStore",
+      "type": "any",
+      "visibility": "public",
+      "definedIn": "ChartModel",
+      "description": "Data store object that can be used to store any data needed for the chart."
+    },
+    {
+      "name": "setupFinished",
+      "type": "Promise<void>",
+      "visibility": "public",
+      "definedIn": "ChartModel",
+      "description": "Promise that resolves when the setup process is complete."
+    }
+  ],
+  "methods": [
+    {
+      "name": "setup",
+      "definedIn": "LineChartModel",
+      "overrides": "ChartModel (abstract)",
+      "async": true,
+      "description": "Completes the async setup process for the line chart model. Must be called before using the model.",
+      "params": [
+        { "name": "params", "type": "ModelParams<ChartConfig<WebChartLineChartSeries>>", "optional": false, "description": null }
+      ],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "generateDefaultConfig",
+      "definedIn": "LineChartModel",
+      "overrides": "ChartModel (abstract)",
+      "visibility": "protected",
+      "async": true,
+      "description": "Generates the default config object when creating a new line chart.",
+      "params": [],
+      "returns": { "type": "Promise<Omit<typeof this._config, \"iLayer\">>", "description": null }
+    },
+    {
+      "name": "initDefaultSeries",
+      "definedIn": "LineChartModel",
+      "visibility": "protected",
+      "async": true,
+      "description": "Initializes the default series for the line chart. Used in resetting the series styling.",
+      "params": [],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "getSeriesLineStyle",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Gets the line style of the series based on the series index. If the index is out of bounds, returns undefined.",
+      "params": [
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "RESTSimpleLineSymbolStyle | undefined", "description": null }
+    },
+    {
+      "name": "setSeriesLineStyle",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Sets the line style of the series based on the series index.",
+      "params": [
+        { "name": "newStyle", "type": "RESTSimpleLineSymbolStyle | undefined", "optional": false, "description": "The new style for the series." },
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getSeriesLineWidth",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Gets the line width of the series based on the series index. If the index is out of bounds, returns undefined.",
+      "params": [
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "number | undefined", "description": null }
+    },
+    {
+      "name": "setSeriesLineWidth",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Sets the line width of the series based on the series index.",
+      "params": [
+        { "name": "newWidth", "type": "number | undefined", "optional": false, "description": "The new width for the series." },
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getSeriesMarkerColor",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Gets the marker color of the series based on the series index. If the index is out of bounds, returns undefined.",
+      "params": [
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "Color | undefined", "description": null }
+    },
+    {
+      "name": "setSeriesMarkerColor",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Sets the marker color of the series based on the series index.",
+      "params": [
+        { "name": "newColor", "type": "Color | undefined", "optional": false, "description": "The new color for the series." },
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getSeriesMarkerStyle",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Gets the marker style of the series based on the series index. If the index is out of bounds, returns undefined.",
+      "params": [
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "RESTSimpleMarkerSymbolStyle | undefined", "description": null }
+    },
+    {
+      "name": "setSeriesMarkerStyle",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Sets the marker style of the series based on the series index.",
+      "params": [
+        { "name": "newStyle", "type": "RESTSimpleMarkerSymbolStyle | undefined", "optional": false, "description": "The new style for the series." },
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getSeriesMarkerSize",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Gets the marker size of the series based on the series index. If the index is out of bounds, returns undefined.",
+      "params": [
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "number | undefined", "description": null }
+    },
+    {
+      "name": "setSeriesMarkerSize",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Sets the marker size of the series based on the series index.",
+      "params": [
+        { "name": "newSize", "type": "number | undefined", "optional": false, "description": "The new size for the series." },
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "isLineSmoothed",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Specify whether line segments of the series should be smoothed. Default false.",
+      "params": [
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "setLineSmoothed",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Specify whether line segments of the series should be smoothed.",
+      "params": [
+        { "name": "smoothed", "type": "boolean", "optional": false, "description": "true if line segments of the series should be smoothed, false otherwise." },
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "isAreaVisible",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Specify whether the line series should show area. Default false.",
+      "params": [
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "setAreaVisible",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Specify whether the line series should show area.",
+      "params": [
+        { "name": "visible", "type": "boolean", "optional": false, "description": "true if the line series should show area, false otherwise." },
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "isMarkerVisible",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Indicate whether to show or hide the markers/bullets of the line series. Default true.",
+      "params": [
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "setMarkerVisible",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Indicate whether to show or hide the markers/bullets of the line series.",
+      "params": [
+        { "name": "visible", "type": "boolean", "optional": false, "description": "true if the markers/bullets of the line series should be shown, false otherwise." },
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getAreaColor",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Specify the color of the filled area for line chart. areaColor will be applied only if showArea is true, and defaults to the line color if not provided.",
+      "params": [
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "Color | undefined", "description": null }
+    },
+    {
+      "name": "setAreaColor",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Specify the color of the filled area for line chart.",
+      "params": [
+        { "name": "color", "type": "Color | undefined", "optional": false, "description": "The color of the filled area for line chart." },
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "isNegativeValuesStackedToBaseline",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Specify how negative values are treated in stacked series. If true, negative values are stacked on the base line. If false, negative values are stacked in relation to their previous values in the stack. Default true.",
+      "params": [
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "setNegativeValuesStackedToBaseline",
+      "definedIn": "LineChartModel",
+      "async": false,
+      "description": "Specify how negative values are treated in stacked series.",
+      "params": [
+        { "name": "stackNegativeValuesToBaseline", "type": "boolean", "optional": false, "description": "true if negative values should be stacked on the base line, false otherwise." },
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": "The index of the series." }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "resetSeriesStyling",
+      "definedIn": "LineChartModel",
+      "async": true,
+      "description": "Resets the series styling to the default styling.",
+      "params": [],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "resetAvailable",
+      "definedIn": "LineChartModel",
+      "async": true,
+      "description": "Returns whether the series styling is able to be reset.",
+      "params": [],
+      "returns": { "type": "Promise<boolean>", "description": null }
+    },
+
+    {
+      "name": "getXAxisField",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Gets the x-axis field for the chart.",
+      "params": [],
+      "returns": { "type": "string", "description": null }
+    },
+    {
+      "name": "setXAxisField",
+      "definedIn": "SerialChartModel",
+      "async": true,
+      "description": "Sets the x-axis field for the chart. Must be awaited for the changes to take effect.",
+      "params": [
+        { "name": "newXAxisField", "type": "string", "optional": false, "description": null }
+      ],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "getAggregationType",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Gets the aggregation type for the chart.",
+      "params": [],
+      "returns": { "type": "RESTStatisticType", "description": null }
+    },
+    {
+      "name": "setAggregationType",
+      "definedIn": "SerialChartModel",
+      "async": true,
+      "description": "Sets the aggregation type for the chart. Must be awaited for the changes to take effect.",
+      "params": [
+        { "name": "newAggregationType", "type": "RESTStatisticType", "optional": false, "description": null }
+      ],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "getSplitByField",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Gets the split-by field for the chart.",
+      "params": [],
+      "returns": { "type": "string", "description": null }
+    },
+    {
+      "name": "setSplitByField",
+      "definedIn": "SerialChartModel",
+      "async": true,
+      "description": "Sets the split-by field for the chart. Must be awaited for the changes to take effect.",
+      "params": [
+        { "name": "newSplitByField", "type": "string", "optional": false, "description": null }
+      ],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "getNumericFields",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Gets the numeric fields array for the chart.",
+      "params": [],
+      "returns": { "type": "string[]", "description": null }
+    },
+    {
+      "name": "setNumericFields",
+      "definedIn": "SerialChartModel",
+      "async": true,
+      "description": "Sets the numeric field or numeric fields array for the chart. Must be awaited for the changes to take effect.",
+      "params": [
+        { "name": "newNumericFields", "type": "string[] | string", "optional": false, "description": null }
+      ],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "getDataFilter",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Gets the data filter for the chart.",
+      "params": [],
+      "returns": { "type": "WebChartDataFilters | undefined", "description": null }
+    },
+    {
+      "name": "setDataFilter",
+      "definedIn": "SerialChartModel",
+      "async": true,
+      "description": "Sets the data filter for the chart.",
+      "params": [
+        { "name": "newDataFilter", "type": "WebChartDataFilters | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "getCustomSortValues",
+      "definedIn": "SerialChartModel",
+      "async": true,
+      "description": "Gets the list of the category values for the chart.",
+      "params": [],
+      "returns": { "type": "Promise<string[]>", "description": null }
+    },
+    {
+      "name": "getSortOrder",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Gets the sort order for the chart.",
+      "params": [],
+      "returns": { "type": "SerialChartDataSortingKinds", "description": null }
+    },
+    {
+      "name": "setSortOrder",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Sets the sort order for the chart.",
+      "params": [
+        { "name": "newSortOrder", "type": "SerialChartDataSortingKinds", "optional": false, "description": null },
+        { "name": "orderByList", "type": "string[]", "optional": true, "default": null, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getOrderByList",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Gets the list of custom sort values for custom sort.",
+      "params": [],
+      "returns": { "type": "string[]", "description": null }
+    },
+    {
+      "name": "setOrderByList",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Sets the list of custom sort values for custom sort.",
+      "params": [
+        { "name": "newOrderByList", "type": "string[]", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "updateSeriesFromLayerFilter",
+      "definedIn": "SerialChartModel",
+      "async": true,
+      "description": "Updates the series based on the layer filter.",
+      "params": [],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "getSeriesName",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Gets the name of the series based on the series index.",
+      "params": [
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": null }
+      ],
+      "returns": { "type": "string | undefined", "description": null }
+    },
+    {
+      "name": "setSeriesName",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Sets the name of the series based on the series index.",
+      "params": [
+        { "name": "newName", "type": "string", "optional": false, "description": null },
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getSeriesColor",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Gets the color of the series based on the series index.",
+      "params": [
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": null }
+      ],
+      "returns": { "type": "Color | undefined", "description": null }
+    },
+    {
+      "name": "setSeriesColor",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Sets the color of the series based on the series index.",
+      "params": [
+        { "name": "newColor", "type": "Color | undefined", "optional": false, "description": null },
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getOrderOfSeries",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Gets the order of the series array by returning an array of series ids.",
+      "params": [],
+      "returns": { "type": "string[]", "description": null }
+    },
+    {
+      "name": "setOrderOfSeries",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Sets the order of the series array by providing an array of series ids.",
+      "params": [
+        { "name": "newOrder", "type": "string[]", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getStackedType",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Gets how the bars/lines should be placed when multiple series are rendered in the same chart. Default sideBySide.",
+      "params": [],
+      "returns": { "type": "WebChartStackedKinds | undefined", "description": null }
+    },
+    {
+      "name": "setStackedType",
+      "definedIn": "SerialChartModel",
+      "async": true,
+      "description": "Sets how the bars/lines should be placed when multiple series are rendered in the same chart. Default sideBySide.",
+      "params": [
+        { "name": "newStackedType", "type": "WebChartStackedKinds | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "moveSeries",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Moves a series from one index in the series array to another.",
+      "params": [
+        { "name": "fromIndex", "type": "number", "optional": false, "description": null },
+        { "name": "toIndex", "type": "number", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "moveCustomSortValuesInOrderByList",
+      "definedIn": "SerialChartModel",
+      "async": false,
+      "description": "Moves the custom sort values in-place for the order by list in the config.",
+      "params": [
+        { "name": "fromIndex", "type": "number", "optional": false, "description": null },
+        { "name": "toIndex", "type": "number", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "resetConfig",
+      "definedIn": "SerialChartModel",
+      "visibility": "protected",
+      "async": true,
+      "description": "Resets the config to the default config.",
+      "params": [],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+
+    {
+      "name": "isSameChartAs",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Checks if the current chart model is for the same chart as another chart model.",
+      "params": [
+        { "name": "otherModel", "type": "ChartModel | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "getConfig",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Gets the current chart configuration object.",
+      "params": [],
+      "returns": { "type": "ChartConfig", "description": null }
+    },
+    {
+      "name": "setConfig",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Sets the chart configuration object.",
+      "params": [
+        { "name": "newConfig", "type": "ChartConfig", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getChartType",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Gets the chart type.",
+      "params": [],
+      "returns": { "type": "typeof this._chartType", "description": "\"lineSeries\" for LineChartModel." }
+    },
+    {
+      "name": "getLayer",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Gets the associated layer.",
+      "params": [],
+      "returns": { "type": "SupportedLayer | undefined", "description": null }
+    },
+    {
+      "name": "getChartId",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Gets the chart id.",
+      "params": [],
+      "returns": { "type": "string | undefined", "description": null }
+    },
+    {
+      "name": "setChartId",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Sets the chart id.",
+      "params": [
+        { "name": "newId", "type": "string", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getTitleText",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Gets the chart title text.",
+      "params": [],
+      "returns": { "type": "string", "description": null }
+    },
+    {
+      "name": "setTitleText",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Sets the chart title text.",
+      "params": [
+        { "name": "newTitle", "type": "string", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getDescriptionText",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Gets the chart description text.",
+      "params": [],
+      "returns": { "type": "string", "description": null }
+    },
+    {
+      "name": "setDescriptionText",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Sets the chart description text.",
+      "params": [
+        { "name": "newDescription", "type": "string", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getChartTitleVisibility",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Gets whether the chart title is visible.",
+      "params": [],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "setChartTitleVisibility",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Sets whether the chart title is visible.",
+      "params": [
+        { "name": "newVisibility", "type": "boolean", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getDescriptionVisibility",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Gets whether the chart description is visible.",
+      "params": [],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "setDescriptionVisibility",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Sets whether the chart description is visible.",
+      "params": [
+        { "name": "newVisibility", "type": "boolean", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getTitleSymbol",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Gets the title text symbol.",
+      "params": [],
+      "returns": { "type": "WebChartTextSymbol | undefined", "description": null }
+    },
+    {
+      "name": "setTitleSymbol",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Sets the title text symbol.",
+      "params": [
+        { "name": "newTitleSymbol", "type": "WebChartTextSymbol | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getDescriptionSymbol",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Gets the description text symbol.",
+      "params": [],
+      "returns": { "type": "WebChartTextSymbol | undefined", "description": null }
+    },
+    {
+      "name": "setDescriptionSymbol",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Sets the description text symbol.",
+      "params": [
+        { "name": "newDescriptionSymbol", "type": "WebChartTextSymbol | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getBackgroundColor",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Gets the background color of the chart.",
+      "params": [],
+      "returns": { "type": "Color | undefined", "description": null }
+    },
+    {
+      "name": "setBackgroundColor",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Sets the background color of the chart.",
+      "params": [
+        { "name": "newBackgroundColor", "type": "Color | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "setSeriesVisibility",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Sets the visibility of a series.",
+      "params": [
+        { "name": "props", "type": "LegendItemVisibility", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getSeriesId",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Gets the series ID for a given series index.",
+      "params": [
+        { "name": "seriesIndex", "type": "number", "optional": false, "description": null }
+      ],
+      "returns": { "type": "string | undefined", "description": null }
+    },
+    {
+      "name": "getSeriesIndex",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Gets the series index for a given series ID.",
+      "params": [
+        { "name": "seriesId", "type": "string", "optional": false, "description": null }
+      ],
+      "returns": { "type": "number | undefined", "description": null }
+    },
+    {
+      "name": "getSeriesLength",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Gets the length of the series array.",
+      "params": [],
+      "returns": { "type": "number", "description": null }
+    },
+    {
+      "name": "getChartSubType",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Gets the chart sub type of the series.",
+      "params": [],
+      "returns": { "type": "ChartSubType", "description": null }
+    },
+    {
+      "name": "setFetchNULLValues",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Sets whether to fetch null values for them to be counted or displayed as categories on the chart.",
+      "params": [
+        { "name": "fetchNULLValues", "type": "boolean", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getFetchNULLValues",
+      "definedIn": "ChartModel",
+      "async": false,
+      "description": "Gets whether to fetch null values for them to be counted or displayed as categories on the chart.",
+      "params": [],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "emitConfigUpdate",
+      "definedIn": "ChartModel",
+      "visibility": "protected",
+      "async": false,
+      "description": "Emits a config update event.",
+      "params": [
+        { "name": "functionCalled", "type": "string", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "loadConfigFromLayer",
+      "definedIn": "ChartModel",
+      "visibility": "protected",
+      "async": true,
+      "generic": "T extends SupportedChartSeries",
+      "description": "Loads the config based on the provided props.",
+      "params": [
+        { "name": "params", "type": "ModelParams<ChartConfig<T>>", "optional": false, "description": null }
+      ],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+
+    {
+      "name": "getXAxisTitleText",
+      "definedIn": "ModelWithBasicXAxis",
+      "async": false,
+      "description": "Gets the x-axis title text.",
+      "params": [],
+      "returns": { "type": "string", "description": null }
+    },
+    {
+      "name": "setXAxisTitleText",
+      "definedIn": "ModelWithBasicXAxis",
+      "async": false,
+      "description": "Sets the x-axis title text.",
+      "params": [
+        { "name": "newXAxisTitleText", "type": "string", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getXAxisTitleVisibility",
+      "definedIn": "ModelWithBasicXAxis",
+      "async": false,
+      "description": "Gets whether the x-axis title is visible.",
+      "params": [],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "setXAxisTitleVisibility",
+      "definedIn": "ModelWithBasicXAxis",
+      "async": false,
+      "description": "Sets the visibility of the x-axis title.",
+      "params": [
+        { "name": "newXAxisTitleVisibility", "type": "boolean", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getMaxXBound",
+      "definedIn": "ModelWithBasicXAxis",
+      "async": false,
+      "description": "Gets the maximum bound that is currently set for the x-axis.",
+      "params": [],
+      "returns": { "type": "number | null", "description": null }
+    },
+    {
+      "name": "setMaxXBound",
+      "definedIn": "ModelWithBasicXAxis",
+      "async": true,
+      "description": "Sets the maximum bound for the x-axis. Must be awaited for the changes to take effect.",
+      "params": [
+        { "name": "newMaxXBound", "type": "number | null", "optional": false, "description": null }
+      ],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "getMinXBound",
+      "definedIn": "ModelWithBasicXAxis",
+      "async": false,
+      "description": "Gets the minimum bound that is currently set for the x-axis.",
+      "params": [],
+      "returns": { "type": "number | null", "description": null }
+    },
+    {
+      "name": "setMinXBound",
+      "definedIn": "ModelWithBasicXAxis",
+      "async": true,
+      "description": "Sets the minimum bound for the x-axis. Must be awaited for the changes to take effect.",
+      "params": [
+        { "name": "newMinXBound", "type": "number | null", "optional": false, "description": null }
+      ],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "getXAxisTitleSymbol",
+      "definedIn": "ModelWithBasicXAxis",
+      "async": false,
+      "description": "Gets the x-axis title text symbol.",
+      "params": [],
+      "returns": { "type": "WebChartTextSymbol | undefined", "description": null }
+    },
+    {
+      "name": "setXAxisTitleSymbol",
+      "definedIn": "ModelWithBasicXAxis",
+      "async": false,
+      "description": "Sets the x-axis title text symbol.",
+      "params": [
+        { "name": "newXAxisTitle", "type": "WebChartTextSymbol | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getAxisLabelsSymbol",
+      "definedIn": "ModelWithBasicXAxis",
+      "async": false,
+      "description": "Gets the axis labels text symbol.",
+      "params": [],
+      "returns": { "type": "WebChartTextSymbol | undefined", "description": null }
+    },
+    {
+      "name": "setAxisLabelsSymbol",
+      "definedIn": "ModelWithBasicXAxis",
+      "async": false,
+      "description": "Sets the axis labels text symbol.",
+      "params": [
+        { "name": "newAxisLabelsSymbol", "type": "WebChartTextSymbol | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getAxisLinesSymbol",
+      "definedIn": "ModelWithBasicXAxis",
+      "async": false,
+      "description": "Gets the axis lines symbol.",
+      "params": [],
+      "returns": { "type": "ISimpleLineSymbol | undefined", "description": null }
+    },
+    {
+      "name": "setAxisLinesSymbol",
+      "definedIn": "ModelWithBasicXAxis",
+      "async": false,
+      "description": "Sets the axis lines symbol.",
+      "params": [
+        { "name": "newAxisLinesSymbol", "type": "ISimpleLineSymbol | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+
+    {
+      "name": "getYAxisTitleText",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Gets the Y-axis title text.",
+      "params": [],
+      "returns": { "type": "string", "description": null }
+    },
+    {
+      "name": "setYAxisTitleText",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Sets the Y-axis title text.",
+      "params": [
+        { "name": "newYAxisTitleText", "type": "string", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getYAxisTitleVisibility",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Gets the visibility of the Y-axis title.",
+      "params": [],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "setYAxisTitleVisibility",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Sets the visibility of the Y-axis title.",
+      "params": [
+        { "name": "newYAxisTitleVisibility", "type": "boolean", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getMaxYBound",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Gets the maximum bound for the y-axis.",
+      "params": [],
+      "returns": { "type": "number | null", "description": null }
+    },
+    {
+      "name": "setMaxYBound",
+      "definedIn": "ModelWithXYAxes",
+      "async": true,
+      "description": "Sets the maximum bound for the y-axis. Must be awaited for the changes to take effect.",
+      "params": [
+        { "name": "newMaxYBound", "type": "number | null", "optional": false, "description": null }
+      ],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "getMinYBound",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Gets the minimum bound for the y-axis.",
+      "params": [],
+      "returns": { "type": "number | null", "description": null }
+    },
+    {
+      "name": "setMinYBound",
+      "definedIn": "ModelWithXYAxes",
+      "async": true,
+      "description": "Sets the minimum bound for the y-axis. Must be awaited for the changes to take effect.",
+      "params": [
+        { "name": "newMinYBound", "type": "number | null", "optional": false, "description": null }
+      ],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "getXAxisValueFormat",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Gets the value format options for the x-axis.",
+      "params": [],
+      "returns": { "type": "CategoryFormatOptions | DateTimeFormatOptions | NumberFormatOptions | undefined", "description": null }
+    },
+    {
+      "name": "setXAxisValueFormat",
+      "definedIn": "ModelWithXYAxes",
+      "async": true,
+      "description": "Sets the value format options for the x-axis. Must be awaited for the changes to take effect.",
+      "params": [
+        { "name": "newXAxisValueFormat", "type": "CategoryFormatOptions | DateTimeFormatOptions | NumberFormatOptions | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "getYAxisValueFormat",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Gets the value format options for the y-axis.",
+      "params": [],
+      "returns": { "type": "NumberFormatOptions | undefined", "description": null }
+    },
+    {
+      "name": "setYAxisValueFormat",
+      "definedIn": "ModelWithXYAxes",
+      "async": true,
+      "description": "Sets the value format options for the y-axis. Must be awaited for the changes to take effect.",
+      "params": [
+        { "name": "newYAxisValueFormat", "type": "NumberFormatOptions | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "getXLogarithmic",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Gets whether logarithmic scale is enabled for the x-axis.",
+      "params": [],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "setXLogarithmic",
+      "definedIn": "ModelWithXYAxes",
+      "async": true,
+      "description": "Sets whether logarithmic scale is enabled for the x-axis. Must be awaited for the changes to take effect.",
+      "params": [
+        { "name": "newXLogarithmicState", "type": "boolean", "optional": false, "description": null }
+      ],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "getYLogarithmic",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Gets whether logarithmic scale is enabled for the y-axis.",
+      "params": [],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "setYLogarithmic",
+      "definedIn": "ModelWithXYAxes",
+      "async": true,
+      "description": "Sets whether logarithmic scale is enabled for the y-axis. Must be awaited for the changes to take effect.",
+      "params": [
+        { "name": "newYLogarithmicState", "type": "boolean", "optional": false, "description": null }
+      ],
+      "returns": { "type": "Promise<void>", "description": null }
+    },
+    {
+      "name": "getXAxisScrollbar",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Gets the x-axis scrollbar configuration.",
+      "params": [],
+      "returns": { "type": "WebChartAxisScrollBar | undefined", "description": null }
+    },
+    {
+      "name": "setXAxisScrollbar",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Sets the x-axis scrollbar configuration.",
+      "params": [
+        { "name": "scrollbar", "type": "WebChartAxisScrollBar", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getYAxisScrollbar",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Gets the y-axis scrollbar configuration.",
+      "params": [],
+      "returns": { "type": "WebChartAxisScrollBar | undefined", "description": null }
+    },
+    {
+      "name": "setYAxisScrollbar",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Sets the y-axis scrollbar configuration.",
+      "params": [
+        { "name": "scrollbar", "type": "WebChartAxisScrollBar", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getYAxisTitleSymbol",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Gets the y-axis title text symbol.",
+      "params": [],
+      "returns": { "type": "WebChartTextSymbol | undefined", "description": null }
+    },
+    {
+      "name": "setYAxisTitleSymbol",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Sets the y-axis title text symbol.",
+      "params": [
+        { "name": "newYAxisTitleSymbol", "type": "WebChartTextSymbol | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getGridLinesSymbol",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Gets the grid lines symbol.",
+      "params": [],
+      "returns": { "type": "ISimpleLineSymbol | undefined", "description": null }
+    },
+    {
+      "name": "setGridLinesSymbol",
+      "definedIn": "ModelWithXYAxes",
+      "async": false,
+      "description": "Sets the grid lines symbol.",
+      "params": [
+        { "name": "newGridLinesSymbol", "type": "ISimpleLineSymbol | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+
+    {
+      "name": "getLegendVisibility",
+      "definedIn": "ModelWithLegend",
+      "async": false,
+      "description": "Gets whether the legend is visible.",
+      "params": [],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "setLegendVisibility",
+      "definedIn": "ModelWithLegend",
+      "async": false,
+      "description": "Sets whether the legend is visible.",
+      "params": [
+        { "name": "newLegendVisibility", "type": "boolean", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getLegendTitleText",
+      "definedIn": "ModelWithLegend",
+      "async": false,
+      "description": "Gets the legend title text.",
+      "params": [],
+      "returns": { "type": "string", "description": null }
+    },
+    {
+      "name": "setLegendTitleText",
+      "definedIn": "ModelWithLegend",
+      "async": false,
+      "description": "Sets the legend title text.",
+      "params": [
+        { "name": "newLegendTitleText", "type": "string", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getLegendTitleVisibility",
+      "definedIn": "ModelWithLegend",
+      "async": false,
+      "description": "Gets whether the legend title is visible.",
+      "params": [],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "setLegendTitleVisibility",
+      "definedIn": "ModelWithLegend",
+      "async": false,
+      "description": "Sets whether the legend title is visible.",
+      "params": [
+        { "name": "newShowLegendTitle", "type": "boolean", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getLegendPosition",
+      "definedIn": "ModelWithLegend",
+      "async": false,
+      "description": "Gets the legend position.",
+      "params": [],
+      "returns": { "type": "WebChartLegendPositions", "description": null }
+    },
+    {
+      "name": "setLegendPosition",
+      "definedIn": "ModelWithLegend",
+      "async": false,
+      "description": "Sets the legend position.",
+      "params": [
+        { "name": "newLegendPosition", "type": "WebChartLegendPositions", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getLegendTitleSymbol",
+      "definedIn": "ModelWithLegend",
+      "async": false,
+      "description": "Gets the legend title symbol.",
+      "params": [],
+      "returns": { "type": "WebChartTextSymbol | undefined", "description": null }
+    },
+    {
+      "name": "setLegendTitleSymbol",
+      "definedIn": "ModelWithLegend",
+      "async": false,
+      "description": "Sets the legend title symbol.",
+      "params": [
+        { "name": "newLegendTitle", "type": "WebChartTextSymbol | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getLegendTextSymbol",
+      "definedIn": "ModelWithLegend",
+      "async": false,
+      "description": "Gets the legend text symbol.",
+      "params": [],
+      "returns": { "type": "WebChartTextSymbol | undefined", "description": null }
+    },
+    {
+      "name": "setLegendTextSymbol",
+      "definedIn": "ModelWithLegend",
+      "async": false,
+      "description": "Sets the legend text symbol.",
+      "params": [
+        { "name": "newLegendText", "type": "WebChartTextSymbol | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+
+    {
+      "name": "getColorMatch",
+      "definedIn": "ModelWithColorMatch",
+      "async": false,
+      "description": "Gets whether the chart should attempt to match the data source's colors.",
+      "params": [],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "setColorMatch",
+      "definedIn": "ModelWithColorMatch",
+      "async": false,
+      "description": "Sets whether the chart should attempt to match the data source's colors.",
+      "params": [
+        { "name": "newColorMatch", "type": "boolean", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+
+    {
+      "name": "getRotatedState",
+      "definedIn": "ModelWithRotation",
+      "async": false,
+      "description": "Gets whether the chart is rotated.",
+      "params": [],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "setRotatedState",
+      "definedIn": "ModelWithRotation",
+      "async": false,
+      "description": "Sets whether the chart is rotated.",
+      "params": [
+        { "name": "newRotatedState", "type": "boolean", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+
+    {
+      "name": "getDataLabelsVisibility",
+      "definedIn": "ModelWithDataLabels",
+      "async": false,
+      "description": "Gets whether the data labels are visible.",
+      "params": [],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "setDataLabelsVisibility",
+      "definedIn": "ModelWithDataLabels",
+      "async": false,
+      "description": "Sets the visibility of the data labels.",
+      "params": [
+        { "name": "newDataLabelsVisibility", "type": "boolean", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getDataLabelsSymbol",
+      "definedIn": "ModelWithDataLabels",
+      "async": false,
+      "description": "Gets the data labels text symbol.",
+      "params": [],
+      "returns": { "type": "WebChartTextSymbol | undefined", "description": null }
+    },
+    {
+      "name": "setDataLabelsSymbol",
+      "definedIn": "ModelWithDataLabels",
+      "async": false,
+      "description": "Sets the data labels text symbol.",
+      "params": [
+        { "name": "newDataLabelsSymbol", "type": "WebChartTextSymbol | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+
+    {
+      "name": "getGuideLabelsSymbol",
+      "definedIn": "ModelWithGuides",
+      "async": false,
+      "description": "Gets the guide labels text symbol.",
+      "params": [],
+      "returns": { "type": "WebChartTextSymbol | undefined", "description": null }
+    },
+    {
+      "name": "setGuideLabelsSymbol",
+      "definedIn": "ModelWithGuides",
+      "async": false,
+      "description": "Sets the guide labels text symbol.",
+      "params": [
+        { "name": "newGuideLabelsSymbol", "type": "WebChartTextSymbol | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getGuideVisibility",
+      "definedIn": "ModelWithGuides",
+      "async": false,
+      "description": "Gets whether a guide is visible.",
+      "params": [
+        { "name": "index", "type": "number", "optional": true, "default": 0, "description": null },
+        { "name": "orientation", "type": "GuideOrientation", "optional": true, "default": "y", "description": null }
+      ],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "setGuideVisibility",
+      "definedIn": "ModelWithGuides",
+      "async": false,
+      "description": "Sets whether a guide is visible.",
+      "params": [
+        { "name": "visible", "type": "boolean", "optional": false, "description": null },
+        { "name": "index", "type": "number", "optional": true, "default": 0, "description": null },
+        { "name": "orientation", "type": "GuideOrientation", "optional": true, "default": "y", "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getGuideStart",
+      "definedIn": "ModelWithGuides",
+      "async": false,
+      "description": "Gets the start value of a guide.",
+      "params": [
+        { "name": "index", "type": "number", "optional": true, "default": 0, "description": null },
+        { "name": "orientation", "type": "GuideOrientation", "optional": true, "default": "y", "description": null }
+      ],
+      "returns": { "type": "Date | number | string | null", "description": null }
+    },
+    {
+      "name": "setGuideStart",
+      "definedIn": "ModelWithGuides",
+      "async": false,
+      "description": "Sets the start value of a guide.",
+      "params": [
+        { "name": "start", "type": "Date | number | string | null", "optional": false, "description": null },
+        { "name": "index", "type": "number", "optional": true, "default": 0, "description": null },
+        { "name": "orientation", "type": "GuideOrientation", "optional": true, "default": "y", "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getGuideEnd",
+      "definedIn": "ModelWithGuides",
+      "async": false,
+      "description": "Gets the end value of a guide.",
+      "params": [
+        { "name": "index", "type": "number", "optional": true, "default": 0, "description": null },
+        { "name": "orientation", "type": "GuideOrientation", "optional": true, "default": "y", "description": null }
+      ],
+      "returns": { "type": "Date | number | string | null | undefined", "description": null }
+    },
+    {
+      "name": "setGuideEnd",
+      "definedIn": "ModelWithGuides",
+      "async": false,
+      "description": "Sets the end value of a guide.",
+      "params": [
+        { "name": "end", "type": "Date | number | string | null | undefined", "optional": false, "description": null },
+        { "name": "index", "type": "number", "optional": true, "default": 0, "description": null },
+        { "name": "orientation", "type": "GuideOrientation", "optional": true, "default": "y", "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getGuideName",
+      "definedIn": "ModelWithGuides",
+      "async": false,
+      "description": "Gets the name of a guide.",
+      "params": [
+        { "name": "index", "type": "number", "optional": true, "default": 0, "description": null },
+        { "name": "orientation", "type": "GuideOrientation", "optional": true, "default": "y", "description": null }
+      ],
+      "returns": { "type": "string | undefined", "description": null }
+    },
+    {
+      "name": "setGuideName",
+      "definedIn": "ModelWithGuides",
+      "async": false,
+      "description": "Sets the name of a guide.",
+      "params": [
+        { "name": "name", "type": "string", "optional": false, "description": null },
+        { "name": "index", "type": "number", "optional": true, "default": 0, "description": null },
+        { "name": "orientation", "type": "GuideOrientation", "optional": true, "default": "y", "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getGuideLabelText",
+      "definedIn": "ModelWithGuides",
+      "async": false,
+      "description": "Gets the guide label text.",
+      "params": [
+        { "name": "index", "type": "number", "optional": true, "default": 0, "description": null },
+        { "name": "orientation", "type": "GuideOrientation", "optional": true, "default": "y", "description": null }
+      ],
+      "returns": { "type": "string | undefined", "description": null }
+    },
+    {
+      "name": "setGuideLabelText",
+      "definedIn": "ModelWithGuides",
+      "async": false,
+      "description": "Sets the guide label text.",
+      "params": [
+        { "name": "labelText", "type": "string", "optional": false, "description": null },
+        { "name": "index", "type": "number", "optional": true, "default": 0, "description": null },
+        { "name": "orientation", "type": "GuideOrientation", "optional": true, "default": "y", "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getGuideAbove",
+      "definedIn": "ModelWithGuides",
+      "async": false,
+      "description": "Gets whether the guide should be rendered above the other chart elements.",
+      "params": [
+        { "name": "index", "type": "number", "optional": true, "default": 0, "description": null },
+        { "name": "orientation", "type": "GuideOrientation", "optional": true, "default": "y", "description": null }
+      ],
+      "returns": { "type": "boolean", "description": null }
+    },
+    {
+      "name": "setGuideAbove",
+      "definedIn": "ModelWithGuides",
+      "async": false,
+      "description": "Sets whether the guide should be rendered above the other chart elements.",
+      "params": [
+        { "name": "above", "type": "boolean", "optional": false, "description": null },
+        { "name": "index", "type": "number", "optional": true, "default": 0, "description": null },
+        { "name": "orientation", "type": "GuideOrientation", "optional": true, "default": "y", "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getGuideStyle",
+      "definedIn": "ModelWithGuides",
+      "async": false,
+      "description": "Gets the guide style.",
+      "params": [
+        { "name": "index", "type": "number", "optional": true, "default": 0, "description": null },
+        { "name": "orientation", "type": "GuideOrientation", "optional": true, "default": "y", "description": null }
+      ],
+      "returns": { "type": "ISimpleFillSymbol | ISimpleLineSymbol | undefined", "description": null }
+    },
+    {
+      "name": "setGuideStyle",
+      "definedIn": "ModelWithGuides",
+      "async": false,
+      "description": "Sets the guide style.",
+      "params": [
+        { "name": "style", "type": "ISimpleFillSymbol | ISimpleLineSymbol", "optional": false, "description": null },
+        { "name": "index", "type": "number", "optional": true, "default": 0, "description": null },
+        { "name": "orientation", "type": "GuideOrientation", "optional": true, "default": "y", "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+
+    {
+      "name": "getXGuidesLength",
+      "definedIn": "ModelWithXGuides",
+      "async": false,
+      "description": "Gets the number of guides in the X-axis guides list.",
+      "params": [],
+      "returns": { "type": "number | undefined", "description": null }
+    },
+    {
+      "name": "addXAxisGuide",
+      "definedIn": "ModelWithXGuides",
+      "async": false,
+      "description": "Adds an X-axis guide.",
+      "params": [
+        { "name": "name", "type": "string", "optional": false, "description": null },
+        { "name": "index", "type": "number", "optional": true, "default": null, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "deleteXAxisGuide",
+      "definedIn": "ModelWithXGuides",
+      "async": false,
+      "description": "Deletes an X-axis guide.",
+      "params": [
+        { "name": "index", "type": "number", "optional": true, "default": null, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+
+    {
+      "name": "getYGuidesLength",
+      "definedIn": "ModelWithYGuides",
+      "async": false,
+      "description": "Gets the number of guides in the Y-axis guides list.",
+      "params": [],
+      "returns": { "type": "number | undefined", "description": null }
+    },
+    {
+      "name": "addYAxisGuide",
+      "definedIn": "ModelWithYGuides",
+      "async": false,
+      "description": "Adds a Y-axis guide.",
+      "params": [
+        { "name": "name", "type": "string", "optional": false, "description": null },
+        { "name": "index", "type": "number", "optional": true, "default": null, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "deleteYAxisGuide",
+      "definedIn": "ModelWithYGuides",
+      "async": false,
+      "description": "Deletes a Y-axis guide.",
+      "params": [
+        { "name": "index", "type": "number", "optional": true, "default": null, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+
+    {
+      "name": "getTimeIntervalSize",
+      "definedIn": "ModelWithTemporalBinning",
+      "async": false,
+      "description": "Gets the time interval size for a temporal chart.",
+      "params": [],
+      "returns": { "type": "number | undefined", "description": null }
+    },
+    {
+      "name": "setTimeIntervalSize",
+      "definedIn": "ModelWithTemporalBinning",
+      "async": false,
+      "description": "Sets the time interval size for a temporal chart.",
+      "params": [
+        { "name": "newTimeIntervalSize", "type": "number | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getTimeIntervalUnits",
+      "definedIn": "ModelWithTemporalBinning",
+      "async": false,
+      "description": "Gets the time interval units for a temporal chart.",
+      "params": [],
+      "returns": { "type": "WebChartTimeIntervalUnits | undefined", "description": null }
+    },
+    {
+      "name": "setTimeIntervalUnits",
+      "definedIn": "ModelWithTemporalBinning",
+      "async": false,
+      "description": "Sets the time interval units for a temporal chart.",
+      "params": [
+        { "name": "newTimeIntervalUnits", "type": "WebChartTimeIntervalUnits | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getTimeAggregationType",
+      "definedIn": "ModelWithTemporalBinning",
+      "async": false,
+      "description": "Gets the time aggregation type for a temporal chart.",
+      "params": [],
+      "returns": { "type": "WebChartTimeAggregationTypes | undefined", "description": null }
+    },
+    {
+      "name": "setTimeAggregationType",
+      "definedIn": "ModelWithTemporalBinning",
+      "async": false,
+      "description": "Sets the time aggregation type for a temporal chart.",
+      "params": [
+        { "name": "newTimeAggregationType", "type": "WebChartTimeAggregationTypes | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getTrimIncompleteTimeInterval",
+      "definedIn": "ModelWithTemporalBinning",
+      "async": false,
+      "description": "Gets whether to trim incomplete time intervals for a temporal chart.",
+      "params": [],
+      "returns": { "type": "boolean | undefined", "description": null }
+    },
+    {
+      "name": "setTrimIncompleteTimeInterval",
+      "definedIn": "ModelWithTemporalBinning",
+      "async": false,
+      "description": "Sets whether to trim incomplete time intervals for a temporal chart.",
+      "params": [
+        { "name": "newTrimIncompleteTimeInterval", "type": "boolean | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "getNullPolicy",
+      "definedIn": "ModelWithTemporalBinning",
+      "async": false,
+      "description": "Gets the policy which tells the chart how to handle null values.",
+      "params": [],
+      "returns": { "type": "WebChartNullPolicyTypes | undefined", "description": null }
+    },
+    {
+      "name": "setNullPolicy",
+      "definedIn": "ModelWithTemporalBinning",
+      "async": false,
+      "description": "Sets the policy which tells the chart how to handle null values.",
+      "params": [
+        { "name": "newNullPolicy", "type": "WebChartNullPolicyTypes | undefined", "optional": false, "description": null }
+      ],
+      "returns": { "type": "void", "description": null }
+    },
+    {
+      "name": "resetTimeInterval",
+      "definedIn": "ModelWithTemporalBinning",
+      "async": false,
+      "description": "Resets the time interval to default for a temporal line chart.",
+      "params": [],
+      "returns": { "type": "void", "description": null }
+    }
+  ],
+  "referencedTypes": [
+    { "name": "WebChart", "package": "@arcgis/charts-spec" },
+    { "name": "WebChartLineChartSeries", "package": "@arcgis/charts-spec" },
+    { "name": "RESTSimpleLineSymbolStyle", "package": "@arcgis/charts-spec" },
+    { "name": "RESTSimpleMarkerSymbolStyle", "package": "@arcgis/charts-spec" },
+    { "name": "ChartConfig", "package": "@arcgis/charts-shared-utils", "generic": true },
+    { "name": "ChartSubType", "package": "@arcgis/charts-shared-utils" },
+    { "name": "SupportedChartSeries", "package": "@arcgis/charts-shared-utils" },
+    { "name": "LayerInfo", "package": "@arcgis/charts-model", "local": true, "sourceFile": "interfaces/common.d.ts" },
+    { "name": "ModelParams", "package": "@arcgis/charts-model", "local": true, "sourceFile": "interfaces/chart-interfaces.d.ts" },
+    { "name": "GuideOrientation", "package": "@arcgis/charts-model", "local": true, "sourceFile": "interfaces/common.d.ts" },
+    { "name": "SerialChartDataSortingKinds", "package": "@arcgis/charts-model", "local": true, "sourceFile": "interfaces/common.d.ts" },
+    { "name": "Color", "package": "@arcgis/charts-spec" },
+    { "name": "WebChartTextSymbol", "package": "@arcgis/charts-spec" },
+    { "name": "LegendItemVisibility", "package": "@arcgis/charts-spec" },
+    { "name": "SupportedLayer", "package": "@arcgis/charts-spec" },
+    { "name": "RESTStatisticType", "package": "@arcgis/charts-spec" },
+    { "name": "WebChartDataFilters", "package": "@arcgis/charts-spec" },
+    { "name": "WebChartStackedKinds", "package": "@arcgis/charts-spec" },
+    { "name": "CategoryFormatOptions", "package": "@arcgis/charts-spec" },
+    { "name": "DateTimeFormatOptions", "package": "@arcgis/charts-spec" },
+    { "name": "NumberFormatOptions", "package": "@arcgis/charts-spec" },
+    { "name": "WebChartAxisScrollBar", "package": "@arcgis/charts-spec" },
+    { "name": "ISimpleLineSymbol", "package": "@arcgis/charts-spec" },
+    { "name": "ISimpleFillSymbol", "package": "@arcgis/charts-spec" },
+    { "name": "WebChartLegendPositions", "package": "@arcgis/charts-spec" },
+    { "name": "WebChartTimeIntervalUnits", "package": "@arcgis/charts-spec" },
+    { "name": "WebChartTimeAggregationTypes", "package": "@arcgis/charts-spec" },
+    { "name": "WebChartNullPolicyTypes", "package": "@arcgis/charts-spec" }
+  ]
+}

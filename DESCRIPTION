@@ -23,9 +23,11 @@ Collate:
     'types-webchart.R'
     'types-bar-chart.R'
     'types-scatter-plot.R'
+    'types-line-chart.R'
     'enums-widget.R'
     'arcgis-chart-widget.R'
 Imports:
     S7,
     s7x,
     htmlwidgets
+URL: http://r.esri.com/arcgisviz/
