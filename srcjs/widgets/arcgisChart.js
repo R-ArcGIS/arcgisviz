@@ -30,7 +30,10 @@ HTMLWidgets.widget({
             config: x.config,
           });
 
-          chartEl.layer = model.getLayer();
+          // `layer` is a getter on the model (WithLayer, mixed into
+          // ChartModel), not a getLayer() method - createModel() has
+          // already built the FeatureLayer from the iLayer JSON.
+          chartEl.layer = model.layer;
           chartEl.model = model;
         } catch (err) {
           el.innerHTML =

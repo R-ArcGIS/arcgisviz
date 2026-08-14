@@ -70,10 +70,13 @@ from the JSON file.
 JSON config. `createModel({ iLayer, config })` (from
 `@arcgis/charts-components`) builds the `FeatureLayer` internally from the
 JSON `iLayer` you pass it (no live service needed for a feature
-collection) - get it back with `model.getLayer()` to hand to
-`<arcgis-chart>`. Don't try to construct a `FeatureLayer` yourself from the
-`iLayer` JSON; `createModel` already does it and `model.getLayer()` is the
-documented way to retrieve it.
+collection) - get it back off the model's **`layer` getter** (`WithLayer`,
+`dist/model/properties/layer.d.ts`, mixed into `ChartModel`) to hand to
+`<arcgis-chart>`. There is no `model.getLayer()` method - `getLayer()` is a
+standalone package export (`dist/utils/layer/index.d.ts`) taking an
+`iLayer`, and calling it on the model throws
+`r.getLayer is not a function` in the bundled build. Don't construct a
+`FeatureLayer` yourself either; `createModel` already did it.
 
 `createModel()` accepts five prop combinations
 (`dist/model/shared/setup-utils.d.ts`); this widget uses
