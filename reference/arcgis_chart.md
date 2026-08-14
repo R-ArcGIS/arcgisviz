@@ -2,22 +2,15 @@
 
 Creates an htmlwidget wrapping the `<arcgis-chart>` web component. The
 chart's model and layer are created client-side (in the browser) from
-`i_layer` via the JS `createModel()` function - no live ArcGIS Server
-feature service is required when `i_layer` is a self-contained feature
-collection (see `arcgisutils::as_layer()`/`as_feature_collection()`).
+`i_layer` and `config` via the JS `createModel()` function - no live
+ArcGIS Server feature service is required when `i_layer` is a
+self-contained feature collection (see
+[`as_chart_layer()`](http://r.esri.com/arcgisviz/reference/as_chart_layer.md)).
 
 ## Usage
 
 ``` r
-arcgis_chart(
-  i_layer,
-  chart_type = "barChart",
-  x_field = NULL,
-  y_field = NULL,
-  width = NULL,
-  height = NULL,
-  element_id = NULL
-)
+arcgis_chart(i_layer, config, width = NULL, height = NULL, element_id = NULL)
 ```
 
 ## Arguments
@@ -25,17 +18,14 @@ arcgis_chart(
 - i_layer:
 
   A list giving the JSON layer definition (`IFeatureLayer`), e.g. built
-  with `arcgisutils::as_layer()`.
+  with
+  [`as_chart_layer()`](http://r.esri.com/arcgisviz/reference/as_chart_layer.md).
 
-- chart_type:
+- config:
 
-  One of the `@arcgis/charts-components` `ModelTypes` strings, e.g.
-  `"barChart"`, `"lineChart"`, `"scatterplot"`. Validated against
-  [`ModelTypes()`](http://r.esri.com/arcgisviz/reference/ModelTypes.md).
-
-- x_field, y_field:
-
-  Field names to assign to the chart's x/y axes.
+  A list giving the chart config (`ChartConfig`, i.e. the `WebChart`
+  shape). The chart type is derived from its first series' `type`, so no
+  separate chart-type argument is needed.
 
 - width, height:
 
@@ -45,3 +35,9 @@ arcgis_chart(
 - element_id:
 
   Optional DOM element ID for the widget.
+
+## Details
+
+Most users want
+[`arc_bar()`](http://r.esri.com/arcgisviz/reference/arc_bar.md)/[`arc_scatter()`](http://r.esri.com/arcgisviz/reference/arc_scatter.md)/[`arc_line()`](http://r.esri.com/arcgisviz/reference/arc_line.md)
+instead, which build both arguments for you.
