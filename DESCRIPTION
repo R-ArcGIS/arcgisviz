@@ -23,6 +23,8 @@ Collate:
     'types-webchart.R'
     'types-bar-chart.R'
     'types-scatter-plot.R'
-Imports: 
+    'arcgis-chart-widget.R'
+Imports:
     S7,
-    s7x
+    s7x,
+    htmlwidgets
