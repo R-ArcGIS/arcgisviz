@@ -15,5 +15,5 @@ arc_col(.data, x, y)
 An \code{ArcChart}.
 }
 \description{
-Plots \code{y} verbatim, one bar per row, the way \code{\link[ggplot2:geom_col]{ggplot2::geom_col()}} does.
+Plots \code{y} verbatim, one bar per row, the way \code{ggplot2::geom_col()} does.
 }

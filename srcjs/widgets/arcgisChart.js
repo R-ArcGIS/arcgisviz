@@ -41,16 +41,26 @@ function deepMerge(target, source) {
   return out;
 }
 
+// Pixels, not percentages: amCharts 5 - which useAmCharts5() picks for
+// scatter, histogram, radar and heat (customElement.js:18705) - keeps
+// whatever size it measured at setup. amCharts 4 (bar, line) doesn't care.
+function setSize(chartEl, el, width, height) {
+  var w = width > 0 ? width : el.offsetWidth;
+  var h = height > 0 ? height : el.offsetHeight;
+  chartEl.style.width = w + "px";
+  chartEl.style.height = h + "px";
+}
+
 HTMLWidgets.widget({
   name: "arcgisChart",
 
   type: "output",
 
   factory: function (el, width, height) {
+    // No `display` here: `:host` is `flex`, and an inline value outranks it.
+    // .chart-wrapper has no height of its own - it stretches as a flex item.
     var chartEl = document.createElement("arcgis-chart");
-    chartEl.style.display = "block";
-    chartEl.style.width = "100%";
-    chartEl.style.height = "100%";
+    setSize(chartEl, el, width, height);
     el.appendChild(chartEl);
 
     return {
@@ -82,8 +92,7 @@ HTMLWidgets.widget({
       },
 
       resize: function (width, height) {
-        // <arcgis-chart> fills chartEl (100% width/height), which fills
-        // el (the htmlwidgets container) - no manual resize needed.
+        setSize(chartEl, el, width, height);
       },
     };
   },

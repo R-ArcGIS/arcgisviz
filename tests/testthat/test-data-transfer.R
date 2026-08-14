@@ -34,8 +34,30 @@ test_that("unset properties are dropped rather than sent as null", {
 
   # createModel() layers `config` over its own defaults, so an explicit
   # null would override a default instead of falling back to it.
-  expect_named(cfg, c("version", "type", "series"))
+  expect_named(cfg, c("version", "type", "axes", "series"))
   expect_false(any(vapply(cfg, is.null, logical(1))))
+})
+
+test_that("axis titles come from the mapping, not the model's defaults", {
+  # Tooltips label each value with the axis title and only fall back to the
+  # field alias when it is empty (customElement.js:10170), so the localized
+  # "X-axis"/"Count" defaults have to be overwritten.
+  axes <- s7x::as_vector(arc_scatter(test_df(), category, value)@webchart)$axes
+  expect_identical(axes[[1]]$title$content$text, "category")
+  expect_identical(axes[[2]]$title$content$text, "value")
+
+  counted <- s7x::as_vector(arc_bar(test_df(), category)@webchart)$axes
+  expect_identical(counted[[2]]$title$content$text, "count")
+
+  agg <- arc_chart(test_df()) |>
+    set_type("bar") |>
+    set_x(category) |>
+    set_y(value) |>
+    set_stat("mean")
+  expect_identical(
+    s7x::as_vector(agg@webchart)$axes[[2]]$title$content$text,
+    "mean(value)"
+  )
 })
 
 test_that("stat = 'identity' sends a null query to delete the default", {

@@ -15,7 +15,7 @@ arc_bar(.data, x)
 An \code{ArcChart}.
 }
 \description{
-Counts rows per \code{x}, the way \code{\link[ggplot2:geom_bar]{ggplot2::geom_bar()}} does. Use \code{\link[=arc_col]{arc_col()}}
+Counts rows per \code{x}, the way \code{ggplot2::geom_bar()} does. Use \code{\link[=arc_col]{arc_col()}}
 to plot values you have already summarised, or \code{\link[=set_stat]{set_stat()}} for any other
 aggregation.
 }

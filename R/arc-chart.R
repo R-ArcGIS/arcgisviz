@@ -200,6 +200,23 @@ series_aggregation <- function(chart, stat, call = rlang::caller_env()) {
   )
 }
 
+# Tooltips label each value with the axis title, falling back to the field
+# alias only when that title is empty (customElement.js:10170) - and the
+# model's defaults are the localized "X-axis"/"Count", so leaving them in
+# place mislabels both the axis and the tooltip.
+axis_titled <- function(text) {
+  if (is.na(text)) {
+    return(WebChartAxis())
+  }
+
+  WebChartAxis(
+    title = WebChartText(
+      type = "chartText",
+      content = WebChartTextSymbol(type = "esriTS", text = text)
+    )
+  )
+}
+
 # NULL until set_type() has run - as_widget() reports that as an error.
 build_webchart <- function(chart) {
   if (is.na(chart@chart_type)) {
@@ -207,16 +224,26 @@ build_webchart <- function(chart) {
   }
   spec <- chart_type_map[[chart@chart_type]]
   stat <- if (is.na(chart@stat)) "identity" else chart@stat
+  aggregating <- spec$aggregates && stat != "identity"
 
-  agg <- if (spec$aggregates && stat != "identity") {
+  agg <- if (aggregating) {
     series_aggregation(chart, stat)
   } else {
     list(y = chart@y, query = NULL)
   }
 
+  y_label <- if (!aggregating) {
+    chart@y
+  } else if (identical(stat, "count")) {
+    "count"
+  } else {
+    sprintf("%s(%s)", stat, chart@y)
+  }
+
   WebChart(
     version = "25.1.0",
     type = "chart",
+    axes = list(axis_titled(chart@x), axis_titled(y_label)),
     series = list(
       spec$series_class(
         type = spec$series_type,
