@@ -4,15 +4,25 @@
 \alias{arcgis_chart}
 \title{Render an ArcGIS chart}
 \usage{
-arcgis_chart(i_layer, config, width = NULL, height = NULL, element_id = NULL)
+arcgis_chart(
+  i_layer,
+  chart_type,
+  config,
+  width = NULL,
+  height = NULL,
+  element_id = NULL
+)
 }
 \arguments{
 \item{i_layer}{A list giving the JSON layer definition (\code{IFeatureLayer}),
 e.g. built with \code{\link[=as_chart_layer]{as_chart_layer()}}.}
 
+\item{chart_type}{A \code{ModelTypes} string, e.g. \code{"barChart"}. Used to build
+the default model that \code{config} is merged over.}
+
 \item{config}{A list giving the chart config (\code{ChartConfig}, i.e. the
-\code{WebChart} shape). The chart type is derived from its first series'
-\code{type}, so no separate chart-type argument is needed.}
+\code{WebChart} shape). May be sparse - it is merged over the defaults
+client-side.}
 
 \item{width, height}{Widget sizing, passed to \code{\link[htmlwidgets:createWidget]{htmlwidgets::createWidget()}}.}
 

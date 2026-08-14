@@ -1,11 +1,6 @@
-# htmlwidgets binding for the <arcgis-chart> web component from
-# @arcgis/charts-components. See srcjs/README.md for the JS-side
-# architecture and dev-docs/js-widget-architecture.md for the full data flow.
-#
-# This is the low-level widget constructor: both arguments are already-plain
-# lists. Building them from a data frame and an S7 config is R/arc-data.R's
-# job (`as_chart_layer()` / `as_widget()`), which also documents the
-# createModel() contract this payload has to satisfy.
+# htmlwidgets binding for <arcgis-chart>. See srcjs/README.md and
+# dev-docs/js-widget-architecture.md. Payload construction lives in
+# R/arc-data.R.
 
 #' Render an ArcGIS chart
 #'
@@ -20,15 +15,18 @@
 #'
 #' @param i_layer A list giving the JSON layer definition (`IFeatureLayer`),
 #'   e.g. built with [as_chart_layer()].
+#' @param chart_type A `ModelTypes` string, e.g. `"barChart"`. Used to build
+#'   the default model that `config` is merged over.
 #' @param config A list giving the chart config (`ChartConfig`, i.e. the
-#'   `WebChart` shape). The chart type is derived from its first series'
-#'   `type`, so no separate chart-type argument is needed.
+#'   `WebChart` shape). May be sparse - it is merged over the defaults
+#'   client-side.
 #' @param width,height Widget sizing, passed to [htmlwidgets::createWidget()].
 #' @param element_id Optional DOM element ID for the widget.
 #'
 #' @export
 arcgis_chart <- function(
   i_layer,
+  chart_type,
   config,
   width = NULL,
   height = NULL,
@@ -36,11 +34,10 @@ arcgis_chart <- function(
 ) {
   x <- list(
     iLayer = i_layer,
+    chartType = as.character(ModelTypes(chart_type)),
     config = config
   )
 
-  # Serialize with our own yyjsonr-based function rather than htmlwidgets'
-  # jsonlite defaults - see `widget_json()` in R/arc-data.R.
   attr(x, "TOJSON_FUNC") <- widget_json
 
   htmlwidgets::createWidget(

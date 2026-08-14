@@ -2,13 +2,38 @@ import "widgets";
 import { defineCustomElements as defineChartElements } from "@arcgis/charts-components/loader";
 import { createModel } from "@arcgis/charts-components";
 
-// Registers the <arcgis-chart> custom element (lazy-loads its chunk on
-// first use). See srcjs/README.md for the overall architecture: R builds
-// a self-contained `iLayer` (feature collection) JSON via arcgisutils and
-// the full chart `config` (the WebChart shape) from its S7 type layer, and
-// hands both to createModel(). The chart type is derived from
-// config.series[0].type - there is no separate chartType to pass.
+// R sends a sparse config; the model supplies the defaults (a WebChart
+// needs a full axes/labels/symbol tree or the engine throws "There are no
+// X axes on chart"). See srcjs/README.md.
 defineChartElements(window);
+
+// Arrays merge element-wise so a sparse series layers onto the default
+// series instead of replacing it.
+function deepMerge(target, source) {
+  if (
+    source === null ||
+    typeof source !== "object" ||
+    target === null ||
+    typeof target !== "object"
+  ) {
+    return source;
+  }
+
+  if (Array.isArray(source) || Array.isArray(target)) {
+    if (!Array.isArray(source) || !Array.isArray(target)) {
+      return source;
+    }
+    return source.map(function (item, i) {
+      return i < target.length ? deepMerge(target[i], item) : item;
+    });
+  }
+
+  var out = Object.assign({}, target);
+  Object.keys(source).forEach(function (key) {
+    out[key] = deepMerge(target[key], source[key]);
+  });
+  return out;
+}
 
 HTMLWidgets.widget({
   name: "arcgisChart",
@@ -27,12 +52,14 @@ HTMLWidgets.widget({
         try {
           var model = await createModel({
             iLayer: x.iLayer,
-            config: x.config,
+            chartType: x.chartType,
           });
 
-          // `layer` is a getter on the model (WithLayer, mixed into
-          // ChartModel), not a getLayer() method - createModel() has
-          // already built the FeatureLayer from the iLayer JSON.
+          if (x.config) {
+            model.config = deepMerge(model.config, x.config);
+          }
+
+          // `layer` is a getter (WithLayer); there is no getLayer() method.
           chartEl.layer = model.layer;
           chartEl.model = model;
         } catch (err) {
