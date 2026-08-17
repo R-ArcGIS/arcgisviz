@@ -1,3 +1,6 @@
+#' @include types-line-chart.R
+NULL
+
 # Public, user-facing chart-building API. Wraps the internal S7 type layer
 # (R/types-*.R) - none of those classes, or their s7x::Enum values, are
 # meant to be constructed or referenced by users of this package. Friendly
@@ -13,11 +16,16 @@
 
 library(S7)
 
-#' ArcChart
+#' A chart specification
 #'
-#' @section Properties:
-#' `@webchart` is computed from the mapping, not stored - assigning to it
-#' has no effect.
+#' Holds a data frame and the mapping built up by the `set_*()` functions.
+#' The `@webchart` property is computed from that mapping rather than stored,
+#' so assigning to it has no effect.
+#'
+#' @examples
+#' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+#'
+#' arc_col(df, species, mass)@webchart
 #' @name ArcChart
 #' @export
 ArcChart <- new_class(
@@ -30,6 +38,8 @@ ArcChart <- new_class(
     stat = s7x::class_string,
     labs = class_list,
     color = class_list,
+    axes = class_list,
+    flipped = s7x::class_boolean,
     webchart = S7::new_property(getter = function(self) build_webchart(self))
   )
 )
@@ -84,8 +94,18 @@ stat_map <- c(
 
 #' Start a chart
 #'
-#' @param .data A data frame (or similar) the chart's fields will come from.
-#' @return An `ArcChart`. Pipe it into [set_type()] before [set_x()]/[set_y()].
+#' Creates an empty chart bound to a data frame. Pipe it into [set_type()]
+#' before mapping any columns.
+#'
+#' @param .data Defines which data frame the chart draws its fields from.
+#' @return An `ArcChart`.
+#' @examples
+#' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+#'
+#' arc_chart(df) |>
+#'   set_type("bar") |>
+#'   set_x(species) |>
+#'   set_y(mass)
 #' @export
 arc_chart <- function(.data) {
   ArcChart(data = .data)
@@ -93,9 +113,20 @@ arc_chart <- function(.data) {
 
 #' Set a chart's type
 #'
-#' @param chart An `ArcChart`, from [arc_chart()].
-#' @param type One of `"bar"`, `"scatter"`, `"line"`.
+#' Chooses which kind of series the chart draws. Every other `set_*()`
+#' function needs this to have run first.
+#'
+#' @param chart Defines which chart to modify.
+#' @param type Defines which series the chart draws. One of `"bar"`,
+#'   `"scatter"`, or `"line"`.
 #' @return `chart`, with its series type set.
+#' @examples
+#' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+#'
+#' arc_chart(df) |>
+#'   set_type("scatter") |>
+#'   set_x(mass) |>
+#'   set_y(mass)
 #' @export
 set_type <- function(chart, type) {
   chart@chart_type <- rlang::arg_match0(type, names(chart_type_map))
@@ -131,12 +162,21 @@ check_column <- function(chart, col, arg, call = rlang::caller_env()) {
   )
 }
 
-#' Map a column to a chart's x/y field
+#' Map a column to a chart's x or y field
 #'
-#' @param chart An `ArcChart`, from [arc_chart()] with [set_type()] already
-#'   called.
-#' @param x,y A bare column name from `chart`'s data (tidy eval).
+#' Binds a column to one of the chart's positional fields. Both take a bare
+#' column name.
+#'
+#' @param chart Defines which chart to modify.
+#' @param x,y Defines which column supplies the field.
 #' @return `chart`, with the field mapping set.
+#' @examples
+#' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+#'
+#' arc_chart(df) |>
+#'   set_type("bar") |>
+#'   set_x(species) |>
+#'   set_y(mass)
 #' @export
 set_x <- function(chart, x) {
   check_chart_type_set(chart)
@@ -158,17 +198,21 @@ set_y <- function(chart, y) {
 
 #' Set a chart's statistical transformation
 #'
-#' How `y` is derived from the data. `"identity"` plots `y` verbatim, one mark
-#' per row; every other value aggregates `y` grouped by `x`. `"count"` needs
-#' no `y` - it counts rows per `x`.
+#' Chooses how `y` is derived from the data. `"identity"` plots `y` verbatim
+#' and every other value aggregates `y` grouped by `x`.
 #'
-#' Bar and line charts only; scatterplots ignore it.
-#'
-#' @param chart An `ArcChart`, from [arc_chart()] with [set_type()] already
-#'   called.
-#' @param stat One of `"identity"`, `"count"`, `"sum"`, `"mean"`, `"min"`,
-#'   `"max"`, `"sd"`, `"var"`.
+#' @param chart Defines which chart to modify.
+#' @param stat Defines how `y` is aggregated. One of `"identity"`, `"count"`,
+#'   `"sum"`, `"mean"`, `"min"`, `"max"`, `"sd"`, or `"var"`.
 #' @return `chart`, with its stat set.
+#' @examples
+#' df <- data.frame(species = c("a", "a", "b"), mass = c(1, 5, 3))
+#'
+#' arc_chart(df) |>
+#'   set_type("bar") |>
+#'   set_x(species) |>
+#'   set_y(mass) |>
+#'   set_stat("mean")
 #' @export
 set_stat <- function(chart, stat) {
   check_chart_type_set(chart)
@@ -239,15 +283,20 @@ lab_value <- function(value, arg, call = rlang::caller_env()) {
 #' Set a chart's labels
 #'
 #' Overrides the text a chart labels itself with. Omitting an argument leaves
-#' that label as it is; passing a string sets it, and passing `NULL` removes
-#' it. `x` and `y` default to the mapped column names.
+#' that label alone, a string sets it, and `NULL` removes it.
 #'
-#' @param chart An `ArcChart`, from [arc_chart()].
+#' @param chart Defines which chart to modify.
 #' @param ... These dots are for future extensions and must be empty.
-#' @param title,subtitle,caption Chart-level text. `caption` is rendered as
-#'   the chart's footer. All three are absent unless set.
-#' @param x,y Axis titles. These also label the values in a tooltip.
+#' @param title,subtitle,caption Defines the chart-level text. Absent unless
+#'   set, and `caption` renders as the chart's footer.
+#' @param x,y Defines the axis titles, which also label tooltip values.
+#'   Defaults to the mapped column names.
 #' @return `chart`, with its labels set.
+#' @examples
+#' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+#'
+#' arc_col(df, species, mass) |>
+#'   set_labs(title = "Mass by species", x = "Species", y = "Mass (g)")
 #' @export
 set_labs <- function(
   chart,
@@ -304,41 +353,205 @@ chart_titled <- function(text) {
 # alias only when that title is empty (customElement.js:10170) - and the
 # model's defaults are the localized "X-axis"/"Count", so leaving them in
 # place mislabels both the axis and the tooltip.
-axis_titled <- function(text) {
-  # Nothing mapped to title the axis with, so leave those defaults alone.
+axis_title <- function(text) {
+  # Nothing mapped to title the axis with, so leave that default alone.
   if (is.na(text)) {
-    return(WebChartAxis())
+    return(NULL)
   }
 
   # A removed label has to blank the default rather than be dropped, and an
   # invisible title reserves no height (customElement.js:12053).
   if (!nzchar(text)) {
-    return(WebChartAxis(
-      title = WebChartText(
-        type = "chartText",
-        visible = FALSE,
-        content = WebChartTextSymbol(type = "esriTS", text = "")
-      )
+    return(WebChartText(
+      type = "chartText",
+      visible = FALSE,
+      content = WebChartTextSymbol(type = "esriTS", text = "")
     ))
   }
 
-  WebChartAxis(title = chart_text(text))
+  chart_text(text)
+}
+
+# `opts` is already keyed by spec property name, translated in set_axis().
+chart_axis <- function(text, opts) {
+  args <- opts
+  title <- axis_title(text)
+  if (!rlang::is_null(title)) {
+    args$title <- title
+  }
+  rlang::exec(WebChartAxis, !!!args)
+}
+
+check_axis_flag <- function(value, arg, call = rlang::caller_env()) {
+  if (
+    rlang::is_null(value) || rlang::is_scalar_logical(value) && !is.na(value)
+  ) {
+    return(invisible(value))
+  }
+  cli::cli_abort(
+    c(
+      "{.arg {arg}} must be {.code TRUE} or {.code FALSE}.",
+      "x" = "You supplied {.obj_type_friendly {value}}."
+    ),
+    call = call
+  )
+}
+
+check_limits <- function(limits, call = rlang::caller_env()) {
+  if (rlang::is_null(limits)) {
+    return(invisible(limits))
+  }
+  if (!is.numeric(limits) || length(limits) != 2L) {
+    cli::cli_abort(
+      c(
+        "{.arg limits} must be two numbers.",
+        "x" = "You supplied {.obj_type_friendly {limits}}.",
+        "i" = "Use {.code NA} for a bound the chart should pick itself."
+      ),
+      call = call
+    )
+  }
+  if (!anyNA(limits) && limits[[1]] >= limits[[2]]) {
+    cli::cli_abort(
+      c(
+        "{.arg limits} must be increasing.",
+        "x" = "{.val {limits[[1]]}} is not below {.val {limits[[2]]}}."
+      ),
+      call = call
+    )
+  }
+  invisible(limits)
+}
+
+#' Set an axis
+#'
+#' Overrides how one axis is scaled and drawn. Omitted arguments leave that
+#' part of the axis as the chart would draw it.
+#'
+#' @param chart Defines which chart to modify.
+#' @param axis Defines which axis to change, either `"x"` or `"y"`.
+#' @param ... These dots are for future extensions and must be empty.
+#' @param limits default `NULL`. Defines the two values the axis spans, where
+#'   `NA` leaves that bound to the chart.
+#' @param log default `NULL`. Defines whether the axis is logarithmic.
+#' @param zero_line default `NULL`. Defines whether a line is drawn at zero.
+#' @param integer_only default `NULL`. Defines whether only whole numbers are
+#'   labelled.
+#' @param tick_spacing default `NULL`. Defines the smallest gap between ticks,
+#'   which the chart may still widen to fit.
+#' @param buffer default `NULL`. Defines whether space is added around the
+#'   series.
+#' @param visible default `NULL`. Defines whether the axis is drawn at all.
+#' @return `chart`, with that axis set.
+#' @examples
+#' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+#'
+#' arc_col(df, species, mass) |>
+#'   set_axis("y", limits = c(0, 10), zero_line = TRUE)
+#' @export
+set_axis <- function(
+  chart,
+  axis,
+  ...,
+  limits = NULL,
+  log = NULL,
+  zero_line = NULL,
+  integer_only = NULL,
+  tick_spacing = NULL,
+  buffer = NULL,
+  visible = NULL
+) {
+  rlang::check_dots_empty()
+  axis <- rlang::arg_match0(axis, c("x", "y"))
+
+  check_limits(limits)
+  check_axis_flag(log, "log")
+  check_axis_flag(zero_line, "zero_line")
+  check_axis_flag(integer_only, "integer_only")
+  check_axis_flag(buffer, "buffer")
+  check_axis_flag(visible, "visible")
+
+  if (!rlang::is_null(tick_spacing)) {
+    if (
+      !rlang::is_scalar_double(tick_spacing) &&
+        !rlang::is_scalar_integer(tick_spacing)
+    ) {
+      cli::cli_abort(
+        "{.arg tick_spacing} must be a single number.",
+        call = rlang::caller_env()
+      )
+    }
+    if (tick_spacing < 1) {
+      cli::cli_abort(
+        c(
+          "{.arg tick_spacing} must be at least 1.",
+          "x" = "You supplied {.val {tick_spacing}}."
+        ),
+        call = rlang::caller_env()
+      )
+    }
+  }
+
+  # Stored under spec property names so chart_axis() can splice them straight
+  # into WebChartAxis(). An NA bound is left unset, which is what the spec
+  # reads as "work it out from the data".
+  opts <- list(
+    minimum = if (!rlang::is_null(limits) && !is.na(limits[[1]])) limits[[1]],
+    maximum = if (!rlang::is_null(limits) && !is.na(limits[[2]])) limits[[2]],
+    isLogarithmic = log,
+    displayZeroLine = zero_line,
+    integerOnlyValues = integer_only,
+    tickSpacing = if (!rlang::is_null(tick_spacing)) as.double(tick_spacing),
+    buffer = buffer,
+    visible = visible
+  )
+  opts <- opts[!vapply(opts, rlang::is_null, logical(1))]
+
+  stored <- chart@axes[[axis]]
+  for (nm in names(opts)) {
+    stored[[nm]] <- opts[[nm]]
+  }
+  chart@axes[[axis]] <- stored
+  chart
+}
+
+#' Swap a chart's axes
+#'
+#' Draws the chart on its side, turning vertical bars into horizontal ones.
+#' The mapping is untouched, so `x` stays `x`.
+#'
+#' @param chart Defines which chart to modify.
+#' @param flipped default `TRUE`. Defines whether the axes are swapped.
+#' @return `chart`, with its orientation set.
+#' @examples
+#' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+#'
+#' arc_col(df, species, mass) |>
+#'   set_flipped()
+#' @export
+set_flipped <- function(chart, flipped = TRUE) {
+  check_axis_flag(flipped, "flipped")
+  chart@flipped <- flipped
+  chart
 }
 
 #' Map a column to colour
 #'
 #' Colours each mark by the value of a column. A numeric column becomes a
-#' continuous gradient; a character or factor column gets one colour per
+#' continuous gradient and a character or factor column gets one colour per
 #' distinct value.
 #'
-#' @param chart An `ArcChart`, from [arc_chart()] with [set_type()] already
-#'   called.
-#' @param color A bare column name from `chart`'s data (tidy eval).
-#' @param palette The name of an Esri colour ramp (e.g. `"Blue 3"`,
-#'   `"Flower Field"`), or a vector of R colours to build one from. Defaults to
-#'   the ramp the ArcGIS SDK itself uses for gradients, and to its own series
-#'   palette for discrete colours.
+#' @param chart Defines which chart to modify.
+#' @param color Defines which column the colours are drawn from.
+#' @param palette default `NULL`. Defines which colours to use, either the
+#'   name of an Esri ramp such as `"Blue 3"` or a vector of R colours. `NULL`
+#'   uses the ramp the ArcGIS SDK itself defaults to.
 #' @return `chart`, with its colour mapping set.
+#' @examples
+#' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+#'
+#' arc_col(df, species, mass) |>
+#'   set_color(mass, palette = "Red 1")
 #' @export
 set_color <- function(chart, color, palette = NULL) {
   check_chart_type_set(chart)
@@ -592,9 +805,10 @@ build_webchart <- function(chart) {
     footer = chart_titled(labs$caption),
     chartRenderer = renderer,
     colorMatch = if (rlang::is_null(renderer)) NA else TRUE,
+    rotated = chart@flipped,
     axes = list(
-      axis_titled(axis_lab(labs$x, chart@x)),
-      axis_titled(axis_lab(labs$y, y_label))
+      chart_axis(axis_lab(labs$x, chart@x), chart@axes$x),
+      chart_axis(axis_lab(labs$y, y_label), chart@axes$y)
     ),
     series = list(
       spec$series_class(
@@ -611,12 +825,16 @@ build_webchart <- function(chart) {
 
 #' Bar chart
 #'
-#' Counts rows per `x`. Use [arc_col()] to plot values you have already
-#' summarised, or [set_stat()] for any other aggregation.
+#' Counts rows per `x`. Use [arc_col()] for values you have already summarised
+#' or [set_stat()] for any other aggregation.
 #'
 #' @inheritParams arc_chart
-#' @param x A bare column name from `.data` (tidy eval).
+#' @param x Defines which column the bars are grouped by.
 #' @return An `ArcChart`.
+#' @examples
+#' df <- data.frame(species = c("a", "a", "b"), mass = c(1, 5, 3))
+#'
+#' arc_bar(df, species)
 #' @export
 arc_bar <- function(.data, x) {
   arc_chart(.data) |> set_type("bar") |> set_x({{ x }}) |> set_stat("count")
@@ -624,11 +842,15 @@ arc_bar <- function(.data, x) {
 
 #' Column chart
 #'
-#' Plots `y` verbatim, one bar per row.
+#' Plots `y` verbatim, one bar per row. Use [arc_bar()] to count rows instead.
 #'
 #' @inheritParams arc_chart
-#' @param x,y Bare column names from `.data` (tidy eval).
+#' @param x,y Defines which columns supply the bar positions and heights.
 #' @return An `ArcChart`.
+#' @examples
+#' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+#'
+#' arc_col(df, species, mass)
 #' @export
 arc_col <- function(.data, x, y) {
   arc_chart(.data) |> set_type("bar") |> set_x({{ x }}) |> set_y({{ y }})
@@ -636,7 +858,14 @@ arc_col <- function(.data, x, y) {
 
 #' Scatterplot
 #'
+#' Plots one marker per row. Scatterplots ignore [set_stat()].
+#'
 #' @inheritParams arc_col
+#' @return An `ArcChart`.
+#' @examples
+#' df <- data.frame(len = c(1, 5, 3), dep = c(2, 4, 6))
+#'
+#' arc_scatter(df, len, dep)
 #' @export
 arc_scatter <- function(.data, x, y) {
   arc_chart(.data) |> set_type("scatter") |> set_x({{ x }}) |> set_y({{ y }})
@@ -644,7 +873,15 @@ arc_scatter <- function(.data, x, y) {
 
 #' Line chart
 #'
+#' Joins one point per row in `x` order. Use [set_stat()] to aggregate `y`
+#' first.
+#'
 #' @inheritParams arc_col
+#' @return An `ArcChart`.
+#' @examples
+#' df <- data.frame(year = c(2020, 2021, 2022), mass = c(1, 5, 3))
+#'
+#' arc_line(df, year, mass)
 #' @export
 arc_line <- function(.data, x, y) {
   arc_chart(.data) |> set_type("line") |> set_x({{ x }}) |> set_y({{ y }})

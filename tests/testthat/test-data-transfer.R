@@ -269,6 +269,59 @@ test_that("parse_color() handles names, hex, and hex with alpha", {
   expect_error(parse_color("notacolour"), "valid colours")
 })
 
+test_that("set_axis() writes spec properties onto the named axis only", {
+  chart <- arc_col(test_df(), category, value) |>
+    set_axis("y", limits = c(0, 10), log = TRUE, zero_line = TRUE) |>
+    set_axis("x", visible = FALSE)
+  axes <- s7x::as_vector(chart@webchart)$axes
+
+  expect_false(axes[[1]]$visible)
+  expect_null(axes[[1]]$minimum)
+
+  expect_identical(axes[[2]]$minimum, 0)
+  expect_identical(axes[[2]]$maximum, 10)
+  expect_true(axes[[2]]$isLogarithmic)
+  expect_true(axes[[2]]$displayZeroLine)
+
+  # The axis title still comes from the mapping.
+  expect_identical(axes[[2]]$title$content$text, "value")
+})
+
+test_that("set_axis() accumulates and leaves an NA bound to the chart", {
+  chart <- arc_col(test_df(), category, value) |>
+    set_axis("y", limits = c(0, NA)) |>
+    set_axis("y", integer_only = TRUE)
+  y <- s7x::as_vector(chart@webchart)$axes[[2]]
+
+  expect_identical(y$minimum, 0)
+  expect_null(y$maximum)
+  expect_true(y$integerOnlyValues)
+})
+
+test_that("set_axis() rejects bad input", {
+  chart <- arc_col(test_df(), category, value)
+
+  expect_error(set_axis(chart, "z"), class = "rlang_error")
+  expect_error(set_axis(chart, "y", limits = 1), "must be two numbers")
+  expect_error(set_axis(chart, "y", limits = c(10, 0)), "must be increasing")
+  expect_error(set_axis(chart, "y", log = "yes"), "must be")
+  expect_error(set_axis(chart, "y", tick_spacing = 0), "at least 1")
+  expect_error(set_axis(chart, "y", TRUE), class = "rlib_error_dots_nonempty")
+})
+
+test_that("set_flipped() rotates the chart", {
+  flipped <- arc_col(test_df(), category, value) |> set_flipped()
+  expect_true(s7x::as_vector(flipped@webchart)$rotated)
+
+  # Unset stays absent so the model's own default survives.
+  expect_null(
+    s7x::as_vector(arc_col(test_df(), category, value)@webchart)$rotated
+  )
+  expect_false(
+    s7x::as_vector((flipped |> set_flipped(FALSE))@webchart)$rotated
+  )
+})
+
 test_that("stat = 'identity' sends a null query to delete the default", {
   cfg <- s7x::as_vector(arc_col(test_df(), category, value)@webchart)
 
@@ -352,7 +405,9 @@ test_that("the widget serializes with our own function, not htmlwidgets'", {
 
 test_that("the widget payload serializes fields row-wise", {
   w <- as_widget(arc_scatter(test_df(), category, value))
-  json <- as.character(htmlwidgets:::toJSON(w))
+  # Called the way htmlwidgets calls it, through the hook the test above
+  # asserts is installed.
+  json <- attr(w$x, "TOJSON_FUNC", exact = TRUE)(w$x)
 
   # The JS side does `fields.map(Field.fromJSON)`, so a columnar data frame
   # (jsonlite's default under htmlwidgets) would break it.
