@@ -1,3 +1,6 @@
+#' @include types-format-options.R
+NULL
+
 # S7 classes for statistics-definition spec types used by
 # WebChartSeriesQuery. Source of truth:
 # node_modules/@arcgis/charts-components/dist/spec/rest-js-types.d.ts

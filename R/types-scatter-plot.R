@@ -1,3 +1,6 @@
+#' @include types-bar-chart.R
+NULL
+
 # S7 classes for the scatterplot's JSON config shape (WebChart + a series
 # array of WebChartScatterplotSeries). Source of truth:
 # node_modules/@arcgis/charts-components/dist/spec/web-chart.d.ts (see

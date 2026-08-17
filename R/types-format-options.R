@@ -1,3 +1,6 @@
+#' @include types-renderer.R
+NULL
+
 # S7 classes for the value-format types used by WebChartAxis/WebChartBarChartSeries.
 # Source of truth: node_modules/@arcgis/charts-components/dist/spec/web-chart.d.ts
 # (see CLAUDE.md). Unchanged from the old charts-spec-derived version -

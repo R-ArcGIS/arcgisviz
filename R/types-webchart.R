@@ -1,3 +1,6 @@
+#' @include types-statistics.R
+NULL
+
 # S7 classes for ArcGIS Charts WebChart* spec object types with nested/ref'd
 # properties (built on top of the enums, Color, and simple types in
 # color.R/types-simple.R/types-format-options.R). Source of truth:

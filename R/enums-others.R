@@ -1,3 +1,6 @@
+#' @include enums-intl-date-time.R
+NULL
+
 # Enums for ArcGIS Charts spec types with no shared WebChart*/Intl* name
 # prefix. Source of truth is the spec bundled inside @arcgis/charts-components
 # (not the standalone, stale @arcgis/charts-model/@arcgis/charts-spec

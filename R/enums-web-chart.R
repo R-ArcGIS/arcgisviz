@@ -1,3 +1,6 @@
+#' @include color.R
+NULL
+
 # Enums for ArcGIS Charts WebChart* config types. Source of truth is the
 # spec bundled inside @arcgis/charts-components (not the standalone, stale
 # @arcgis/charts-model/@arcgis/charts-spec packages - see CLAUDE.md):

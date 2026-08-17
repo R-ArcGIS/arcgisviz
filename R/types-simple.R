@@ -1,3 +1,6 @@
+#' @include enums-others.R
+NULL
+
 # S7 classes for ArcGIS Charts spec object types whose properties are all
 # primitives, Color, or enums - no nested/ref'd object types. Source of
 # truth: node_modules/@arcgis/charts-components/dist/spec/rest-js-types.d.ts,

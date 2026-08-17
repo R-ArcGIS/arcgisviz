@@ -1,3 +1,6 @@
+#' @include types-scatter-plot.R
+NULL
+
 # S7 class for the line chart's series shape (WebChartLineChartSeries).
 # Source of truth: node_modules/@arcgis/charts-components/dist/spec/
 # web-chart.d.ts (see CLAUDE.md). Reuses the same root WebChart class as

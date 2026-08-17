@@ -1,3 +1,6 @@
+#' @include types-series-shared.R
+NULL
+
 # S7 classes for the bar chart's JSON config shape (WebChart + a series
 # array of WebChartBarChartSeries). Source of truth:
 # node_modules/@arcgis/charts-components/dist/spec/web-chart.d.ts (see

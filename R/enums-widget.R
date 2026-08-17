@@ -1,3 +1,6 @@
+#' @include arc-data.R
+NULL
+
 # Enum for the chart_type argument of arcgis_chart(). Unlike the enums in
 # enums-web-chart.R/enums-intl-date-time.R/enums-others.R, this one isn't
 # from @arcgis/charts-spec's JSON Schema - it's @arcgis/charts-components'

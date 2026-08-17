@@ -1,3 +1,6 @@
+#' @include types-simple.R
+NULL
+
 # S7 classes for the renderers WebChart$chartRenderer accepts. Unlike every
 # other type in this package these do NOT come from
 # @arcgis/charts-components' spec - IDrawingInfo$renderer is `any` there

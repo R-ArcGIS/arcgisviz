@@ -1,3 +1,6 @@
+#' @include types-webchart.R
+NULL
+
 # S7 classes shared by more than one chart type's series (bar + line, via
 # WebChartTemporalSeries). Source of truth:
 # node_modules/@arcgis/charts-components/dist/spec/web-chart.d.ts (see

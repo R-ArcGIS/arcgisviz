@@ -1,3 +1,6 @@
+#' @include enums-web-chart.R
+NULL
+
 # Enums for the JS-native Intl.DateTimeFormatOptions / Intl.NumberFormatOptions
 # types used by ArcGIS Charts' NumberFormatOptions/DateTimeFormatOptions specs.
 # Generated from data-raw/enums.json (see data-raw/resolve-spec-types.R and
