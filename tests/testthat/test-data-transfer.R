@@ -322,6 +322,56 @@ test_that("set_flipped() rotates the chart", {
   )
 })
 
+test_that("a histogram sends bins and no y", {
+  cfg <- s7x::as_vector(arc_histogram(test_df(), value, bins = 10)@webchart)
+  series <- cfg$series[[1]]
+
+  expect_identical(series$type, "histogramSeries")
+  expect_identical(series$x, "value")
+  expect_identical(series$binCount, 10)
+  # The frequency axis is derived, and only bar and line carry a query.
+  expect_null(series$y)
+  expect_null(series$query)
+
+  # deepMerge maps over the source array, so a compacted-away axis would
+  # shorten `axes` and delete one of the model's own.
+  expect_length(cfg$axes, 2)
+  expect_identical(cfg$axes[[2]]$type, "chartAxis")
+
+  expect_error(set_bins(arc_bar(test_df(), category), 5), "only applies")
+  expect_error(set_bins(arc_histogram(test_df(), value), 0), "at least 1")
+  expect_error(set_bins(arc_histogram(test_df(), value), 2.5), "whole number")
+})
+
+test_that("a box plot carries y and its own config subtype", {
+  chart <- arc_boxplot(test_df(), category, value)
+  expect_true(S7::S7_inherits(chart@webchart, WebBoxPlot))
+
+  cfg <- s7x::as_vector(chart@webchart)
+  expect_identical(cfg$series[[1]]$type, "boxPlotSeries")
+  expect_identical(cfg$series[[1]]$x, "category")
+  expect_identical(cfg$series[[1]]$y, "value")
+  expect_null(cfg$showOutliers)
+
+  hidden <- s7x::as_vector((chart |> set_outliers(FALSE))@webchart)
+  expect_false(hidden$showOutliers)
+  expect_error(set_outliers(arc_bar(test_df(), category)), "only applies")
+})
+
+test_that("a heat chart grids two columns", {
+  chart <- arc_heat(test_df(), category, value)
+  expect_true(S7::S7_inherits(chart@webchart, WebHeatChart))
+
+  cfg <- s7x::as_vector(chart@webchart)
+  expect_identical(cfg$series[[1]]$type, "heatSeries")
+  expect_identical(cfg$series[[1]]$x, "category")
+  expect_identical(cfg$series[[1]]$y, "value")
+  expect_null(cfg$series[[1]]$query)
+
+  # Cells are shaded by their own heat rules, not by a chartRenderer.
+  expect_error(set_color(chart, category), "does not apply to heat")
+})
+
 test_that("stat = 'identity' sends a null query to delete the default", {
   cfg <- s7x::as_vector(arc_col(test_df(), category, value)@webchart)
 

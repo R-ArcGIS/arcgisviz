@@ -13,7 +13,9 @@ ArcChart(
   labs = list(),
   color = list(),
   axes = list(),
-  flipped = NA
+  flipped = NA,
+  bins = NA_real_,
+  outliers = NA
 )
 }
 \description{

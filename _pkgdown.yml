@@ -36,6 +36,9 @@ reference:
       - arc_col
       - arc_scatter
       - arc_line
+      - arc_histogram
+      - arc_boxplot
+      - arc_heat
       - ArcChart
 
   - title: Aesthetics
@@ -52,6 +55,8 @@ reference:
     contents:
       - set_axis
       - set_flipped
+      - set_bins
+      - set_outliers
 
   - title: Rendering
     desc: Turn a chart into an htmlwidget, in a document or in Shiny.
@@ -67,6 +72,8 @@ reference:
       for you by the functions above.
     contents:
       - WebChart
+      - WebBoxPlot
+      - WebHeatChart
       - WebChartAxis
       - WebChartAxisScrollBar
       - WebChartCursorCrosshair
@@ -93,11 +100,24 @@ reference:
       - WebChartBarChartSeries
       - WebChartLineChartSeries
       - WebChartScatterplotSeries
+      - WebChartHistogramSeries
+      - WebChartBoxPlotSeries
+      - WebChartHeatChartSeries
       - WebChartSeriesQuery
       - WebChartTemporalBinning
       - WebChartTemporalBinningOffset
+      - WebChartCalendarDatePartsBinning
       - ScatterplotOverlays
+      - HistogramOverlays
       - SizePolicy
+
+  - title: Heat rules
+    desc: How heat chart cells are shaded and how empty ones are drawn.
+    contents:
+      - WebChartHeatChartGradient
+      - WebChartHeatChartHeatClassBreaks
+      - WebChartHeatChartHeatClassBreaksColorRampInfo
+      - WebChartHeatChartEmptyCell
 
   - title: Renderers
     desc: >
@@ -160,6 +180,11 @@ reference:
       - WebChartQuerySpatialRelationship
       - WebChartSortOrderKinds
       - WebChartStackedKinds
+      - WebChartDataTransformations
+      - WebChartClassBreakTypes
+      - WebChartHeatChartHeatRulesTypes
+      - WebChartHeatChartViewTypes
+      - WebChartCalendarDatePartsUnits
       - WebChartTemporalBinningUnits
       - WebChartTextSymbolHorizontalAlignment
       - WebChartTextSymbolVerticalAlignment

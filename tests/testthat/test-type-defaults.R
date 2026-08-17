@@ -43,3 +43,27 @@ test_that("a minimally-specified WebChart constructs without every property set"
   expect_length(chart@series, 1)
   expect_true(S7::S7_inherits(chart@series[[1]], WebChartBarChartSeries))
 })
+
+test_that("the histogram, box plot, and heat chart classes construct minimally", {
+  expect_true(is.na(WebChartHistogramSeries(type = "histogramSeries")@binCount))
+  expect_null(HistogramOverlays(type = "chartOverlays")@mean)
+  expect_true(is.na(WebChartBoxPlotSeries(type = "boxPlotSeries")@x))
+  expect_true(is.na(WebChartHeatChartSeries(type = "heatSeries")@y))
+
+  expect_null(WebChartHeatChartGradient()@outsideRangeLowerColor)
+  expect_true(is.na(WebChartHeatChartHeatClassBreaks()@breaksCount))
+  expect_true(is.na(WebChartHeatChartEmptyCell()@text))
+  expect_true(is.na(WebChartCalendarDatePartsBinning()@unit@value))
+})
+
+test_that("the WebChart subtypes inherit their parent's properties and methods", {
+  box <- WebBoxPlot(version = "25.1.0", type = "chart", series = list())
+  expect_true(S7::S7_inherits(box, WebChart))
+  expect_true(is.na(box@showOutliers))
+
+  heat <- WebHeatChart(version = "25.1.0", type = "chart", series = list())
+  expect_true(is.na(heat@firstDayOfWeek))
+  # The as_vector() method is registered on WebChart, so a subtype has to
+  # pick it up by inheritance or unset properties stop being dropped.
+  expect_named(s7x::as_vector(heat), c("version", "type", "title"))
+})

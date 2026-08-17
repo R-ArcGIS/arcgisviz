@@ -109,3 +109,42 @@ WebChartQuerySpatialRelationship <- s7x::new_enum(
     "within"
   )
 )
+
+#' @export
+WebChartDataTransformations <- s7x::new_enum(
+  "WebChartDataTransformations",
+  c("none", "logarithmic", "squareRoot")
+)
+
+#' @export
+WebChartClassBreakTypes <- s7x::new_enum(
+  "WebChartClassBreakTypes",
+  c("equal-interval", "quantile", "natural-breaks", "manual")
+)
+
+#' @export
+WebChartHeatChartHeatRulesTypes <- s7x::new_enum(
+  "WebChartHeatChartHeatRulesTypes",
+  c("gradient", "renderer")
+)
+
+#' @export
+WebChartHeatChartViewTypes <- s7x::new_enum(
+  "WebChartHeatChartViewTypes",
+  c("SingleCalendarView", "SequentialCalendarViews")
+)
+
+#' @export
+WebChartCalendarDatePartsUnits <- s7x::new_enum(
+  "WebChartCalendarDatePartsUnits",
+  c(
+    "dayOfMonth",
+    "dayOfWeek",
+    "dayOfYear",
+    "hourOfDay",
+    "monthOfYear",
+    "minuteOfDay",
+    "weekOfYear",
+    "quarterOfYear"
+  )
+)

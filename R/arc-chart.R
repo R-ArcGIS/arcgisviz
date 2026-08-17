@@ -1,4 +1,4 @@
-#' @include types-line-chart.R
+#' @include types-heat-chart.R
 NULL
 
 # Public, user-facing chart-building API. Wraps the internal S7 type layer
@@ -40,6 +40,8 @@ ArcChart <- new_class(
     color = class_list,
     axes = class_list,
     flipped = s7x::class_boolean,
+    bins = s7x::class_double,
+    outliers = s7x::class_boolean,
     webchart = S7::new_property(getter = function(self) build_webchart(self))
   )
 )
@@ -47,14 +49,18 @@ ArcChart <- new_class(
 # friendly kebab/plain type name -> {model_type (ModelTypes value, used to
 # build the client-side defaults), series_type (the series' own `type`
 # discriminator), series_class (which WebChart*Series S7 class to build),
-# aggregates (whether the series honours `stat` at all), symbol_* (the symbol
-# a chartRenderer carries for this chart type - see color_renderer())}
+# config_class (WebChart, or the subtype the spec gives this chart type),
+# aggregates (whether the series honours `stat` at all), has_y (whether the
+# series takes a y field), symbol_* (the symbol a chartRenderer carries for
+# this chart type - see color_renderer())}
 chart_type_map <- list(
   bar = list(
     model_type = "barChart",
     series_type = "barSeries",
     series_class = WebChartBarChartSeries,
+    config_class = WebChart,
     aggregates = TRUE,
+    has_y = TRUE,
     symbol_class = ISimpleFillSymbol,
     symbol_type = "esriSFS",
     symbol_style = SimpleFillSymbolStyle("esriSFSSolid")
@@ -63,7 +69,9 @@ chart_type_map <- list(
     model_type = "scatterplot",
     series_type = "scatterSeries",
     series_class = WebChartScatterplotSeries,
+    config_class = WebChart,
     aggregates = FALSE,
+    has_y = TRUE,
     symbol_class = ISimpleMarkerSymbol,
     symbol_type = "esriSMS",
     symbol_style = SimpleMarkerSymbolStyle("esriSMSCircle")
@@ -72,10 +80,45 @@ chart_type_map <- list(
     model_type = "lineChart",
     series_type = "lineSeries",
     series_class = WebChartLineChartSeries,
+    config_class = WebChart,
     aggregates = TRUE,
+    has_y = TRUE,
     symbol_class = ISimpleLineSymbol,
     symbol_type = "esriSLS",
     symbol_style = SimpleLineSymbolStyle("esriSLSSolid")
+  ),
+  histogram = list(
+    model_type = "histogram",
+    series_type = "histogramSeries",
+    series_class = WebChartHistogramSeries,
+    config_class = WebChart,
+    aggregates = FALSE,
+    has_y = FALSE,
+    symbol_class = ISimpleFillSymbol,
+    symbol_type = "esriSFS",
+    symbol_style = SimpleFillSymbolStyle("esriSFSSolid")
+  ),
+  boxplot = list(
+    model_type = "boxPlot",
+    series_type = "boxPlotSeries",
+    series_class = WebChartBoxPlotSeries,
+    config_class = WebBoxPlot,
+    aggregates = FALSE,
+    has_y = TRUE,
+    symbol_class = ISimpleFillSymbol,
+    symbol_type = "esriSFS",
+    symbol_style = SimpleFillSymbolStyle("esriSFSSolid")
+  ),
+  heat = list(
+    model_type = "heatChart",
+    series_type = "heatSeries",
+    series_class = WebChartHeatChartSeries,
+    config_class = WebHeatChart,
+    aggregates = FALSE,
+    has_y = TRUE,
+    symbol_class = ISimpleFillSymbol,
+    symbol_type = "esriSFS",
+    symbol_style = SimpleFillSymbolStyle("esriSFSSolid")
   )
 )
 
@@ -373,8 +416,12 @@ axis_title <- function(text) {
 }
 
 # `opts` is already keyed by spec property name, translated in set_axis().
+# `type` is required by the spec and also keeps the axis from compacting to
+# nothing: deepMerge maps over the source array, so a dropped axis would
+# shorten `axes` and delete one of the model's own.
 chart_axis <- function(text, opts) {
   args <- opts
+  args$type <- "chartAxis"
   title <- axis_title(text)
   if (!rlang::is_null(title)) {
     args$title <- title
@@ -555,6 +602,19 @@ set_flipped <- function(chart, flipped = TRUE) {
 #' @export
 set_color <- function(chart, color, palette = NULL) {
   check_chart_type_set(chart)
+
+  # Heat cells are shaded by the series' own heat rules, so a chartRenderer
+  # would be ignored rather than applied.
+  if (identical(chart@chart_type, "heat")) {
+    cli::cli_abort(
+      c(
+        "{.fn set_color} does not apply to heat charts.",
+        "i" = "Cells are shaded by how many rows fall into each."
+      ),
+      call = rlang::caller_env()
+    )
+  }
+
   col <- rlang::as_string(rlang::ensym(color))
   check_column(chart, col, "color")
 
@@ -796,7 +856,26 @@ build_webchart <- function(chart) {
 
   renderer <- color_renderer(chart, spec)
 
-  WebChart(
+  series <- list(
+    type = spec$series_type,
+    id = "series1",
+    name = "series1",
+    x = chart@x
+  )
+  # A histogram bins one field, so it has no `y` and derives its own
+  # frequency axis. The rest carry `y`, and only bar and line take a query -
+  # everything else keeps whichever one the client's defaults supply.
+  if (isTRUE(spec$has_y)) {
+    series$y <- agg$y
+  }
+  if (isTRUE(spec$aggregates)) {
+    series$query <- agg$query
+  }
+  if (identical(chart@chart_type, "histogram") && !is.na(chart@bins)) {
+    series$binCount <- chart@bins
+  }
+
+  config <- list(
     version = "25.1.0",
     type = "chart",
     title = chart_titled(labs$title),
@@ -809,17 +888,88 @@ build_webchart <- function(chart) {
       chart_axis(axis_lab(labs$x, chart@x), chart@axes$x),
       chart_axis(axis_lab(labs$y, y_label), chart@axes$y)
     ),
-    series = list(
-      spec$series_class(
-        type = spec$series_type,
-        id = "series1",
-        name = "series1",
-        x = chart@x,
-        y = agg$y,
-        query = agg$query
-      )
-    )
+    series = list(rlang::exec(spec$series_class, !!!series))
   )
+  if (identical(chart@chart_type, "boxplot")) {
+    config$showOutliers <- chart@outliers
+  }
+
+  rlang::exec(spec$config_class, !!!config)
+}
+
+check_chart_type_is <- function(chart, type, call = rlang::caller_env()) {
+  if (identical(chart@chart_type, type)) {
+    return(invisible(chart))
+  }
+  cli::cli_abort(
+    c(
+      "This only applies to {.val {type}} charts.",
+      "x" = "{.arg chart} is {.val {chart@chart_type}}."
+    ),
+    call = call
+  )
+}
+
+#' Set a histogram's bin count
+#'
+#' Splits the mapped column into a fixed number of bins. Leaving it unset
+#' lets the chart choose.
+#'
+#' @param chart Defines which chart to modify.
+#' @param bins Defines how many bins the data is split into, at least 1.
+#' @return `chart`, with its bin count set.
+#' @examples
+#' df <- data.frame(mass = c(1, 5, 3, 8, 2))
+#'
+#' arc_histogram(df, mass) |>
+#'   set_bins(10)
+#' @export
+set_bins <- function(chart, bins) {
+  check_chart_type_set(chart)
+  check_chart_type_is(chart, "histogram")
+
+  if (!rlang::is_scalar_double(bins) && !rlang::is_scalar_integer(bins)) {
+    cli::cli_abort(
+      c(
+        "{.arg bins} must be a single number.",
+        "x" = "You supplied {.obj_type_friendly {bins}}."
+      ),
+      call = rlang::caller_env()
+    )
+  }
+  if (bins < 1 || bins != round(bins)) {
+    cli::cli_abort(
+      c(
+        "{.arg bins} must be a whole number of at least 1.",
+        "x" = "You supplied {.val {bins}}."
+      ),
+      call = rlang::caller_env()
+    )
+  }
+
+  chart@bins <- as.double(bins)
+  chart
+}
+
+#' Show or hide box plot outliers
+#'
+#' Controls whether points beyond the whiskers are drawn.
+#'
+#' @param chart Defines which chart to modify.
+#' @param outliers default `TRUE`. Defines whether outlying points are drawn.
+#' @return `chart`, with its outlier display set.
+#' @examples
+#' df <- data.frame(species = c("a", "a", "b"), mass = c(1, 5, 3))
+#'
+#' arc_boxplot(df, species, mass) |>
+#'   set_outliers(FALSE)
+#' @export
+set_outliers <- function(chart, outliers = TRUE) {
+  check_chart_type_set(chart)
+  check_chart_type_is(chart, "boxplot")
+  check_axis_flag(outliers, "outliers")
+  chart@outliers <- outliers
+  chart
 }
 
 #' Bar chart
@@ -868,6 +1018,63 @@ arc_col <- function(.data, x, y) {
 #' @export
 arc_scatter <- function(.data, x, y) {
   arc_chart(.data) |> set_type("scatter") |> set_x({{ x }}) |> set_y({{ y }})
+}
+
+#' Histogram
+#'
+#' Bins one numeric column and plots the frequency of each bin. The frequency
+#' axis is derived, so there is no `y` to map.
+#'
+#' @inheritParams arc_chart
+#' @param x Defines which numeric column is binned.
+#' @param bins default `NULL`. Defines how many bins to split `x` into, or
+#'   `NULL` to let the chart choose.
+#' @return An `ArcChart`.
+#' @examples
+#' df <- data.frame(mass = c(1, 5, 3, 8, 2))
+#'
+#' arc_histogram(df, mass, bins = 10)
+#' @export
+arc_histogram <- function(.data, x, bins = NULL) {
+  chart <- arc_chart(.data) |> set_type("histogram") |> set_x({{ x }})
+  if (rlang::is_null(bins)) {
+    return(chart)
+  }
+  set_bins(chart, bins)
+}
+
+#' Box plot
+#'
+#' Draws the five number summary of `y` for each value of `x`.
+#'
+#' @inheritParams arc_chart
+#' @param x Defines which column the boxes are grouped by.
+#' @param y Defines which numeric column is summarised.
+#' @return An `ArcChart`.
+#' @examples
+#' df <- data.frame(species = c("a", "a", "b"), mass = c(1, 5, 3))
+#'
+#' arc_boxplot(df, species, mass)
+#' @export
+arc_boxplot <- function(.data, x, y) {
+  arc_chart(.data) |> set_type("boxplot") |> set_x({{ x }}) |> set_y({{ y }})
+}
+
+#' Heat chart
+#'
+#' Draws a grid of cells, one per pair of `x` and `y` values, shaded by how
+#' many rows fall into each.
+#'
+#' @inheritParams arc_chart
+#' @param x,y Defines which columns form the grid.
+#' @return An `ArcChart`.
+#' @examples
+#' df <- data.frame(species = c("a", "a", "b"), island = c("x", "y", "x"))
+#'
+#' arc_heat(df, species, island)
+#' @export
+arc_heat <- function(.data, x, y) {
+  arc_chart(.data) |> set_type("heat") |> set_x({{ x }}) |> set_y({{ y }})
 }
 
 #' Line chart

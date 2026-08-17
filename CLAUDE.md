@@ -91,10 +91,21 @@ tidy-eval bare column names, friendly kebab-case type names) and a data
 -transfer layer (`R/arc-data.R`) that turns a data frame + config into the
 widget payload. That public API now covers mapping (`set_x()`/`set_y()`/
 `set_stat()`), text (`set_labs()`), colour (`set_color()`, see below), and
-scales (`set_axis()`/`set_flipped()`). Box plot, pie, gauge, histogram, and
-radar chart types are not yet modeled, and there is no legend surface yet
+scales (`set_axis()`/`set_flipped()`). Six chart types are modeled: bar,
+line, scatter, histogram, box plot, and heat (plus combo bar-line for free).
+Pie, gauge, and radar are not. There is no legend surface yet
 (`WebChart$legend` is modeled but nothing sets it), which colour has made
 worth adding.
+
+Two shapes worth knowing before adding a seventh chart type. `chart_type_map`
+(`R/arc-chart.R`) carries `config_class`, `has_y`, and `aggregates` per type,
+and `build_webchart()` reads them rather than branching on the type name.
+Chart types whose spec defines a `WebChart` subtype get it as a real S7
+subclass (`WebBoxPlot`, `WebHeatChart`), which is how they inherit the
+`as_vector()` method that drops unset properties. And **every axis must carry
+`type = "chartAxis"`**: `deepMerge()` maps over the source array
+(`srcjs/widgets/arcgisChart.js:24`), so an axis that compacts away to nothing
+shortens `axes` and deletes one of the model's own.
 
 ## Serialization
 
@@ -226,12 +237,28 @@ takes any vector of R colours, parsed by `grDevices::col2rgb()` in `R/color.R`.
 - **Geometry types** (`IPoint`/`IPolygon`/etc.) - handled elsewhere, not
   modeled in this package's type registry. `WebChartDataFilters$geometry`
   stays `class_any`.
-- **Other chart types' series shapes** (pie, gauge, histogram, box plot,
-  radar, heat) - `web-chart.d.ts` has all of these in one file now (no
-  per-chart-type `.d.ts` sprawl to resolve), so adding one is just reading
-  the relevant interface(s) there and following the `arcgis-spec-types`
-  skill's conventions - not fundamentally blocked on anything, just not
-  done yet.
+- **Pie, gauge, and radar series shapes** - `web-chart.d.ts` has all of these
+  in one file, so adding one is reading the relevant interface(s) there and
+  following the `arcgis-spec-types` skill's conventions plus the
+  `chart_type_map` notes above. Not blocked on anything, just not done yet.
+- **Heat chart colour.** Cells are shaded by the series' own `gradientRules`
+  or `classBreaksRules`, not by `chartRenderer`, so `set_color()` errors on a
+  heat chart rather than silently building a renderer the engine ignores. A
+  heat colour surface is worth adding, it is just a different mechanism.
+
+## Naming
+
+**Never name a function or argument `*_for` or `resolve_*`.** No
+`palette_for()`, no `resolve_stops()`. Both read as machine-generated. Name
+the thing it returns or the thing it does: `palette_stops()`,
+`discrete_colors()`, `chart_axis()`.
+
+The public API takes its vocabulary from the grammar of graphics. A user who
+knows ggplot2 should be able to guess a name and be right: `arc_histogram()`
+not `arc_binned_bar()`, `bins` not `binCount`, `set_color()` not
+`set_color_mapping()`. Friendly values stay kebab-case with no spec prefixes
+("side-by-side", not "sideBySide"). Nothing in the public surface exposes an
+S7 class or a spec enum value.
 
 ## Comments
 
