@@ -4,123 +4,228 @@ What the package does (one paragraph).
 
 ## All functions
 
-- [`ArcChart`](http://r.esri.com/arcgisviz/reference/ArcChart.md) :
+- [`ArcChart()`](http://r.esri.com/arcgisviz/reference/ArcChart.md) :
   ArcChart
 
-- [`CategoryFormatOptions`](http://r.esri.com/arcgisviz/reference/CategoryFormatOptions.md)
+- [`CategoryFormatOptions()`](http://r.esri.com/arcgisviz/reference/CategoryFormatOptions.md)
   : CategoryFormatOptions
 
-- [`Color`](http://r.esri.com/arcgisviz/reference/Color.md) : Color
+- [`Color()`](http://r.esri.com/arcgisviz/reference/Color.md) : Color
 
-- [`DateTimeFormatOptions`](http://r.esri.com/arcgisviz/reference/DateTimeFormatOptions.md)
+- [`DateTimeFormatOptions()`](http://r.esri.com/arcgisviz/reference/DateTimeFormatOptions.md)
   : DateTimeFormatOptions
 
-- [`IFont`](http://r.esri.com/arcgisviz/reference/IFont.md) : IFont
+- [`IFont()`](http://r.esri.com/arcgisviz/reference/IFont.md) : IFont
 
-- [`ISimpleFillSymbol`](http://r.esri.com/arcgisviz/reference/ISimpleFillSymbol.md)
+- [`IFontDecoration()`](http://r.esri.com/arcgisviz/reference/IFontDecoration.md)
+  : IFontDecoration
+
+- [`IFontStyle()`](http://r.esri.com/arcgisviz/reference/IFontStyle.md)
+  : IFontStyle
+
+- [`IFontWeight()`](http://r.esri.com/arcgisviz/reference/IFontWeight.md)
+  : IFontWeight
+
+- [`ISimpleFillSymbol()`](http://r.esri.com/arcgisviz/reference/ISimpleFillSymbol.md)
   : ISimpleFillSymbol
 
-- [`ISimpleLineSymbol`](http://r.esri.com/arcgisviz/reference/ISimpleLineSymbol.md)
+- [`ISimpleLineSymbol()`](http://r.esri.com/arcgisviz/reference/ISimpleLineSymbol.md)
   : ISimpleLineSymbol
 
-- [`ISimpleMarkerSymbol`](http://r.esri.com/arcgisviz/reference/ISimpleMarkerSymbol.md)
+- [`ISimpleMarkerSymbol()`](http://r.esri.com/arcgisviz/reference/ISimpleMarkerSymbol.md)
   : ISimpleMarkerSymbol
 
-- [`IStatisticDefinition`](http://r.esri.com/arcgisviz/reference/IStatisticDefinition.md)
+- [`IStatisticDefinition()`](http://r.esri.com/arcgisviz/reference/IStatisticDefinition.md)
   : IStatisticDefinition
 
-- [`IStatisticDefinitionStatisticParameters`](http://r.esri.com/arcgisviz/reference/IStatisticDefinitionStatisticParameters.md)
+- [`IStatisticDefinitionStatisticParameters()`](http://r.esri.com/arcgisviz/reference/IStatisticDefinitionStatisticParameters.md)
   : IStatisticDefinitionStatisticParameters
 
-- [`IntlDateTimeFormatOptions`](http://r.esri.com/arcgisviz/reference/IntlDateTimeFormatOptions.md)
+- [`IStatisticDefinitionStatisticParametersOrderBy()`](http://r.esri.com/arcgisviz/reference/IStatisticDefinitionStatisticParametersOrderBy.md)
+  : IStatisticDefinitionStatisticParametersOrderBy
+
+- [`IStatisticDefinitionStatisticType()`](http://r.esri.com/arcgisviz/reference/IStatisticDefinitionStatisticType.md)
+  : IStatisticDefinitionStatisticType
+
+- [`IntlDateTimeDigitStyle()`](http://r.esri.com/arcgisviz/reference/IntlDateTimeDigitStyle.md)
+  : IntlDateTimeDigitStyle
+
+- [`IntlDateTimeFormatLength()`](http://r.esri.com/arcgisviz/reference/IntlDateTimeFormatLength.md)
+  : IntlDateTimeFormatLength
+
+- [`IntlDateTimeFormatOptions()`](http://r.esri.com/arcgisviz/reference/IntlDateTimeFormatOptions.md)
   : IntlDateTimeFormatOptions
 
-- [`IntlNumberFormatOptions`](http://r.esri.com/arcgisviz/reference/IntlNumberFormatOptions.md)
+- [`IntlDateTimeFormatOptionsFormatMatcher()`](http://r.esri.com/arcgisviz/reference/IntlDateTimeFormatOptionsFormatMatcher.md)
+  : IntlDateTimeFormatOptionsFormatMatcher
+
+- [`IntlDateTimeFormatOptionsHourCycle()`](http://r.esri.com/arcgisviz/reference/IntlDateTimeFormatOptionsHourCycle.md)
+  : IntlDateTimeFormatOptionsHourCycle
+
+- [`IntlDateTimeFormatOptionsMonth()`](http://r.esri.com/arcgisviz/reference/IntlDateTimeFormatOptionsMonth.md)
+  : IntlDateTimeFormatOptionsMonth
+
+- [`IntlDateTimeFormatOptionsTimeZoneName()`](http://r.esri.com/arcgisviz/reference/IntlDateTimeFormatOptionsTimeZoneName.md)
+  : IntlDateTimeFormatOptionsTimeZoneName
+
+- [`IntlFormatWidth()`](http://r.esri.com/arcgisviz/reference/IntlFormatWidth.md)
+  : IntlFormatWidth
+
+- [`IntlLocaleMatcher()`](http://r.esri.com/arcgisviz/reference/IntlLocaleMatcher.md)
+  : IntlLocaleMatcher
+
+- [`IntlNumberFormatOptions()`](http://r.esri.com/arcgisviz/reference/IntlNumberFormatOptions.md)
   : IntlNumberFormatOptions
+
+- [`IntlNumberFormatOptionsCompactDisplay()`](http://r.esri.com/arcgisviz/reference/IntlNumberFormatOptionsCompactDisplay.md)
+  : IntlNumberFormatOptionsCompactDisplay
+
+- [`IntlNumberFormatOptionsCurrencyDisplay()`](http://r.esri.com/arcgisviz/reference/IntlNumberFormatOptionsCurrencyDisplay.md)
+  : IntlNumberFormatOptionsCurrencyDisplay
+
+- [`IntlNumberFormatOptionsCurrencySign()`](http://r.esri.com/arcgisviz/reference/IntlNumberFormatOptionsCurrencySign.md)
+  : IntlNumberFormatOptionsCurrencySign
+
+- [`IntlNumberFormatOptionsNotation()`](http://r.esri.com/arcgisviz/reference/IntlNumberFormatOptionsNotation.md)
+  : IntlNumberFormatOptionsNotation
+
+- [`IntlNumberFormatOptionsSignDisplay()`](http://r.esri.com/arcgisviz/reference/IntlNumberFormatOptionsSignDisplay.md)
+  : IntlNumberFormatOptionsSignDisplay
+
+- [`IntlNumberFormatOptionsStyle()`](http://r.esri.com/arcgisviz/reference/IntlNumberFormatOptionsStyle.md)
+  : IntlNumberFormatOptionsStyle
 
 - [`ModelTypes()`](http://r.esri.com/arcgisviz/reference/ModelTypes.md)
   : ModelTypes
 
-- [`NumberFormatOptions`](http://r.esri.com/arcgisviz/reference/NumberFormatOptions.md)
+- [`NumberFormatOptions()`](http://r.esri.com/arcgisviz/reference/NumberFormatOptions.md)
   : NumberFormatOptions
 
-- [`ScatterplotOverlays`](http://r.esri.com/arcgisviz/reference/ScatterplotOverlays.md)
+- [`RESTUnits()`](http://r.esri.com/arcgisviz/reference/RESTUnits.md) :
+  RESTUnits
+
+- [`ScatterplotOverlays()`](http://r.esri.com/arcgisviz/reference/ScatterplotOverlays.md)
   : ScatterplotOverlays
 
-- [`SizePolicy`](http://r.esri.com/arcgisviz/reference/SizePolicy.md) :
-  SizePolicy
+- [`SimpleFillSymbolStyle()`](http://r.esri.com/arcgisviz/reference/SimpleFillSymbolStyle.md)
+  : SimpleFillSymbolStyle
 
-- [`TimeIntervalInfo`](http://r.esri.com/arcgisviz/reference/TimeIntervalInfo.md)
+- [`SimpleLineSymbolStyle()`](http://r.esri.com/arcgisviz/reference/SimpleLineSymbolStyle.md)
+  : SimpleLineSymbolStyle
+
+- [`SimpleMarkerSymbolStyle()`](http://r.esri.com/arcgisviz/reference/SimpleMarkerSymbolStyle.md)
+  : SimpleMarkerSymbolStyle
+
+- [`SizePolicy()`](http://r.esri.com/arcgisviz/reference/SizePolicy.md)
+  : SizePolicy
+
+- [`SizePolicyScaleTypes()`](http://r.esri.com/arcgisviz/reference/SizePolicyScaleTypes.md)
+  : SizePolicyScaleTypes
+
+- [`TimeIntervalInfo()`](http://r.esri.com/arcgisviz/reference/TimeIntervalInfo.md)
   : TimeIntervalInfo
 
-- [`WebChart`](http://r.esri.com/arcgisviz/reference/WebChart.md) :
+- [`WebChart()`](http://r.esri.com/arcgisviz/reference/WebChart.md) :
   WebChart
 
-- [`WebChartAxis`](http://r.esri.com/arcgisviz/reference/WebChartAxis.md)
+- [`WebChartAxis()`](http://r.esri.com/arcgisviz/reference/WebChartAxis.md)
   : WebChartAxis
 
-- [`WebChartAxisScrollBar`](http://r.esri.com/arcgisviz/reference/WebChartAxisScrollBar.md)
+- [`WebChartAxisScrollBar()`](http://r.esri.com/arcgisviz/reference/WebChartAxisScrollBar.md)
   : WebChartAxisScrollBar
 
-- [`WebChartBarChartSeries`](http://r.esri.com/arcgisviz/reference/WebChartBarChartSeries.md)
+- [`WebChartBarChartSeries()`](http://r.esri.com/arcgisviz/reference/WebChartBarChartSeries.md)
   : WebChartBarChartSeries
 
-- [`WebChartCursorCrosshair`](http://r.esri.com/arcgisviz/reference/WebChartCursorCrosshair.md)
+- [`WebChartCursorCrosshair()`](http://r.esri.com/arcgisviz/reference/WebChartCursorCrosshair.md)
   : WebChartCursorCrosshair
 
-- [`WebChartDataFilters`](http://r.esri.com/arcgisviz/reference/WebChartDataFilters.md)
+- [`WebChartDataFilters()`](http://r.esri.com/arcgisviz/reference/WebChartDataFilters.md)
   : WebChartDataFilters
 
-- [`WebChartDateTimeUnitFormatOptions`](http://r.esri.com/arcgisviz/reference/WebChartDateTimeUnitFormatOptions.md)
+- [`WebChartDateTimeUnitFormatOptions()`](http://r.esri.com/arcgisviz/reference/WebChartDateTimeUnitFormatOptions.md)
   : WebChartDateTimeUnitFormatOptions
 
-- [`WebChartDirectionalDataOrder`](http://r.esri.com/arcgisviz/reference/WebChartDirectionalDataOrder.md)
+- [`WebChartDirectionalDataOrder()`](http://r.esri.com/arcgisviz/reference/WebChartDirectionalDataOrder.md)
   : WebChartDirectionalDataOrder
 
-- [`WebChartGuide`](http://r.esri.com/arcgisviz/reference/WebChartGuide.md)
+- [`WebChartDirectionalDataOrderOrderType()`](http://r.esri.com/arcgisviz/reference/WebChartDirectionalDataOrderOrderType.md)
+  : WebChartDirectionalDataOrderOrderType
+
+- [`WebChartGuide()`](http://r.esri.com/arcgisviz/reference/WebChartGuide.md)
   : WebChartGuide
 
-- [`WebChartLegend`](http://r.esri.com/arcgisviz/reference/WebChartLegend.md)
+- [`WebChartLabelBehavior()`](http://r.esri.com/arcgisviz/reference/WebChartLabelBehavior.md)
+  : WebChartLabelBehavior
+
+- [`WebChartLegend()`](http://r.esri.com/arcgisviz/reference/WebChartLegend.md)
   : WebChartLegend
 
-- [`WebChartLineChartSeries`](http://r.esri.com/arcgisviz/reference/WebChartLineChartSeries.md)
+- [`WebChartLegendPositions()`](http://r.esri.com/arcgisviz/reference/WebChartLegendPositions.md)
+  : WebChartLegendPositions
+
+- [`WebChartLineChartSeries()`](http://r.esri.com/arcgisviz/reference/WebChartLineChartSeries.md)
   : WebChartLineChartSeries
 
-- [`WebChartMultiAxesDataOrder`](http://r.esri.com/arcgisviz/reference/WebChartMultiAxesDataOrder.md)
+- [`WebChartMultiAxesDataOrder()`](http://r.esri.com/arcgisviz/reference/WebChartMultiAxesDataOrder.md)
   : WebChartMultiAxesDataOrder
 
-- [`WebChartNullCategory`](http://r.esri.com/arcgisviz/reference/WebChartNullCategory.md)
+- [`WebChartNullCategory()`](http://r.esri.com/arcgisviz/reference/WebChartNullCategory.md)
   : WebChartNullCategory
 
-- [`WebChartOrderOptions`](http://r.esri.com/arcgisviz/reference/WebChartOrderOptions.md)
+- [`WebChartNullPolicyTypes()`](http://r.esri.com/arcgisviz/reference/WebChartNullPolicyTypes.md)
+  : WebChartNullPolicyTypes
+
+- [`WebChartOrderOptions()`](http://r.esri.com/arcgisviz/reference/WebChartOrderOptions.md)
   : WebChartOrderOptions
 
-- [`WebChartOrderSeriesBy`](http://r.esri.com/arcgisviz/reference/WebChartOrderSeriesBy.md)
+- [`WebChartOrderSeriesBy()`](http://r.esri.com/arcgisviz/reference/WebChartOrderSeriesBy.md)
   : WebChartOrderSeriesBy
 
-- [`WebChartOverlay`](http://r.esri.com/arcgisviz/reference/WebChartOverlay.md)
+- [`WebChartOverlay()`](http://r.esri.com/arcgisviz/reference/WebChartOverlay.md)
   : WebChartOverlay
 
-- [`WebChartPredefinedLabelsDataOrder`](http://r.esri.com/arcgisviz/reference/WebChartPredefinedLabelsDataOrder.md)
+- [`WebChartPredefinedLabelsDataOrder()`](http://r.esri.com/arcgisviz/reference/WebChartPredefinedLabelsDataOrder.md)
   : WebChartPredefinedLabelsDataOrder
 
-- [`WebChartScatterplotSeries`](http://r.esri.com/arcgisviz/reference/WebChartScatterplotSeries.md)
+- [`WebChartQuerySpatialRelationship()`](http://r.esri.com/arcgisviz/reference/WebChartQuerySpatialRelationship.md)
+  : WebChartQuerySpatialRelationship
+
+- [`WebChartScatterplotSeries()`](http://r.esri.com/arcgisviz/reference/WebChartScatterplotSeries.md)
   : WebChartScatterplotSeries
 
-- [`WebChartSeriesQuery`](http://r.esri.com/arcgisviz/reference/WebChartSeriesQuery.md)
+- [`WebChartSeriesQuery()`](http://r.esri.com/arcgisviz/reference/WebChartSeriesQuery.md)
   : WebChartSeriesQuery
 
-- [`WebChartTemporalBinning`](http://r.esri.com/arcgisviz/reference/WebChartTemporalBinning.md)
+- [`WebChartSortOrderKinds()`](http://r.esri.com/arcgisviz/reference/WebChartSortOrderKinds.md)
+  : WebChartSortOrderKinds
+
+- [`WebChartStackedKinds()`](http://r.esri.com/arcgisviz/reference/WebChartStackedKinds.md)
+  : WebChartStackedKinds
+
+- [`WebChartTemporalBinning()`](http://r.esri.com/arcgisviz/reference/WebChartTemporalBinning.md)
   : WebChartTemporalBinning
 
-- [`WebChartTemporalBinningOffset`](http://r.esri.com/arcgisviz/reference/WebChartTemporalBinningOffset.md)
+- [`WebChartTemporalBinningOffset()`](http://r.esri.com/arcgisviz/reference/WebChartTemporalBinningOffset.md)
   : WebChartTemporalBinningOffset
 
-- [`WebChartText`](http://r.esri.com/arcgisviz/reference/WebChartText.md)
+- [`WebChartTemporalBinningUnits()`](http://r.esri.com/arcgisviz/reference/WebChartTemporalBinningUnits.md)
+  : WebChartTemporalBinningUnits
+
+- [`WebChartText()`](http://r.esri.com/arcgisviz/reference/WebChartText.md)
   : WebChartText
 
-- [`WebChartTextSymbol`](http://r.esri.com/arcgisviz/reference/WebChartTextSymbol.md)
+- [`WebChartTextSymbol()`](http://r.esri.com/arcgisviz/reference/WebChartTextSymbol.md)
   : WebChartTextSymbol
+
+- [`WebChartTextSymbolHorizontalAlignment()`](http://r.esri.com/arcgisviz/reference/WebChartTextSymbolHorizontalAlignment.md)
+  : WebChartTextSymbolHorizontalAlignment
+
+- [`WebChartTextSymbolVerticalAlignment()`](http://r.esri.com/arcgisviz/reference/WebChartTextSymbolVerticalAlignment.md)
+  : WebChartTextSymbolVerticalAlignment
+
+- [`WebChartTimeAggregationTypes()`](http://r.esri.com/arcgisviz/reference/WebChartTimeAggregationTypes.md)
+  : WebChartTimeAggregationTypes
 
 - [`arc_bar()`](http://r.esri.com/arcgisviz/reference/arc_bar.md) : Bar
   chart
@@ -151,6 +256,9 @@ What the package does (one paragraph).
 
 - [`as_widget()`](http://r.esri.com/arcgisviz/reference/as_widget.md) :
   Convert a chart to an htmlwidget
+
+- [`set_labs()`](http://r.esri.com/arcgisviz/reference/set_labs.md) :
+  Set a chart's labels
 
 - [`set_stat()`](http://r.esri.com/arcgisviz/reference/set_stat.md) :
   Set a chart's statistical transformation

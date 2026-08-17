@@ -1,6 +1,6 @@
 # Bar chart
 
-Counts rows per `x`, the way `ggplot2::geom_bar()` does. Use
+Counts rows per `x`. Use
 [`arc_col()`](http://r.esri.com/arcgisviz/reference/arc_col.md) to plot
 values you have already summarised, or
 [`set_stat()`](http://r.esri.com/arcgisviz/reference/set_stat.md) for

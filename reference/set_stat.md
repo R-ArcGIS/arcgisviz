@@ -1,10 +1,8 @@
 # Set a chart's statistical transformation
 
-How `y` is derived from the data, in the sense ggplot2's `stat` argument
-means it. `"identity"` plots `y` verbatim, one mark per row
-(`geom_col()`); every other value aggregates `y` grouped by `x`
-(`geom_bar()`, or `stat_summary()`). `"count"` needs no `y` - it counts
-rows per `x`.
+How `y` is derived from the data. `"identity"` plots `y` verbatim, one
+mark per row; every other value aggregates `y` grouped by `x`. `"count"`
+needs no `y` - it counts rows per `x`.
 
 ## Usage
 

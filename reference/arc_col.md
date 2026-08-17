@@ -1,6 +1,6 @@
 # Column chart
 
-Plots `y` verbatim, one bar per row, the way `ggplot2::geom_col()` does.
+Plots `y` verbatim, one bar per row.
 
 ## Usage
 

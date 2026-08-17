@@ -56,6 +56,13 @@ just bundle       # rebuild the JS widget bundle (production, minified)
 just watch        # rebuild JS on every srcjs/ change
 ```
 
+## Every new feature needs a `dev/` example
+
+Every user-facing feature gets a `dev/` example (one file per feature,
+`dev/set-labs.R`), rendered in the Viewer and using
+[`datasets::penguins`](https://rdrr.io/r/datasets/penguins.html). These
+become user-facing tutorials later, so write them to be read.
+
 ## Two skills, load them for the relevant work
 
 - **`arcgis-spec-types`** - hand-writing `s7x`-based S7 classes in `R/`

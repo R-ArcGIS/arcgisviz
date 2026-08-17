@@ -47,6 +47,10 @@
 <span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="ex">just</span> watch        <span class="co"># rebuild JS on every srcjs/ change</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="every-new-feature-needs-a-dev-example">Every new feature needs a <code>dev/</code> example<a class="anchor" aria-label="anchor" href="#every-new-feature-needs-a-dev-example"></a></h2>
+<p>Every user-facing feature gets a <code>dev/</code> example (one file per feature, <code>dev/set-labs.R</code>), rendered in the Viewer and using <code><a href="https://rdrr.io/r/datasets/penguins.html" class="external-link">datasets::penguins</a></code>. These become user-facing tutorials later, so write them to be read.</p>
+</div>
+<div class="section level2">
 <h2 id="two-skills-load-them-for-the-relevant-work">Two skills, load them for the relevant work<a class="anchor" aria-label="anchor" href="#two-skills-load-them-for-the-relevant-work"></a></h2>
 <ul><li>
 <strong><code>arcgis-spec-types</code></strong> - hand-writing <code>s7x</code>-based S7 classes in <code>R/</code> directly from <code>@arcgis/charts-components</code>’s bundled <code>.d.ts</code> spec (see above - no JSON Schema, no mechanical resolver anymore). Load this before adding a new chart type or touching any <code>R/types-*.R</code> / <code>R/enums-*.R</code> / <code>R/color.R</code> file.</li>
