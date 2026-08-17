@@ -34,7 +34,12 @@ Collate:
 Imports:
     S7,
     s7x,
-    htmlwidgets
+    htmlwidgets,
+    rlang,
+    cli,
+    arcgisutils,
+    yyjsonr,
+    grDevices
 URL: http://r.esri.com/arcgisviz/
 Config/roxygen2/version: 8.1.0.9000
 Depends: 
