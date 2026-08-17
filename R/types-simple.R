@@ -40,6 +40,36 @@ ISimpleLineSymbol <- new_class(
   )
 )
 
+#' ISimpleFillSymbol
+#' @name ISimpleFillSymbol
+#' @export
+ISimpleFillSymbol <- new_class(
+  "ISimpleFillSymbol",
+  properties = list(
+    type = s7x::class_string,
+    style = SimpleFillSymbolStyle,
+    color = s7x::property_union(Color, NULL, default = NULL),
+    outline = s7x::property_union(ISimpleLineSymbol, NULL, default = NULL)
+  )
+)
+
+#' ISimpleMarkerSymbol
+#' @name ISimpleMarkerSymbol
+#' @export
+ISimpleMarkerSymbol <- new_class(
+  "ISimpleMarkerSymbol",
+  properties = list(
+    type = s7x::class_string,
+    style = SimpleMarkerSymbolStyle,
+    color = s7x::property_union(Color, NULL, default = NULL),
+    size = s7x::class_double,
+    outline = s7x::property_union(ISimpleLineSymbol, NULL, default = NULL),
+    angle = s7x::class_double,
+    xoffset = s7x::class_double,
+    yoffset = s7x::class_double
+  )
+)
+
 #' CategoryFormatOptions
 #' @name CategoryFormatOptions
 #' @export

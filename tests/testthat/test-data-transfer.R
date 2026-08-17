@@ -126,6 +126,149 @@ test_that("set_labs() leaves omitted labels alone and rejects bad input", {
   expect_error(set_labs(chart, "Hi"), class = "rlib_error_dots_nonempty")
 })
 
+test_that("a numeric colour mapping sends a colorInfo visual variable", {
+  cfg <- s7x::as_vector(
+    (arc_scatter(test_df(), category, value) |> set_color(value))@webchart
+  )
+
+  expect_true(cfg$colorMatch)
+  expect_identical(cfg$chartRenderer$type, "simple")
+  expect_identical(cfg$chartRenderer$symbol$type, "esriSMS")
+
+  vv <- cfg$chartRenderer$visualVariables[[1]]
+  expect_identical(vv$type, "colorInfo")
+  expect_identical(vv$field, "value")
+
+  # The ramp's own stops go over untouched, spread across the column's range.
+  stops <- vv$stops
+  expect_identical(stops[[1]]$value, 1)
+  expect_identical(stops[[length(stops)]]$value, 5)
+  # "Blue 3" is the SDK's defaultColorRampForCharts (class-breaks.js:475).
+  expect_identical(stops[[1]]$color, c(239, 243, 255, 255))
+})
+
+test_that("categories ride integer codes on a visual variable", {
+  # uniqueValue is ignored on the amCharts5 path, so categories go over as a
+  # colorInfo VV against a derived numeric column - one stop per level, so no
+  # value ever falls between stops and the interpolation never kicks in.
+  chart <- arc_col(test_df(), category, value) |> set_color(category)
+  cfg <- s7x::as_vector(chart@webchart)
+
+  expect_identical(cfg$chartRenderer$type, "simple")
+
+  vv <- cfg$chartRenderer$visualVariables[[1]]
+  expect_identical(vv$field, "arcgisviz_color")
+
+  stops <- vv$stops
+  expect_null(names(stops))
+  expect_identical(vapply(stops, function(s) s$value, double(1)), c(1, 2, 3))
+  expect_identical(
+    vapply(stops, function(s) s$label, character(1)),
+    c("a", "b", "c")
+  )
+  # Paired-10, the SDK's own series palette (index.js:45).
+  expect_identical(stops[[1]]$color, c(31, 120, 180, 255))
+
+  # The codes have to reach the browser, so the layer carries the column.
+  sent <- chart_data(chart)
+  expect_identical(sent$arcgisviz_color, c(1L, 2L, 3L))
+  expect_true(
+    "arcgisviz_color" %in%
+      as_chart_layer(sent)$featureCollection$layers[[
+        1
+      ]]$layerDefinition$fields$name
+  )
+})
+
+test_that("an aggregating chart colours categories with a uniqueValue renderer", {
+  # An aggregating query returns only the group-by field and the statistic, so
+  # a derived code column would never come back - but `x` itself does.
+  chart <- arc_bar(test_df(), category) |> set_color(category)
+  cfg <- s7x::as_vector(chart@webchart)
+
+  expect_identical(cfg$chartRenderer$type, "uniqueValue")
+  expect_identical(cfg$chartRenderer$field1, "category")
+  expect_identical(names(chart_data(chart)), names(test_df()))
+
+  infos <- cfg$chartRenderer$uniqueValueInfos
+  expect_null(names(infos))
+  expect_identical(
+    vapply(infos, function(i) i$value, character(1)),
+    c("a", "b", "c")
+  )
+  expect_identical(infos[[1]]$symbol$color, c(31, 120, 180, 255))
+
+  # Nothing but `x` survives the query, so nothing else can be coloured.
+  grouped <- data.frame(
+    category = c("a", "b"),
+    grp = c("x", "y"),
+    value = c(1, 2)
+  )
+  expect_error(
+    (arc_chart(grouped) |>
+      set_type("bar") |>
+      set_x(category) |>
+      set_y(value) |>
+      set_stat("mean") |>
+      set_color(grp))@webchart,
+    "same column as"
+  )
+})
+
+test_that("a numeric colour mapping adds no derived column", {
+  chart <- arc_scatter(test_df(), category, value) |> set_color(value)
+  expect_identical(names(chart_data(chart)), names(test_df()))
+})
+
+test_that("an unmapped chart sends neither a renderer nor colorMatch", {
+  cfg <- s7x::as_vector(arc_scatter(test_df(), category, value)@webchart)
+  expect_null(cfg$chartRenderer)
+  expect_null(cfg$colorMatch)
+})
+
+test_that("set_color() accepts a palette name or a colour vector", {
+  ramped <- s7x::as_vector(
+    (arc_scatter(test_df(), category, value) |>
+      set_color(value, palette = "Red 1"))@webchart
+  )
+  expect_false(identical(
+    ramped$chartRenderer$visualVariables[[1]]$stops[[1]]$color,
+    c(239, 243, 255, 255)
+  ))
+
+  custom <- s7x::as_vector(
+    (arc_scatter(test_df(), category, value) |>
+      set_color(value, palette = c("white", "black")))@webchart
+  )
+  stops <- custom$chartRenderer$visualVariables[[1]]$stops
+  expect_length(stops, 2)
+  expect_identical(stops[[1]]$color, c(255, 255, 255, 255))
+  expect_identical(stops[[2]]$color, c(0, 0, 0, 255))
+
+  # A palette is a ramp name or colours; anything else faults as a colour.
+  expect_error(
+    set_color(arc_scatter(test_df(), category, value), value, palette = "Nope"),
+    "valid colours"
+  )
+  expect_error(
+    set_color(arc_scatter(test_df(), category, value), value, palette = "#GGG"),
+    "valid colours"
+  )
+})
+
+test_that("parse_color() handles names, hex, and hex with alpha", {
+  expect_identical(
+    s7x::as_vector(parse_color("steelblue")[[1]]),
+    c(70, 130, 180, 255)
+  )
+  expect_identical(
+    s7x::as_vector(parse_color("#4682B480")[[1]]),
+    c(70, 130, 180, 128)
+  )
+  expect_length(parse_color(c("red", "blue")), 2)
+  expect_error(parse_color("notacolour"), "valid colours")
+})
+
 test_that("stat = 'identity' sends a null query to delete the default", {
   cfg <- s7x::as_vector(arc_col(test_df(), category, value)@webchart)
 

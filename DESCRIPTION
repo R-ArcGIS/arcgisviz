@@ -18,6 +18,7 @@ Collate:
     'enums-intl-date-time.R'
     'enums-others.R'
     'types-simple.R'
+    'types-renderer.R'
     'types-format-options.R'
     'types-statistics.R'
     'types-webchart.R'
@@ -36,3 +37,5 @@ Imports:
     htmlwidgets
 URL: http://r.esri.com/arcgisviz/
 Config/roxygen2/version: 8.1.0.9000
+Depends: 
+    R (>= 3.5)

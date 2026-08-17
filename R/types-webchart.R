@@ -23,19 +23,6 @@
 
 library(S7)
 
-#' ISimpleFillSymbol
-#' @name ISimpleFillSymbol
-#' @export
-ISimpleFillSymbol <- new_class(
-  "ISimpleFillSymbol",
-  properties = list(
-    type = s7x::class_string,
-    style = SimpleFillSymbolStyle,
-    color = s7x::property_union(Color, NULL, default = NULL),
-    outline = s7x::property_union(ISimpleLineSymbol, NULL, default = NULL)
-  )
-)
-
 #' WebChartTextSymbol
 #' @name WebChartTextSymbol
 #' @export

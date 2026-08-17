@@ -29,6 +29,7 @@ ArcChart <- new_class(
     y = s7x::class_string,
     stat = s7x::class_string,
     labs = class_list,
+    color = class_list,
     webchart = S7::new_property(getter = function(self) build_webchart(self))
   )
 )
@@ -36,25 +37,35 @@ ArcChart <- new_class(
 # friendly kebab/plain type name -> {model_type (ModelTypes value, used to
 # build the client-side defaults), series_type (the series' own `type`
 # discriminator), series_class (which WebChart*Series S7 class to build),
-# aggregates (whether the series honours `stat` at all)}
+# aggregates (whether the series honours `stat` at all), symbol_* (the symbol
+# a chartRenderer carries for this chart type - see color_renderer())}
 chart_type_map <- list(
   bar = list(
     model_type = "barChart",
     series_type = "barSeries",
     series_class = WebChartBarChartSeries,
-    aggregates = TRUE
+    aggregates = TRUE,
+    symbol_class = ISimpleFillSymbol,
+    symbol_type = "esriSFS",
+    symbol_style = SimpleFillSymbolStyle("esriSFSSolid")
   ),
   scatter = list(
     model_type = "scatterplot",
     series_type = "scatterSeries",
     series_class = WebChartScatterplotSeries,
-    aggregates = FALSE
+    aggregates = FALSE,
+    symbol_class = ISimpleMarkerSymbol,
+    symbol_type = "esriSMS",
+    symbol_style = SimpleMarkerSymbolStyle("esriSMSCircle")
   ),
   line = list(
     model_type = "lineChart",
     series_type = "lineSeries",
     series_class = WebChartLineChartSeries,
-    aggregates = TRUE
+    aggregates = TRUE,
+    symbol_class = ISimpleLineSymbol,
+    symbol_type = "esriSLS",
+    symbol_style = SimpleLineSymbolStyle("esriSLSSolid")
   )
 )
 
@@ -314,6 +325,237 @@ axis_titled <- function(text) {
   WebChartAxis(title = chart_text(text))
 }
 
+#' Map a column to colour
+#'
+#' Colours each mark by the value of a column. A numeric column becomes a
+#' continuous gradient; a character or factor column gets one colour per
+#' distinct value.
+#'
+#' @param chart An `ArcChart`, from [arc_chart()] with [set_type()] already
+#'   called.
+#' @param color A bare column name from `chart`'s data (tidy eval).
+#' @param palette The name of an Esri colour ramp (e.g. `"Blue 3"`,
+#'   `"Flower Field"`), or a vector of R colours to build one from. Defaults to
+#'   the ramp the ArcGIS SDK itself uses for gradients, and to its own series
+#'   palette for discrete colours.
+#' @return `chart`, with its colour mapping set.
+#' @export
+set_color <- function(chart, color, palette = NULL) {
+  check_chart_type_set(chart)
+  col <- rlang::as_string(rlang::ensym(color))
+  check_column(chart, col, "color")
+
+  # Resolved here, not at render, so a bad palette blames this call. NULL
+  # means "whichever default suits the column's type".
+  stops <- if (rlang::is_null(palette)) {
+    NULL
+  } else {
+    palette_stops(palette, call = rlang::caller_env())
+  }
+
+  chart@color <- list(field = col, stops = stops)
+  chart
+}
+
+# Mirrors the SDK's own class-break symbols (class-breaks.js:414).
+renderer_symbol <- function(spec, color = NULL) {
+  args <- list(
+    type = spec$symbol_type,
+    style = spec$symbol_style,
+    outline = ISimpleLineSymbol(
+      type = "esriSLS",
+      style = SimpleLineSymbolStyle("esriSLSSolid"),
+      color = Color(r = 50, g = 50, b = 50, a = 255),
+      width = 0.5
+    )
+  )
+  if (identical(spec$symbol_type, "esriSMS")) {
+    args$size <- 6
+  }
+  # A line symbol has no outline of its own.
+  if (identical(spec$symbol_type, "esriSLS")) {
+    args$outline <- NULL
+    args$width <- 2
+  }
+  if (!rlang::is_null(color)) {
+    args$color <- color
+  }
+  rlang::exec(spec$symbol_class, !!!args)
+}
+
+# The client interpolates between stops (index2.js:1612), so the ramp's own
+# stops go over untouched, spread across the column's range.
+continuous_renderer <- function(field, values, stops, spec, call) {
+  rng <- range(values, na.rm = TRUE)
+  if (!all(is.finite(rng))) {
+    cli::cli_abort(
+      c(
+        "{.arg color} must map a column with at least one non-missing value.",
+        "x" = "{.field {field}} has none."
+      ),
+      call = call
+    )
+  }
+
+  if (rlang::is_null(stops)) {
+    stops <- palette_stops(esri_default_ramp)
+  }
+
+  # A constant column can't span a gradient; colour it with the ramp's end.
+  if (rng[[1]] == rng[[2]]) {
+    return(ISimpleRenderer(
+      type = "simple",
+      symbol = renderer_symbol(spec, rgba_color(stops[nrow(stops), ]))
+    ))
+  }
+
+  # as.double(): seq() returns an integer vector for integer endpoints.
+  at <- as.double(seq(rng[[1]], rng[[2]], length.out = nrow(stops)))
+  ISimpleRenderer(
+    type = "simple",
+    symbol = renderer_symbol(spec),
+    visualVariables = list(
+      IColorVisualVariable(
+        type = "colorInfo",
+        field = field,
+        stops = lapply(seq_len(nrow(stops)), function(i) {
+          IColorStop(value = at[[i]], color = rgba_color(stops[i, ]))
+        })
+      )
+    )
+  )
+}
+
+color_levels <- function(values) {
+  out <- if (is.factor(values)) levels(values) else unique(as.character(values))
+  sort(out[!is.na(out)])
+}
+
+chart_aggregates <- function(chart) {
+  spec <- chart_type_map[[chart@chart_type]]
+  stat <- if (is.na(chart@stat)) "identity" else chart@stat
+  isTRUE(spec$aggregates) && stat != "identity"
+}
+
+# Under aggregation the query returns only the group-by field and the
+# statistics, so a derived code column never comes back - but the grouped
+# column itself does, and uniqueValue resolves against it (index2.js:1436).
+unique_value_renderer <- function(field, levels, colors, spec) {
+  IUniqueValueRenderer(
+    type = "uniqueValue",
+    field1 = field,
+    fieldDelimiter = ",",
+    # unname(): Map() names its result from a character first argument, which
+    # would serialize uniqueValueInfos as a JSON object instead of an array.
+    uniqueValueInfos = unname(Map(
+      function(value, color) {
+        IUniqueValueInfo(
+          value = value,
+          label = value,
+          symbol = renderer_symbol(spec, color)
+        )
+      },
+      levels,
+      colors
+    ))
+  )
+}
+
+# A uniqueValue renderer is ignored on the scatter (amCharts5) path, so
+# categories otherwise ride a colorInfo visual variable, which every chart type
+# honours. A VV needs a numeric field, hence the integer codes from
+# chart_data(); one stop per code means no value ever falls between stops, so
+# the interpolation never kicks in and the colours come out exact.
+discrete_renderer <- function(field, values, stops, spec, call, chart) {
+  levels <- color_levels(values)
+
+  if (rlang::is_empty(levels)) {
+    cli::cli_abort(
+      c(
+        "{.arg color} must map a column with at least one non-missing value.",
+        "x" = "{.field {field}} has none."
+      ),
+      call = call
+    )
+  }
+
+  colors <- discrete_colors(stops, length(levels))
+
+  if (chart_aggregates(chart)) {
+    if (!identical(field, chart@x)) {
+      cli::cli_abort(
+        c(
+          "{.arg color} must map the same column as {.fn set_x} when the chart
+           aggregates.",
+          "x" = "{.field {field}} is not {.field {chart@x}}.",
+          "i" = "An aggregating query only returns {.field {chart@x}} and the
+                 statistic, so no other column reaches the chart."
+        ),
+        call = call
+      )
+    }
+    return(unique_value_renderer(field, levels, colors, spec))
+  }
+
+  ISimpleRenderer(
+    type = "simple",
+    symbol = renderer_symbol(spec),
+    visualVariables = list(
+      IColorVisualVariable(
+        type = "colorInfo",
+        field = color_code_field,
+        stops = unname(Map(
+          function(code, color, label) {
+            IColorStop(value = as.double(code), color = color, label = label)
+          },
+          seq_along(levels),
+          colors,
+          levels
+        ))
+      )
+    )
+  )
+}
+
+# Numeric -> gradient, everything else -> one colour per value, the same split
+# ggplot2 makes between continuous and discrete scales.
+color_renderer <- function(chart, spec, call = rlang::caller_env()) {
+  color <- chart@color
+  if (rlang::is_empty(color)) {
+    return(NULL)
+  }
+
+  values <- chart@data[[color$field]]
+  if (is.numeric(values)) {
+    return(continuous_renderer(color$field, values, color$stops, spec, call))
+  }
+  discrete_renderer(color$field, values, color$stops, spec, call, chart)
+}
+
+# The extra column a categorical mapping needs - see discrete_renderer().
+color_code_field <- "arcgisviz_color"
+
+#' The data a chart sends, with any derived columns appended
+#' @noRd
+chart_data <- function(chart) {
+  color <- chart@color
+  if (rlang::is_empty(color)) {
+    return(chart@data)
+  }
+
+  values <- chart@data[[color$field]]
+  if (is.numeric(values) || chart_aggregates(chart)) {
+    return(chart@data)
+  }
+
+  out <- chart@data
+  out[[color_code_field]] <- match(
+    as.character(values),
+    color_levels(values)
+  )
+  out
+}
+
 # NULL until set_type() has run - as_widget() reports that as an error.
 build_webchart <- function(chart) {
   if (is.na(chart@chart_type)) {
@@ -340,12 +582,16 @@ build_webchart <- function(chart) {
   labs <- chart@labs
   axis_lab <- function(lab, mapped) if (rlang::is_null(lab)) mapped else lab
 
+  renderer <- color_renderer(chart, spec)
+
   WebChart(
     version = "25.1.0",
     type = "chart",
     title = chart_titled(labs$title),
     subtitle = chart_titled(labs$subtitle),
     footer = chart_titled(labs$caption),
+    chartRenderer = renderer,
+    colorMatch = if (rlang::is_null(renderer)) NA else TRUE,
     axes = list(
       axis_titled(axis_lab(labs$x, chart@x)),
       axis_titled(axis_lab(labs$y, y_label))

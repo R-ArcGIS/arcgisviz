@@ -118,7 +118,12 @@ WebChart <- new_class(
     rotated = s7x::class_boolean,
     stackedType = WebChartStackedKinds,
     colorMatch = s7x::class_boolean,
-    chartRenderer = class_any,
+    chartRenderer = s7x::property_union(
+      ISimpleRenderer,
+      IUniqueValueRenderer,
+      NULL,
+      default = NULL
+    ),
     orderOptions = s7x::property_union(
       WebChartOrderOptions,
       NULL,

@@ -138,7 +138,7 @@ as_widget <- function(chart, width = NULL, height = NULL, element_id = NULL) {
   }
 
   arcgis_chart(
-    i_layer = as_chart_layer(chart@data),
+    i_layer = as_chart_layer(chart_data(chart)),
     chart_type = chart_type_map[[chart@chart_type]]$model_type,
     config = as_vector(chart@webchart),
     width = width,

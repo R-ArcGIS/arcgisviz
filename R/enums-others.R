@@ -78,6 +78,15 @@ SimpleMarkerSymbolStyle <- s7x::new_enum(
   )
 )
 
+# Renderer types aren't in the charts-components spec at all
+# (IDrawingInfo$renderer is `any`) - source is the web map specification,
+# <https://developers.arcgis.com/web-map-specification/objects/simpleRenderer/>.
+#' @export
+IRendererRotationType <- s7x::new_enum(
+  "IRendererRotationType",
+  c("arithmetic", "geographic")
+)
+
 # Renamed from SizePolicyScaleType (singular) - chart-object-literals.d.ts
 # exports the plural SizePolicyScaleTypes.
 #' @export
