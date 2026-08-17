@@ -38,7 +38,7 @@ reference:
       - arc_line
       - ArcChart
 
-  - title: Mapping
+  - title: Aesthetics
     desc: Bind columns and text to a chart.
     contents:
       - set_type
