@@ -2,10 +2,19 @@ default:
     just --list
 
 fmt:
-    air format R/* tests/*
+    air format R tests
 
 lint:
-    jarl check R/* tests/testthat/* && air format --check R/* tests/*
+    jarl check R tests && air format --check R tests
+
+# stage everything and commit, e.g. `just commit feat "add set_axis()"`.
+# `type` takes an optional scope: `just commit "fix(axes)" "clamp limits"`
+commit type message:
+    git add -A && git commit -m '{{ type }}: {{ message }}'
+
+# install the pre-commit and commit-msg hooks from .pre-commit-config.yaml
+hooks:
+    prek install
 
 test:
     R -q -e "devtools::test()"
