@@ -1,6 +1,7 @@
 # Shiny bindings for arcgis_chart
 
-Shiny bindings for arcgis_chart
+Place `arcgisChartOutput()` in a Shiny UI and `renderArcgisChart()` in
+the server.
 
 ## Usage
 
@@ -14,23 +15,33 @@ renderArcgisChart(expr, env = parent.frame(), quoted = FALSE)
 
 - outputId:
 
-  Output variable to read the chart from.
+  Defines which output variable the chart is read from.
 
 - width, height:
 
-  Sizing, passed to
+  default `"100%"` and `"400px"`. Defines the output size, passed to
   [`htmlwidgets::shinyWidgetOutput()`](https://rdrr.io/pkg/htmlwidgets/man/htmlwidgets-shiny.html).
 
 - expr:
 
-  An expression that generates an `arcgis_chart`.
+  Defines the expression that generates the chart.
 
 - env:
 
-  The environment in which to evaluate `expr`.
+  default [`parent.frame()`](https://rdrr.io/r/base/sys.parent.html).
+  Defines where `expr` is evaluated.
 
 - quoted:
 
-  Is `expr` a quoted expression (with
-  [`quote()`](https://rdrr.io/r/base/substitute.html))? This is useful
-  if you want to save an expression in a variable.
+  default `FALSE`. Defines whether `expr` is already quoted.
+
+## Value
+
+A Shiny output or render function.
+
+## Examples
+
+``` r
+arcgisChartOutput("chart")
+#> <div class="arcgisChart html-widget html-widget-output shiny-report-size html-fill-item" id="chart" style="width:100%;height:400px;"></div>
+```

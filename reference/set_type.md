@@ -1,6 +1,7 @@
 # Set a chart's type
 
-Set a chart's type
+Chooses which kind of series the chart draws. Every other `set_*()`
+function needs this to have run first.
 
 ## Usage
 
@@ -12,13 +13,25 @@ set_type(chart, type)
 
 - chart:
 
-  An `ArcChart`, from
-  [`arc_chart()`](http://r.esri.com/arcgisviz/reference/arc_chart.md).
+  Defines which chart to modify.
 
 - type:
 
-  One of `"bar"`, `"scatter"`, `"line"`.
+  Defines which series the chart draws. One of `"bar"`, `"scatter"`, or
+  `"line"`.
 
 ## Value
 
 `chart`, with its series type set.
+
+## Examples
+
+``` r
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+
+arc_chart(df) |>
+  set_type("scatter") |>
+  set_x(mass) |>
+  set_y(mass)
+#> Error in loadNamespace(x): there is no package called ‘arcgisutils’
+```

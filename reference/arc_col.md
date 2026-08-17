@@ -1,6 +1,8 @@
 # Column chart
 
-Plots `y` verbatim, one bar per row.
+Plots `y` verbatim, one bar per row. Use
+[`arc_bar()`](http://r.esri.com/arcgisviz/reference/arc_bar.md) to count
+rows instead.
 
 ## Usage
 
@@ -12,12 +14,21 @@ arc_col(.data, x, y)
 
 - .data:
 
-  A data frame (or similar) the chart's fields will come from.
+  Defines which data frame the chart draws its fields from.
 
 - x, y:
 
-  Bare column names from `.data` (tidy eval).
+  Defines which columns supply the bar positions and heights.
 
 ## Value
 
 An `ArcChart`.
+
+## Examples
+
+``` r
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+
+arc_col(df, species, mass)
+#> Error in loadNamespace(x): there is no package called ‘arcgisutils’
+```

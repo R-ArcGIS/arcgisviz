@@ -1,6 +1,7 @@
-# Map a column to a chart's x/y field
+# Map a column to a chart's x or y field
 
-Map a column to a chart's x/y field
+Binds a column to one of the chart's positional fields. Both take a bare
+column name.
 
 ## Usage
 
@@ -14,15 +15,24 @@ set_y(chart, y)
 
 - chart:
 
-  An `ArcChart`, from
-  [`arc_chart()`](http://r.esri.com/arcgisviz/reference/arc_chart.md)
-  with [`set_type()`](http://r.esri.com/arcgisviz/reference/set_type.md)
-  already called.
+  Defines which chart to modify.
 
 - x, y:
 
-  A bare column name from `chart`'s data (tidy eval).
+  Defines which column supplies the field.
 
 ## Value
 
 `chart`, with the field mapping set.
+
+## Examples
+
+``` r
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+
+arc_chart(df) |>
+  set_type("bar") |>
+  set_x(species) |>
+  set_y(mass)
+#> Error in loadNamespace(x): there is no package called ‘arcgisutils’
+```

@@ -1,11 +1,10 @@
 # Render an ArcGIS chart
 
-Creates an htmlwidget wrapping the `<arcgis-chart>` web component. The
-chart's model and layer are created client-side (in the browser) from
-`i_layer` and `config` via the JS `createModel()` function - no live
-ArcGIS Server feature service is required when `i_layer` is a
-self-contained feature collection (see
-[`as_chart_layer()`](http://r.esri.com/arcgisviz/reference/as_chart_layer.md)).
+Wraps the `<arcgis-chart>` web component directly. Most users want
+[`arc_bar()`](http://r.esri.com/arcgisviz/reference/arc_bar.md),
+[`arc_scatter()`](http://r.esri.com/arcgisviz/reference/arc_scatter.md),
+or [`arc_line()`](http://r.esri.com/arcgisviz/reference/arc_line.md),
+which build the arguments for you.
 
 ## Usage
 
@@ -24,31 +23,42 @@ arcgis_chart(
 
 - i_layer:
 
-  A list giving the JSON layer definition (`IFeatureLayer`), e.g. built
-  with
+  Defines the layer the chart reads, as built by
   [`as_chart_layer()`](http://r.esri.com/arcgisviz/reference/as_chart_layer.md).
 
 - chart_type:
 
-  A `ModelTypes` string, e.g. `"barChart"`. Used to build the default
-  model that `config` is merged over.
+  Defines which default model the config merges over, such as
+  `"barChart"`. See
+  [ModelTypes](http://r.esri.com/arcgisviz/reference/ModelTypes.md).
 
 - config:
 
-  A list giving the chart config (`ChartConfig`, i.e. the `WebChart`
-  shape). May be sparse - it is merged over the defaults client-side.
+  Defines the chart configuration in the `WebChart` shape. May be sparse
+  because the browser merges it over the defaults.
 
 - width, height:
 
-  Widget sizing, passed to
+  default `NULL`. Defines the widget size, passed to
   [`htmlwidgets::createWidget()`](https://rdrr.io/pkg/htmlwidgets/man/createWidget.html).
 
 - element_id:
 
-  Optional DOM element ID for the widget.
+  default `NULL`. Defines the DOM element id to render into.
 
-## Details
+## Value
 
-Most users want
-[`arc_bar()`](http://r.esri.com/arcgisviz/reference/arc_bar.md)/[`arc_scatter()`](http://r.esri.com/arcgisviz/reference/arc_scatter.md)/[`arc_line()`](http://r.esri.com/arcgisviz/reference/arc_line.md)
-instead, which build both arguments for you.
+An htmlwidget.
+
+## Examples
+
+``` r
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+
+arcgis_chart(
+  i_layer = as_chart_layer(df),
+  chart_type = "barChart",
+  config = s7x::as_vector(arc_col(df, species, mass)@webchart)
+)
+#> Error in loadNamespace(x): there is no package called ‘arcgisutils’
+```

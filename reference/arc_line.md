@@ -1,6 +1,8 @@
 # Line chart
 
-Line chart
+Joins one point per row in `x` order. Use
+[`set_stat()`](http://r.esri.com/arcgisviz/reference/set_stat.md) to
+aggregate `y` first.
 
 ## Usage
 
@@ -12,8 +14,21 @@ arc_line(.data, x, y)
 
 - .data:
 
-  A data frame (or similar) the chart's fields will come from.
+  Defines which data frame the chart draws its fields from.
 
 - x, y:
 
-  Bare column names from `.data` (tidy eval).
+  Defines which columns supply the bar positions and heights.
+
+## Value
+
+An `ArcChart`.
+
+## Examples
+
+``` r
+df <- data.frame(year = c(2020, 2021, 2022), mass = c(1, 5, 3))
+
+arc_line(df, year, mass)
+#> Error in loadNamespace(x): there is no package called ‘arcgisutils’
+```

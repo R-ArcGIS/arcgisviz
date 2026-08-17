@@ -1,8 +1,7 @@
 # Set a chart's labels
 
 Overrides the text a chart labels itself with. Omitting an argument
-leaves that label as it is; passing a string sets it, and passing `NULL`
-removes it. `x` and `y` default to the mapped column names.
+leaves that label alone, a string sets it, and `NULL` removes it.
 
 ## Usage
 
@@ -22,8 +21,7 @@ set_labs(
 
 - chart:
 
-  An `ArcChart`, from
-  [`arc_chart()`](http://r.esri.com/arcgisviz/reference/arc_chart.md).
+  Defines which chart to modify.
 
 - ...:
 
@@ -31,13 +29,24 @@ set_labs(
 
 - title, subtitle, caption:
 
-  Chart-level text. `caption` is rendered as the chart's footer. All
-  three are absent unless set.
+  Defines the chart-level text. Absent unless set, and `caption` renders
+  as the chart's footer.
 
 - x, y:
 
-  Axis titles. These also label the values in a tooltip.
+  Defines the axis titles, which also label tooltip values. Defaults to
+  the mapped column names.
 
 ## Value
 
 `chart`, with its labels set.
+
+## Examples
+
+``` r
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+
+arc_col(df, species, mass) |>
+  set_labs(title = "Mass by species", x = "Species", y = "Mass (g)")
+#> Error in loadNamespace(x): there is no package called ‘arcgisutils’
+```

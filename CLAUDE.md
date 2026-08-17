@@ -29,18 +29,21 @@ directly - the non-REST-prefixed versions in rest-js-types.d.ts are what
 properties actually reference). - `.../dist/spec/data-source.d.ts` -
 `TimeIntervalInfo`, `RGBObject`.
 
-There is **no JSON Schema anymore** - `@arcgis/charts-components` only
-ships `.d.ts` declarations, no runtime-extractable schema object
-(checked; not worth re-deriving one). `data-raw/resolve-spec-types.R`
-and `data-raw/spec-type-registry.json` (the old JSON-Schema-driven
-pipeline) are **stale/archival** - don’t treat them as current, and
-don’t mechanically regenerate `R/types-*.R`/`R/enums-*.R` from them.
-Types are now hand-written directly against the `.d.ts` files above,
-same as the imperative-API `data-raw/<model>.json` docs always were
-(those are separately stale too - they came from the removed
-`@arcgis/charts-model` package’s method-level `.d.ts` files, describing
-the `createModel()`/JS-wiring path, which is not current work - see
-`arcgis-js-widget` skill).
+**Don’t hand-write types from a JSON Schema.** There is one in the dist
+(`dist/chunks/index4.js:14` holds a draft-07 object with a full
+`definitions` block, and `dist/json-schema/index.d.ts` types that
+object’s shape), but the `.d.ts` files above are the readable source and
+stay authoritative - the schema carries no type detail the declarations
+lack, and its own `IDrawingInfo$renderer` is untyped.
+`data-raw/resolve-spec-types.R` and `data-raw/spec-type-registry.json`
+(the old JSON-Schema-driven pipeline) are **stale/archival** - don’t
+treat them as current, and don’t mechanically regenerate
+`R/types-*.R`/`R/enums-*.R` from them. Types are now hand-written
+directly against the `.d.ts` files above, same as the imperative-API
+`data-raw/<model>.json` docs always were (those are separately stale
+too - they came from the removed `@arcgis/charts-model` package’s
+method-level `.d.ts` files, describing the `createModel()`/JS-wiring
+path, which is not current work - see `arcgis-js-widget` skill).
 
 ## Commands
 
@@ -91,8 +94,17 @@ that exposes no S7 objects (`R/arc-chart.R`:
 [`arc_bar()`](http://r.esri.com/arcgisviz/reference/arc_bar.md)/[`arc_scatter()`](http://r.esri.com/arcgisviz/reference/arc_scatter.md)/[`arc_line()`](http://r.esri.com/arcgisviz/reference/arc_line.md)
 sugar, tidy-eval bare column names, friendly kebab-case type names) and
 a data -transfer layer (`R/arc-data.R`) that turns a data frame + config
-into the widget payload. Box plot, pie, gauge, histogram, and radar
-chart types are not yet modeled.
+into the widget payload. That public API now covers mapping
+([`set_x()`](http://r.esri.com/arcgisviz/reference/set_x.md)/[`set_y()`](http://r.esri.com/arcgisviz/reference/set_x.md)/
+[`set_stat()`](http://r.esri.com/arcgisviz/reference/set_stat.md)), text
+([`set_labs()`](http://r.esri.com/arcgisviz/reference/set_labs.md)),
+colour
+([`set_color()`](http://r.esri.com/arcgisviz/reference/set_color.md),
+see below), and scales
+([`set_axis()`](http://r.esri.com/arcgisviz/reference/set_axis.md)/[`set_flipped()`](http://r.esri.com/arcgisviz/reference/set_flipped.md)).
+Box plot, pie, gauge, histogram, and radar chart types are not yet
+modeled, and there is no legend surface yet (`WebChart$legend` is
+modeled but nothing sets it), which colour has made worth adding.
 
 ## Serialization
 
@@ -190,6 +202,44 @@ shapes. The non-obvious parts:
   batched path would stream (cf. the SDK’s large-collection sample,
   which does that via `applyEdits()` on a *live* layer), but nothing
   needs it yet.
+
+## Colour (`set_color()`), and the two mechanisms it needs
+
+Colour goes over as `WebChart$chartRenderer` + `colorMatch = TRUE`. The
+client hands that renderer to `@arcgis/core`’s `jsonUtils.fromJSON()`
+and resolves a symbol **per data item** via
+`symbolUtils.getDisplayedSymbol()` (`dist/chunks/index2.js:1541`,
+`:1612`), so no multi-series split-by is involved. The renderer classes
+are hand-written from the **web map** specification, not the charts spec
+(`IDrawingInfo$renderer` is `any`) and not the web *scene* spec (its
+renderers reference `Symbol3D`, SceneView only).
+
+Which renderer to send is decided by the **query shape, not the chart
+type**, and both branches were established empirically:
+
+- **Not aggregating** - a `simple` renderer carrying a `colorInfo`
+  visual variable. Continuous colour spreads the ramp’s own stops across
+  `range(column)` and lets the client interpolate. *Categorical* colour
+  uses the same mechanism, because a `uniqueValue` renderer is silently
+  ignored on the scatter (amCharts5) path: `chart_data()` appends an
+  `arcgisviz_color` integer-code column and the VV gets one stop per
+  code, so no value ever falls between stops and interpolation never
+  kicks in. Stop `label`s carry the level names.
+- **Aggregating** - a `uniqueValue` renderer on the grouped column. A
+  derived code column can’t work here because the query returns only
+  `groupByFieldsForStatistics` plus the statistics. For the same reason,
+  colouring by any column other than `x` while aggregating is an error,
+  not a silent no-op.
+
+Palettes live in `R/sysdata.rda`, built by `data-raw/color-palettes.R`
+from `@arcgis/core/smartMapping/symbology/support/colors.js`: 521 ramps
+(name, tags, stops), plus `esri_series_palette` (ColorBrewer Paired-10,
+the SDK’s own series palette at `chunks/index.js:45`) and
+`esri_default_ramp` (`"Blue 3"`, its `defaultColorRampForCharts` at
+`chunks/class-breaks.js:475`). `palette` also takes any vector of R
+colours, parsed by
+[`grDevices::col2rgb()`](https://rdrr.io/r/grDevices/col2rgb.html) in
+`R/color.R`.
 
 ## Deliberately deferred (don’t “fix” these without asking)
 

@@ -6,6 +6,9 @@
 
 ## Citation
 
+Source:
+[`DESCRIPTION`](https://github.com/JosiahParry/arcgisviz/blob/main/DESCRIPTION)
+
 Last F (2026). *arcgisviz: What the Package Does (One Line, Title
 Case)*. R package version 0.0.0.9000, <http://r.esri.com/arcgisviz/>.
 

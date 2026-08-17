@@ -1,7 +1,7 @@
-# Build an `IFeatureLayer` from a data frame
+# Build a feature layer from a data frame
 
-Wraps `.data` as a self-contained client-side feature collection layer -
-the `iLayer` argument of the JS `createModel()`. No live feature service
+Wraps a data frame as a self-contained client side feature collection,
+the `iLayer` the browser builds the chart from. No live feature service
 is involved.
 
 ## Usage
@@ -19,16 +19,29 @@ as_chart_layer(
 
 - .data:
 
-  A data frame (or `sf` object) to convert.
+  Defines which data frame or `sf` object to convert.
 
-- name, title:
+- name:
 
-  Layer name and human-readable title.
+  default `"chart_data"`. Defines what the layer is named.
+
+- title:
+
+  default `name`. Defines the human readable layer title.
 
 - id:
 
-  A unique layer id.
+  default `"arcgisviz-layer"`. Defines the unique layer id.
 
 ## Value
 
-A list with the `IFeatureLayer` JSON shape.
+A list holding the `IFeatureLayer` JSON shape.
+
+## Examples
+
+``` r
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+
+as_chart_layer(df)
+#> Error in loadNamespace(x): there is no package called ‘arcgisutils’
+```

@@ -1,8 +1,7 @@
 # Set a chart's statistical transformation
 
-How `y` is derived from the data. `"identity"` plots `y` verbatim, one
-mark per row; every other value aggregates `y` grouped by `x`. `"count"`
-needs no `y` - it counts rows per `x`.
+Chooses how `y` is derived from the data. `"identity"` plots `y`
+verbatim and every other value aggregates `y` grouped by `x`.
 
 ## Usage
 
@@ -14,20 +13,26 @@ set_stat(chart, stat)
 
 - chart:
 
-  An `ArcChart`, from
-  [`arc_chart()`](http://r.esri.com/arcgisviz/reference/arc_chart.md)
-  with [`set_type()`](http://r.esri.com/arcgisviz/reference/set_type.md)
-  already called.
+  Defines which chart to modify.
 
 - stat:
 
-  One of `"identity"`, `"count"`, `"sum"`, `"mean"`, `"min"`, `"max"`,
-  `"sd"`, `"var"`.
+  Defines how `y` is aggregated. One of `"identity"`, `"count"`,
+  `"sum"`, `"mean"`, `"min"`, `"max"`, `"sd"`, or `"var"`.
 
 ## Value
 
 `chart`, with its stat set.
 
-## Details
+## Examples
 
-Bar and line charts only; scatterplots ignore it.
+``` r
+df <- data.frame(species = c("a", "a", "b"), mass = c(1, 5, 3))
+
+arc_chart(df) |>
+  set_type("bar") |>
+  set_x(species) |>
+  set_y(mass) |>
+  set_stat("mean")
+#> Error in loadNamespace(x): there is no package called ‘arcgisutils’
+```

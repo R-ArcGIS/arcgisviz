@@ -1,6 +1,8 @@
 # Start a chart
 
-Start a chart
+Creates an empty chart bound to a data frame. Pipe it into
+[`set_type()`](http://r.esri.com/arcgisviz/reference/set_type.md) before
+mapping any columns.
 
 ## Usage
 
@@ -12,10 +14,20 @@ arc_chart(.data)
 
 - .data:
 
-  A data frame (or similar) the chart's fields will come from.
+  Defines which data frame the chart draws its fields from.
 
 ## Value
 
-An `ArcChart`. Pipe it into
-[`set_type()`](http://r.esri.com/arcgisviz/reference/set_type.md) before
-[`set_x()`](http://r.esri.com/arcgisviz/reference/set_x.md)/[`set_y()`](http://r.esri.com/arcgisviz/reference/set_x.md).
+An `ArcChart`.
+
+## Examples
+
+``` r
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+
+arc_chart(df) |>
+  set_type("bar") |>
+  set_x(species) |>
+  set_y(mass)
+#> Error in loadNamespace(x): there is no package called ‘arcgisutils’
+```
