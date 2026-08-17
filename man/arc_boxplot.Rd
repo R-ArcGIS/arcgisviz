@@ -2,9 +2,12 @@
 % Please edit documentation in R/arc-chart.R
 \name{arc_boxplot}
 \alias{arc_boxplot}
+\alias{set_boxplot}
 \title{Box plot}
 \usage{
-arc_boxplot(.data, x, y)
+arc_boxplot(.data, x, y, outliers = NULL, standardize = NULL)
+
+set_boxplot(chart, ..., outliers = NULL, standardize = NULL)
 }
 \arguments{
 \item{.data}{Defines which data frame the chart draws its fields from.}
@@ -12,6 +15,16 @@ arc_boxplot(.data, x, y)
 \item{x}{Defines which column the boxes are grouped by.}
 
 \item{y}{Defines which numeric column is summarised.}
+
+\item{outliers}{default \code{NULL}. Defines whether points beyond the whiskers
+are drawn.}
+
+\item{standardize}{default \code{NULL}. Defines whether values are replaced by
+their z scores, putting every box on a comparable scale.}
+
+\item{chart}{Defines which chart to modify.}
+
+\item{...}{These dots are for future extensions and must be empty.}
 }
 \value{
 An \code{ArcChart}.
@@ -19,8 +32,12 @@ An \code{ArcChart}.
 \description{
 Draws the five number summary of \code{y} for each value of \code{x}.
 }
+\details{
+\code{set_boxplot()} reaches the same options later, for charts built with
+\code{\link[=set_type]{set_type()}} rather than this shortcut.
+}
 \examples{
 df <- data.frame(species = c("a", "a", "b"), mass = c(1, 5, 3))
 
-arc_boxplot(df, species, mass)
+arc_boxplot(df, species, mass, outliers = FALSE)
 }

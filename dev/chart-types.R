@@ -9,11 +9,14 @@ arc_histogram(penguins, body_mass)
 # --- histogram: a fixed bin count ------------------------------------------
 arc_histogram(penguins, body_mass, bins = 15)
 
-# --- histogram: set bins in the pipeline -----------------------------------
+# --- histogram: a log transform before binning ------------------------------
+arc_histogram(penguins, body_mass, bins = 12, transform = "log")
+
+# --- histogram: the same options from the core pipe ------------------------
 arc_chart(penguins) |>
   set_type("histogram") |>
   set_x(flipper_len) |>
-  set_bins(20) |>
+  set_histogram(bins = 20) |>
   set_labs(title = "Flipper length", x = "Flipper length (mm)")
 
 # --- box plot --------------------------------------------------------------
@@ -21,9 +24,13 @@ arc_chart(penguins) |>
 arc_boxplot(penguins, species, body_mass)
 
 # --- box plot: hide the outliers -------------------------------------------
-arc_boxplot(penguins, species, body_mass) |>
-  set_outliers(FALSE) |>
+arc_boxplot(penguins, species, body_mass, outliers = FALSE) |>
   set_labs(title = "Body mass by species", y = "Body mass (g)")
+
+# --- box plot: comparable scales -------------------------------------------
+# z scores instead of raw values, so boxes with different units line up.
+arc_boxplot(penguins, species, body_mass) |>
+  set_boxplot(standardize = TRUE)
 
 # --- box plot: sideways ----------------------------------------------------
 arc_boxplot(penguins, species, bill_len) |>

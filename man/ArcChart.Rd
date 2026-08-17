@@ -14,8 +14,8 @@ ArcChart(
   color = list(),
   axes = list(),
   flipped = NA,
-  bins = NA_real_,
-  outliers = NA
+  series_opts = list(),
+  config_opts = list()
 )
 }
 \description{

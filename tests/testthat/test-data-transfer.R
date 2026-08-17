@@ -338,9 +338,25 @@ test_that("a histogram sends bins and no y", {
   expect_length(cfg$axes, 2)
   expect_identical(cfg$axes[[2]]$type, "chartAxis")
 
-  expect_error(set_bins(arc_bar(test_df(), category), 5), "only applies")
-  expect_error(set_bins(arc_histogram(test_df(), value), 0), "at least 1")
-  expect_error(set_bins(arc_histogram(test_df(), value), 2.5), "whole number")
+  # set_histogram() reaches the same options from the core pipe.
+  piped <- arc_chart(test_df()) |>
+    set_type("histogram") |>
+    set_x(value) |>
+    set_histogram(bins = 4, transform = "log")
+  piped_series <- s7x::as_vector(piped@webchart)$series[[1]]
+  expect_identical(piped_series$binCount, 4)
+  expect_identical(piped_series$dataTransformationType, "logarithmic")
+
+  # Calls layer rather than reset.
+  layered <- s7x::as_vector(set_histogram(piped, bins = 7)@webchart)$series[[1]]
+  expect_identical(layered$binCount, 7)
+  expect_identical(layered$dataTransformationType, "logarithmic")
+
+  expect_error(set_histogram(arc_bar(test_df(), category)), "only applies")
+  expect_error(arc_histogram(test_df(), value, bins = 0), "at least 1")
+  expect_error(arc_histogram(test_df(), value, bins = 2.5), "whole number")
+  expect_error(arc_histogram(test_df(), value, transform = "nope"), "one of")
+  expect_error(set_histogram(piped, TRUE), class = "rlib_error_dots_nonempty")
 })
 
 test_that("a box plot carries y and its own config subtype", {
@@ -353,9 +369,20 @@ test_that("a box plot carries y and its own config subtype", {
   expect_identical(cfg$series[[1]]$y, "value")
   expect_null(cfg$showOutliers)
 
-  hidden <- s7x::as_vector((chart |> set_outliers(FALSE))@webchart)
-  expect_false(hidden$showOutliers)
-  expect_error(set_outliers(arc_bar(test_df(), category)), "only applies")
+  # Both paths reach the same properties on the WebBoxPlot subtype.
+  sugar <- s7x::as_vector(
+    arc_boxplot(test_df(), category, value, outliers = FALSE)@webchart
+  )
+  expect_false(sugar$showOutliers)
+
+  piped <- s7x::as_vector(
+    set_boxplot(chart, outliers = FALSE, standardize = TRUE)@webchart
+  )
+  expect_false(piped$showOutliers)
+  expect_true(piped$standardizeValues)
+
+  expect_error(set_boxplot(arc_bar(test_df(), category)), "only applies")
+  expect_error(set_boxplot(chart, outliers = "no"), "must be")
 })
 
 test_that("a heat chart grids two columns", {

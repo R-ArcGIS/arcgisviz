@@ -40,8 +40,8 @@ ArcChart <- new_class(
     color = class_list,
     axes = class_list,
     flipped = s7x::class_boolean,
-    bins = s7x::class_double,
-    outliers = s7x::class_boolean,
+    series_opts = class_list,
+    config_opts = class_list,
     webchart = S7::new_property(getter = function(self) build_webchart(self))
   )
 )
@@ -871,9 +871,8 @@ build_webchart <- function(chart) {
   if (isTRUE(spec$aggregates)) {
     series$query <- agg$query
   }
-  if (identical(chart@chart_type, "histogram") && !is.na(chart@bins)) {
-    series$binCount <- chart@bins
-  }
+  # Chart-type options, already keyed by spec property name.
+  series <- c(series, chart@series_opts)
 
   config <- list(
     version = "25.1.0",
@@ -890,11 +889,18 @@ build_webchart <- function(chart) {
     ),
     series = list(rlang::exec(spec$series_class, !!!series))
   )
-  if (identical(chart@chart_type, "boxplot")) {
-    config$showOutliers <- chart@outliers
-  }
 
-  rlang::exec(spec$config_class, !!!config)
+  rlang::exec(spec$config_class, !!!c(config, chart@config_opts))
+}
+
+# Unset options leave whatever is already stored, so repeated calls layer
+# rather than reset. Same rule as set_labs() and set_axis().
+merge_opts <- function(stored, opts) {
+  opts <- opts[!vapply(opts, rlang::is_null, logical(1))]
+  for (nm in names(opts)) {
+    stored[[nm]] <- opts[[nm]]
+  }
+  stored
 }
 
 check_chart_type_is <- function(chart, type, call = rlang::caller_env()) {
@@ -910,31 +916,24 @@ check_chart_type_is <- function(chart, type, call = rlang::caller_env()) {
   )
 }
 
-#' Set a histogram's bin count
-#'
-#' Splits the mapped column into a fixed number of bins. Leaving it unset
-#' lets the chart choose.
-#'
-#' @param chart Defines which chart to modify.
-#' @param bins Defines how many bins the data is split into, at least 1.
-#' @return `chart`, with its bin count set.
-#' @examples
-#' df <- data.frame(mass = c(1, 5, 3, 8, 2))
-#'
-#' arc_histogram(df, mass) |>
-#'   set_bins(10)
-#' @export
-set_bins <- function(chart, bins) {
-  check_chart_type_set(chart)
-  check_chart_type_is(chart, "histogram")
+# friendly transform -> WebChartDataTransformations
+histogram_transform_map <- c(
+  none = "none",
+  log = "logarithmic",
+  sqrt = "squareRoot"
+)
 
+check_bins <- function(bins, call = rlang::caller_env()) {
+  if (rlang::is_null(bins)) {
+    return(invisible(bins))
+  }
   if (!rlang::is_scalar_double(bins) && !rlang::is_scalar_integer(bins)) {
     cli::cli_abort(
       c(
         "{.arg bins} must be a single number.",
         "x" = "You supplied {.obj_type_friendly {bins}}."
       ),
-      call = rlang::caller_env()
+      call = call
     )
   }
   if (bins < 1 || bins != round(bins)) {
@@ -943,33 +942,10 @@ set_bins <- function(chart, bins) {
         "{.arg bins} must be a whole number of at least 1.",
         "x" = "You supplied {.val {bins}}."
       ),
-      call = rlang::caller_env()
+      call = call
     )
   }
-
-  chart@bins <- as.double(bins)
-  chart
-}
-
-#' Show or hide box plot outliers
-#'
-#' Controls whether points beyond the whiskers are drawn.
-#'
-#' @param chart Defines which chart to modify.
-#' @param outliers default `TRUE`. Defines whether outlying points are drawn.
-#' @return `chart`, with its outlier display set.
-#' @examples
-#' df <- data.frame(species = c("a", "a", "b"), mass = c(1, 5, 3))
-#'
-#' arc_boxplot(df, species, mass) |>
-#'   set_outliers(FALSE)
-#' @export
-set_outliers <- function(chart, outliers = TRUE) {
-  check_chart_type_set(chart)
-  check_chart_type_is(chart, "boxplot")
-  check_axis_flag(outliers, "outliers")
-  chart@outliers <- outliers
-  chart
+  invisible(bins)
 }
 
 #' Bar chart
@@ -1025,39 +1001,94 @@ arc_scatter <- function(.data, x, y) {
 #' Bins one numeric column and plots the frequency of each bin. The frequency
 #' axis is derived, so there is no `y` to map.
 #'
+#' `set_histogram()` reaches the same options later, for charts built with
+#' [set_type()] rather than this shortcut.
+#'
 #' @inheritParams arc_chart
+#' @param chart Defines which chart to modify.
 #' @param x Defines which numeric column is binned.
+#' @param ... These dots are for future extensions and must be empty.
 #' @param bins default `NULL`. Defines how many bins to split `x` into, or
 #'   `NULL` to let the chart choose.
+#' @param transform default `NULL`. Defines which transformation is applied
+#'   before binning, one of `"none"`, `"log"`, or `"sqrt"`.
 #' @return An `ArcChart`.
 #' @examples
 #' df <- data.frame(mass = c(1, 5, 3, 8, 2))
 #'
 #' arc_histogram(df, mass, bins = 10)
 #' @export
-arc_histogram <- function(.data, x, bins = NULL) {
-  chart <- arc_chart(.data) |> set_type("histogram") |> set_x({{ x }})
-  if (rlang::is_null(bins)) {
-    return(chart)
+arc_histogram <- function(.data, x, bins = NULL, transform = NULL) {
+  arc_chart(.data) |>
+    set_type("histogram") |>
+    set_x({{ x }}) |>
+    set_histogram(bins = bins, transform = transform)
+}
+
+#' @rdname arc_histogram
+#' @export
+set_histogram <- function(chart, ..., bins = NULL, transform = NULL) {
+  rlang::check_dots_empty()
+  check_chart_type_set(chart)
+  check_chart_type_is(chart, "histogram")
+  check_bins(bins)
+
+  opts <- list(binCount = if (!rlang::is_null(bins)) as.double(bins))
+  if (!rlang::is_null(transform)) {
+    transform <- rlang::arg_match0(transform, names(histogram_transform_map))
+    opts$dataTransformationType <- WebChartDataTransformations(
+      histogram_transform_map[[transform]]
+    )
   }
-  set_bins(chart, bins)
+
+  chart@series_opts <- merge_opts(chart@series_opts, opts)
+  chart
 }
 
 #' Box plot
 #'
 #' Draws the five number summary of `y` for each value of `x`.
 #'
+#' `set_boxplot()` reaches the same options later, for charts built with
+#' [set_type()] rather than this shortcut.
+#'
 #' @inheritParams arc_chart
+#' @param chart Defines which chart to modify.
 #' @param x Defines which column the boxes are grouped by.
 #' @param y Defines which numeric column is summarised.
+#' @param ... These dots are for future extensions and must be empty.
+#' @param outliers default `NULL`. Defines whether points beyond the whiskers
+#'   are drawn.
+#' @param standardize default `NULL`. Defines whether values are replaced by
+#'   their z scores, putting every box on a comparable scale.
 #' @return An `ArcChart`.
 #' @examples
 #' df <- data.frame(species = c("a", "a", "b"), mass = c(1, 5, 3))
 #'
-#' arc_boxplot(df, species, mass)
+#' arc_boxplot(df, species, mass, outliers = FALSE)
 #' @export
-arc_boxplot <- function(.data, x, y) {
-  arc_chart(.data) |> set_type("boxplot") |> set_x({{ x }}) |> set_y({{ y }})
+arc_boxplot <- function(.data, x, y, outliers = NULL, standardize = NULL) {
+  arc_chart(.data) |>
+    set_type("boxplot") |>
+    set_x({{ x }}) |>
+    set_y({{ y }}) |>
+    set_boxplot(outliers = outliers, standardize = standardize)
+}
+
+#' @rdname arc_boxplot
+#' @export
+set_boxplot <- function(chart, ..., outliers = NULL, standardize = NULL) {
+  rlang::check_dots_empty()
+  check_chart_type_set(chart)
+  check_chart_type_is(chart, "boxplot")
+  check_axis_flag(outliers, "outliers")
+  check_axis_flag(standardize, "standardize")
+
+  chart@config_opts <- merge_opts(
+    chart@config_opts,
+    list(showOutliers = outliers, standardizeValues = standardize)
+  )
+  chart
 }
 
 #' Heat chart

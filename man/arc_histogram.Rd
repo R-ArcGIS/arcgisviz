@@ -2,9 +2,12 @@
 % Please edit documentation in R/arc-chart.R
 \name{arc_histogram}
 \alias{arc_histogram}
+\alias{set_histogram}
 \title{Histogram}
 \usage{
-arc_histogram(.data, x, bins = NULL)
+arc_histogram(.data, x, bins = NULL, transform = NULL)
+
+set_histogram(chart, ..., bins = NULL, transform = NULL)
 }
 \arguments{
 \item{.data}{Defines which data frame the chart draws its fields from.}
@@ -13,6 +16,13 @@ arc_histogram(.data, x, bins = NULL)
 
 \item{bins}{default \code{NULL}. Defines how many bins to split \code{x} into, or
 \code{NULL} to let the chart choose.}
+
+\item{transform}{default \code{NULL}. Defines which transformation is applied
+before binning, one of \code{"none"}, \code{"log"}, or \code{"sqrt"}.}
+
+\item{chart}{Defines which chart to modify.}
+
+\item{...}{These dots are for future extensions and must be empty.}
 }
 \value{
 An \code{ArcChart}.
@@ -20,6 +30,10 @@ An \code{ArcChart}.
 \description{
 Bins one numeric column and plots the frequency of each bin. The frequency
 axis is derived, so there is no \code{y} to map.
+}
+\details{
+\code{set_histogram()} reaches the same options later, for charts built with
+\code{\link[=set_type]{set_type()}} rather than this shortcut.
 }
 \examples{
 df <- data.frame(mass = c(1, 5, 3, 8, 2))
