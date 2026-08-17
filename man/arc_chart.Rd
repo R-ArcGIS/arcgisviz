@@ -7,11 +7,20 @@
 arc_chart(.data)
 }
 \arguments{
-\item{.data}{A data frame (or similar) the chart's fields will come from.}
+\item{.data}{Defines which data frame the chart draws its fields from.}
 }
 \value{
-An \code{ArcChart}. Pipe it into \code{\link[=set_type]{set_type()}} before \code{\link[=set_x]{set_x()}}/\code{\link[=set_y]{set_y()}}.
+An \code{ArcChart}.
 }
 \description{
-Start a chart
+Creates an empty chart bound to a data frame. Pipe it into \code{\link[=set_type]{set_type()}}
+before mapping any columns.
+}
+\examples{
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+
+arc_chart(df) |>
+  set_type("bar") |>
+  set_x(species) |>
+  set_y(mass)
 }

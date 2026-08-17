@@ -3,21 +3,29 @@
 \name{set_x}
 \alias{set_x}
 \alias{set_y}
-\title{Map a column to a chart's x/y field}
+\title{Map a column to a chart's x or y field}
 \usage{
 set_x(chart, x)
 
 set_y(chart, y)
 }
 \arguments{
-\item{chart}{An \code{ArcChart}, from \code{\link[=arc_chart]{arc_chart()}} with \code{\link[=set_type]{set_type()}} already
-called.}
+\item{chart}{Defines which chart to modify.}
 
-\item{x, y}{A bare column name from \code{chart}'s data (tidy eval).}
+\item{x, y}{Defines which column supplies the field.}
 }
 \value{
 \code{chart}, with the field mapping set.
 }
 \description{
-Map a column to a chart's x/y field
+Binds a column to one of the chart's positional fields. Both take a bare
+column name.
+}
+\examples{
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+
+arc_chart(df) |>
+  set_type("bar") |>
+  set_x(species) |>
+  set_y(mass)
 }

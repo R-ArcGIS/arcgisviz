@@ -7,13 +7,23 @@
 set_type(chart, type)
 }
 \arguments{
-\item{chart}{An \code{ArcChart}, from \code{\link[=arc_chart]{arc_chart()}}.}
+\item{chart}{Defines which chart to modify.}
 
-\item{type}{One of \code{"bar"}, \code{"scatter"}, \code{"line"}.}
+\item{type}{Defines which series the chart draws. One of \code{"bar"},
+\code{"scatter"}, or \code{"line"}.}
 }
 \value{
 \code{chart}, with its series type set.
 }
 \description{
-Set a chart's type
+Chooses which kind of series the chart draws. Every other \verb{set_*()}
+function needs this to have run first.
+}
+\examples{
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+
+arc_chart(df) |>
+  set_type("scatter") |>
+  set_x(mass) |>
+  set_y(mass)
 }

@@ -2,11 +2,14 @@
 % Please edit documentation in R/color.R
 \name{Color}
 \alias{Color}
-\title{Color}
+\title{An RGBA colour}
 \usage{
 Color(r = NA_real_, g = NA_real_, b = NA_real_, a = NA_real_)
 }
 \description{
-An RGBA color, as \code{r}/\code{g}/\code{b}/\code{a} components rather than the spec's raw
-\verb{[r,g,b,a]} tuple.
+Holds a colour as separate \code{r}, \code{g}, \code{b}, and \code{a} components, each on a 0
+to 255 scale. Serialization converts it back to the tuple the spec uses.
+}
+\examples{
+s7x::as_vector(Color(r = 70, g = 130, b = 180, a = 255))
 }

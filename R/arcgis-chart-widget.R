@@ -1,28 +1,34 @@
+#' @include enums-widget.R
+NULL
+
 # htmlwidgets binding for <arcgis-chart>. See srcjs/README.md and
 # dev-docs/js-widget-architecture.md. Payload construction lives in
 # R/arc-data.R.
 
 #' Render an ArcGIS chart
 #'
-#' Creates an htmlwidget wrapping the `<arcgis-chart>` web component. The
-#' chart's model and layer are created client-side (in the browser) from
-#' `i_layer` and `config` via the JS `createModel()` function - no live
-#' ArcGIS Server feature service is required when `i_layer` is a
-#' self-contained feature collection (see [as_chart_layer()]).
+#' Wraps the `<arcgis-chart>` web component directly. Most users want
+#' [arc_bar()], [arc_scatter()], or [arc_line()], which build the arguments
+#' for you.
 #'
-#' Most users want [arc_bar()]/[arc_scatter()]/[arc_line()] instead, which
-#' build both arguments for you.
+#' @param i_layer Defines the layer the chart reads, as built by
+#'   [as_chart_layer()].
+#' @param chart_type Defines which default model the config merges over, such
+#'   as `"barChart"`. See [ModelTypes].
+#' @param config Defines the chart configuration in the `WebChart` shape. May
+#'   be sparse because the browser merges it over the defaults.
+#' @param width,height default `NULL`. Defines the widget size, passed to
+#'   [htmlwidgets::createWidget()].
+#' @param element_id default `NULL`. Defines the DOM element id to render into.
+#' @return An htmlwidget.
+#' @examples
+#' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
 #'
-#' @param i_layer A list giving the JSON layer definition (`IFeatureLayer`),
-#'   e.g. built with [as_chart_layer()].
-#' @param chart_type A `ModelTypes` string, e.g. `"barChart"`. Used to build
-#'   the default model that `config` is merged over.
-#' @param config A list giving the chart config (`ChartConfig`, i.e. the
-#'   `WebChart` shape). May be sparse - it is merged over the defaults
-#'   client-side.
-#' @param width,height Widget sizing, passed to [htmlwidgets::createWidget()].
-#' @param element_id Optional DOM element ID for the widget.
-#'
+#' arcgis_chart(
+#'   i_layer = as_chart_layer(df),
+#'   chart_type = "barChart",
+#'   config = s7x::as_vector(arc_col(df, species, mass)@webchart)
+#' )
 #' @export
 arcgis_chart <- function(
   i_layer,
@@ -59,9 +65,15 @@ arcgis_chart <- function(
 
 #' Shiny bindings for arcgis_chart
 #'
-#' @param outputId Output variable to read the chart from.
-#' @param width,height Sizing, passed to [htmlwidgets::shinyWidgetOutput()].
+#' Place `arcgisChartOutput()` in a Shiny UI and `renderArcgisChart()` in the
+#' server.
 #'
+#' @param outputId Defines which output variable the chart is read from.
+#' @param width,height default `"100%"` and `"400px"`. Defines the output size,
+#'   passed to [htmlwidgets::shinyWidgetOutput()].
+#' @return A Shiny output or render function.
+#' @examples
+#' arcgisChartOutput("chart")
 #' @export
 arcgisChartOutput <- function(outputId, width = "100%", height = "400px") {
   htmlwidgets::shinyWidgetOutput(
@@ -73,11 +85,9 @@ arcgisChartOutput <- function(outputId, width = "100%", height = "400px") {
   )
 }
 
-#' @param expr An expression that generates an `arcgis_chart`.
-#' @param env The environment in which to evaluate `expr`.
-#' @param quoted Is `expr` a quoted expression (with `quote()`)? This is
-#'   useful if you want to save an expression in a variable.
-#'
+#' @param expr Defines the expression that generates the chart.
+#' @param env default `parent.frame()`. Defines where `expr` is evaluated.
+#' @param quoted default `FALSE`. Defines whether `expr` is already quoted.
 #' @rdname arcgisChartOutput
 #' @export
 renderArcgisChart <- function(expr, env = parent.frame(), quoted = FALSE) {

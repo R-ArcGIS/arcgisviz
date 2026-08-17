@@ -7,20 +7,24 @@
 set_stat(chart, stat)
 }
 \arguments{
-\item{chart}{An \code{ArcChart}, from \code{\link[=arc_chart]{arc_chart()}} with \code{\link[=set_type]{set_type()}} already
-called.}
+\item{chart}{Defines which chart to modify.}
 
-\item{stat}{One of \code{"identity"}, \code{"count"}, \code{"sum"}, \code{"mean"}, \code{"min"},
-\code{"max"}, \code{"sd"}, \code{"var"}.}
+\item{stat}{Defines how \code{y} is aggregated. One of \code{"identity"}, \code{"count"},
+\code{"sum"}, \code{"mean"}, \code{"min"}, \code{"max"}, \code{"sd"}, or \code{"var"}.}
 }
 \value{
 \code{chart}, with its stat set.
 }
 \description{
-How \code{y} is derived from the data. \code{"identity"} plots \code{y} verbatim, one mark
-per row; every other value aggregates \code{y} grouped by \code{x}. \code{"count"} needs
-no \code{y} - it counts rows per \code{x}.
+Chooses how \code{y} is derived from the data. \code{"identity"} plots \code{y} verbatim
+and every other value aggregates \code{y} grouped by \code{x}.
 }
-\details{
-Bar and line charts only; scatterplots ignore it.
+\examples{
+df <- data.frame(species = c("a", "a", "b"), mass = c(1, 5, 3))
+
+arc_chart(df) |>
+  set_type("bar") |>
+  set_x(species) |>
+  set_y(mass) |>
+  set_stat("mean")
 }

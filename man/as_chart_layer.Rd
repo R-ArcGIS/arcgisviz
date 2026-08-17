@@ -2,7 +2,7 @@
 % Please edit documentation in R/arc-data.R
 \name{as_chart_layer}
 \alias{as_chart_layer}
-\title{Build an \code{IFeatureLayer} from a data frame}
+\title{Build a feature layer from a data frame}
 \usage{
 as_chart_layer(
   .data,
@@ -12,17 +12,24 @@ as_chart_layer(
 )
 }
 \arguments{
-\item{.data}{A data frame (or \code{sf} object) to convert.}
+\item{.data}{Defines which data frame or \code{sf} object to convert.}
 
-\item{name, title}{Layer name and human-readable title.}
+\item{name}{default \code{"chart_data"}. Defines what the layer is named.}
 
-\item{id}{A unique layer id.}
+\item{title}{default \code{name}. Defines the human readable layer title.}
+
+\item{id}{default \code{"arcgisviz-layer"}. Defines the unique layer id.}
 }
 \value{
-A list with the \code{IFeatureLayer} JSON shape.
+A list holding the \code{IFeatureLayer} JSON shape.
 }
 \description{
-Wraps \code{.data} as a self-contained client-side feature collection layer -
-the \code{iLayer} argument of the JS \code{createModel()}. No live feature service
-is involved.
+Wraps a data frame as a self-contained client side feature collection, the
+\code{iLayer} the browser builds the chart from. No live feature service is
+involved.
+}
+\examples{
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+
+as_chart_layer(df)
 }

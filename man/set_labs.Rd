@@ -15,20 +15,26 @@ set_labs(
 )
 }
 \arguments{
-\item{chart}{An \code{ArcChart}, from \code{\link[=arc_chart]{arc_chart()}}.}
+\item{chart}{Defines which chart to modify.}
 
 \item{...}{These dots are for future extensions and must be empty.}
 
-\item{title, subtitle, caption}{Chart-level text. \code{caption} is rendered as
-the chart's footer. All three are absent unless set.}
+\item{title, subtitle, caption}{Defines the chart-level text. Absent unless
+set, and \code{caption} renders as the chart's footer.}
 
-\item{x, y}{Axis titles. These also label the values in a tooltip.}
+\item{x, y}{Defines the axis titles, which also label tooltip values.
+Defaults to the mapped column names.}
 }
 \value{
 \code{chart}, with its labels set.
 }
 \description{
 Overrides the text a chart labels itself with. Omitting an argument leaves
-that label as it is; passing a string sets it, and passing \code{NULL} removes
-it. \code{x} and \code{y} default to the mapped column names.
+that label alone, a string sets it, and \code{NULL} removes it.
+}
+\examples{
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+
+arc_col(df, species, mass) |>
+  set_labs(title = "Mass by species", x = "Species", y = "Mass (g)")
 }

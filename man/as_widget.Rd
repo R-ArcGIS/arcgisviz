@@ -7,18 +7,22 @@
 as_widget(chart, width = NULL, height = NULL, element_id = NULL)
 }
 \arguments{
-\item{chart}{An \code{ArcChart}, from \code{\link[=arc_chart]{arc_chart()}} or one of \code{\link[=arc_bar]{arc_bar()}},
-\code{\link[=arc_scatter]{arc_scatter()}}, \code{\link[=arc_line]{arc_line()}}.}
+\item{chart}{Defines which chart to render.}
 
-\item{width, height}{Widget sizing, passed to \code{\link[htmlwidgets:createWidget]{htmlwidgets::createWidget()}}.}
+\item{width, height}{default \code{NULL}. Defines the widget size, passed to
+\code{\link[htmlwidgets:createWidget]{htmlwidgets::createWidget()}}.}
 
-\item{element_id}{Optional DOM element ID for the widget.}
+\item{element_id}{default \code{NULL}. Defines the DOM element id to render into.}
 }
 \value{
 An htmlwidget.
 }
 \description{
-Converts an \code{\link[=arc_chart]{arc_chart()}} object into a renderable htmlwidget: its data
-becomes a client-side feature collection layer, and its config is sent as
-the \code{config} argument of the JS \code{createModel()}.
+Turns an \code{\link[=arc_chart]{arc_chart()}} into a renderable widget. Printing an \code{ArcChart}
+calls this for you.
+}
+\examples{
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+
+as_widget(arc_col(df, species, mass))
 }

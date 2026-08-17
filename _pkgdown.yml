@@ -1,4 +1,180 @@
 url: http://r.esri.com/arcgisviz/
+
+repo:
+  url:
+    home: https://github.com/JosiahParry/arcgisviz
+    source: https://github.com/JosiahParry/arcgisviz/blob/main/
+    issue: https://github.com/JosiahParry/arcgisviz/issues/
+    user: https://github.com/
+
 template:
   bootstrap: 5
+  light-switch: true
+  bslib:
+    # Calcite's brand blue and neutral dark, the same values the Maps SDK
+    # styles charts with (@arcgis/charts-components chunks/index.js).
+    primary: "#007AC2"
+    bg: "#ffffff"
+    fg: "#2b2b2b"
+    navbar-light-bg: "#f4f8fb"
+    navbar-dark-bg: "#12222c"
+    enable-rounded: false
 
+navbar:
+  structure:
+    left: [reference, articles]
+    right: [search, github, lightswitch]
+
+reference:
+  - title: Charts
+    desc: >
+      Start a chart. Each shortcut is the equivalent pipeline of `set_*()`
+      calls, ready to pipe further.
+    contents:
+      - arc_chart
+      - arc_bar
+      - arc_col
+      - arc_scatter
+      - arc_line
+      - ArcChart
+
+  - title: Mapping
+    desc: Bind columns and text to a chart.
+    contents:
+      - set_type
+      - set_x
+      - set_stat
+      - set_color
+      - set_labs
+
+  - title: Scales and orientation
+    desc: How the axes are scaled and which way the chart is drawn.
+    contents:
+      - set_axis
+      - set_flipped
+
+  - title: Rendering
+    desc: Turn a chart into an htmlwidget, in a document or in Shiny.
+    contents:
+      - as_widget
+      - as_chart_layer
+      - arcgis_chart
+      - arcgisChartOutput
+
+  - title: Chart configuration
+    desc: >
+      S7 classes mirroring the `WebChart` JSON the Maps SDK consumes. Built
+      for you by the functions above.
+    contents:
+      - WebChart
+      - WebChartAxis
+      - WebChartAxisScrollBar
+      - WebChartCursorCrosshair
+      - WebChartDataFilters
+      - WebChartGuide
+      - WebChartLegend
+      - WebChartNullCategory
+      - WebChartOverlay
+      - WebChartText
+      - WebChartTextSymbol
+
+  - title: Ordering
+    desc: How a chart sorts its data and its series.
+    contents:
+      - WebChartOrderOptions
+      - WebChartDirectionalDataOrder
+      - WebChartMultiAxesDataOrder
+      - WebChartPredefinedLabelsDataOrder
+      - WebChartOrderSeriesBy
+
+  - title: Series
+    desc: One class per chart type, plus the query that feeds it.
+    contents:
+      - WebChartBarChartSeries
+      - WebChartLineChartSeries
+      - WebChartScatterplotSeries
+      - WebChartSeriesQuery
+      - WebChartTemporalBinning
+      - WebChartTemporalBinningOffset
+      - ScatterplotOverlays
+      - SizePolicy
+
+  - title: Renderers
+    desc: >
+      Data driven styling. A simple renderer carries visual variables for
+      continuous colour and a unique value renderer covers categories.
+    contents:
+      - ISimpleRenderer
+      - IColorVisualVariable
+      - IColorStop
+      - IUniqueValueRenderer
+      - IUniqueValueInfo
+
+  - title: Symbols and colour
+    desc: How individual marks are drawn.
+    contents:
+      - Color
+      - ISimpleFillSymbol
+      - ISimpleLineSymbol
+      - ISimpleMarkerSymbol
+      - IFont
+
+  - title: Value formatting
+    desc: How numbers, dates, and categories are rendered as text.
+    contents:
+      - NumberFormatOptions
+      - DateTimeFormatOptions
+      - CategoryFormatOptions
+      - WebChartDateTimeUnitFormatOptions
+      - IntlDateTimeFormatOptions
+      - IntlNumberFormatOptions
+      - TimeIntervalInfo
+
+  - title: Statistics
+    desc: Server side aggregation applied before the chart is drawn.
+    contents:
+      - IStatisticDefinition
+      - IStatisticDefinitionStatisticParameters
+
+  - title: Enumerations
+    desc: >
+      Scalar values drawn from a fixed set of variants. Each one validates a
+      single property of the classes above.
+    contents:
+      - ModelTypes
+      - RESTUnits
+      - IFontDecoration
+      - IFontStyle
+      - IFontWeight
+      - IRendererRotationType
+      - IStatisticDefinitionStatisticType
+      - IStatisticDefinitionStatisticParametersOrderBy
+      - SimpleFillSymbolStyle
+      - SimpleLineSymbolStyle
+      - SimpleMarkerSymbolStyle
+      - SizePolicyScaleTypes
+      - WebChartDirectionalDataOrderOrderType
+      - WebChartLabelBehavior
+      - WebChartLegendPositions
+      - WebChartNullPolicyTypes
+      - WebChartQuerySpatialRelationship
+      - WebChartSortOrderKinds
+      - WebChartStackedKinds
+      - WebChartTemporalBinningUnits
+      - WebChartTextSymbolHorizontalAlignment
+      - WebChartTextSymbolVerticalAlignment
+      - WebChartTimeAggregationTypes
+      - IntlDateTimeDigitStyle
+      - IntlDateTimeFormatLength
+      - IntlFormatWidth
+      - IntlLocaleMatcher
+      - IntlDateTimeFormatOptionsFormatMatcher
+      - IntlDateTimeFormatOptionsHourCycle
+      - IntlDateTimeFormatOptionsMonth
+      - IntlDateTimeFormatOptionsTimeZoneName
+      - IntlNumberFormatOptionsCompactDisplay
+      - IntlNumberFormatOptionsCurrencyDisplay
+      - IntlNumberFormatOptionsCurrencySign
+      - IntlNumberFormatOptionsNotation
+      - IntlNumberFormatOptionsSignDisplay
+      - IntlNumberFormatOptionsStyle

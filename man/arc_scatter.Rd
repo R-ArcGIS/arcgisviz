@@ -7,10 +7,18 @@
 arc_scatter(.data, x, y)
 }
 \arguments{
-\item{.data}{A data frame (or similar) the chart's fields will come from.}
+\item{.data}{Defines which data frame the chart draws its fields from.}
 
-\item{x, y}{Bare column names from \code{.data} (tidy eval).}
+\item{x, y}{Defines which columns supply the bar positions and heights.}
+}
+\value{
+An \code{ArcChart}.
 }
 \description{
-Scatterplot
+Plots one marker per row. Scatterplots ignore \code{\link[=set_stat]{set_stat()}}.
+}
+\examples{
+df <- data.frame(len = c(1, 5, 3), dep = c(2, 4, 6))
+
+arc_scatter(df, len, dep)
 }

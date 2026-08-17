@@ -7,13 +7,18 @@
 arc_col(.data, x, y)
 }
 \arguments{
-\item{.data}{A data frame (or similar) the chart's fields will come from.}
+\item{.data}{Defines which data frame the chart draws its fields from.}
 
-\item{x, y}{Bare column names from \code{.data} (tidy eval).}
+\item{x, y}{Defines which columns supply the bar positions and heights.}
 }
 \value{
 An \code{ArcChart}.
 }
 \description{
-Plots \code{y} verbatim, one bar per row.
+Plots \code{y} verbatim, one bar per row. Use \code{\link[=arc_bar]{arc_bar()}} to count rows instead.
+}
+\examples{
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+
+arc_col(df, species, mass)
 }

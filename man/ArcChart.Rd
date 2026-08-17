@@ -2,7 +2,7 @@
 % Please edit documentation in R/arc-chart.R
 \name{ArcChart}
 \alias{ArcChart}
-\title{ArcChart}
+\title{A chart specification}
 \usage{
 ArcChart(
   data = NULL,
@@ -11,15 +11,18 @@ ArcChart(
   y = NA_character_,
   stat = NA_character_,
   labs = list(),
-  color = list()
+  color = list(),
+  axes = list(),
+  flipped = NA
 )
 }
 \description{
-ArcChart
+Holds a data frame and the mapping built up by the \verb{set_*()} functions.
+The \verb{@webchart} property is computed from that mapping rather than stored,
+so assigning to it has no effect.
 }
-\section{Properties}{
+\examples{
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
 
-\verb{@webchart} is computed from the mapping, not stored - assigning to it
-has no effect.
+arc_col(df, species, mass)@webchart
 }
-

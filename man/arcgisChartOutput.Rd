@@ -10,17 +10,24 @@ arcgisChartOutput(outputId, width = "100\%", height = "400px")
 renderArcgisChart(expr, env = parent.frame(), quoted = FALSE)
 }
 \arguments{
-\item{outputId}{Output variable to read the chart from.}
+\item{outputId}{Defines which output variable the chart is read from.}
 
-\item{width, height}{Sizing, passed to \code{\link[htmlwidgets:shinyWidgetOutput]{htmlwidgets::shinyWidgetOutput()}}.}
+\item{width, height}{default \code{"100\%"} and \code{"400px"}. Defines the output size,
+passed to \code{\link[htmlwidgets:shinyWidgetOutput]{htmlwidgets::shinyWidgetOutput()}}.}
 
-\item{expr}{An expression that generates an \code{arcgis_chart}.}
+\item{expr}{Defines the expression that generates the chart.}
 
-\item{env}{The environment in which to evaluate \code{expr}.}
+\item{env}{default \code{parent.frame()}. Defines where \code{expr} is evaluated.}
 
-\item{quoted}{Is \code{expr} a quoted expression (with \code{quote()})? This is
-useful if you want to save an expression in a variable.}
+\item{quoted}{default \code{FALSE}. Defines whether \code{expr} is already quoted.}
+}
+\value{
+A Shiny output or render function.
 }
 \description{
-Shiny bindings for arcgis_chart
+Place \code{arcgisChartOutput()} in a Shiny UI and \code{renderArcgisChart()} in the
+server.
+}
+\examples{
+arcgisChartOutput("chart")
 }

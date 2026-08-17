@@ -7,14 +7,19 @@
 arc_bar(.data, x)
 }
 \arguments{
-\item{.data}{A data frame (or similar) the chart's fields will come from.}
+\item{.data}{Defines which data frame the chart draws its fields from.}
 
-\item{x}{A bare column name from \code{.data} (tidy eval).}
+\item{x}{Defines which column the bars are grouped by.}
 }
 \value{
 An \code{ArcChart}.
 }
 \description{
-Counts rows per \code{x}. Use \code{\link[=arc_col]{arc_col()}} to plot values you have already
-summarised, or \code{\link[=set_stat]{set_stat()}} for any other aggregation.
+Counts rows per \code{x}. Use \code{\link[=arc_col]{arc_col()}} for values you have already summarised
+or \code{\link[=set_stat]{set_stat()}} for any other aggregation.
+}
+\examples{
+df <- data.frame(species = c("a", "a", "b"), mass = c(1, 5, 3))
+
+arc_bar(df, species)
 }

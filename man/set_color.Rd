@@ -7,21 +7,25 @@
 set_color(chart, color, palette = NULL)
 }
 \arguments{
-\item{chart}{An \code{ArcChart}, from \code{\link[=arc_chart]{arc_chart()}} with \code{\link[=set_type]{set_type()}} already
-called.}
+\item{chart}{Defines which chart to modify.}
 
-\item{color}{A bare column name from \code{chart}'s data (tidy eval).}
+\item{color}{Defines which column the colours are drawn from.}
 
-\item{palette}{The name of an Esri colour ramp (e.g. \code{"Blue 3"},
-\code{"Flower Field"}), or a vector of R colours to build one from. Defaults to
-the ramp the ArcGIS SDK itself uses for gradients, and to its own series
-palette for discrete colours.}
+\item{palette}{default \code{NULL}. Defines which colours to use, either the
+name of an Esri ramp such as \code{"Blue 3"} or a vector of R colours. \code{NULL}
+uses the ramp the ArcGIS SDK itself defaults to.}
 }
 \value{
 \code{chart}, with its colour mapping set.
 }
 \description{
 Colours each mark by the value of a column. A numeric column becomes a
-continuous gradient; a character or factor column gets one colour per
+continuous gradient and a character or factor column gets one colour per
 distinct value.
+}
+\examples{
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+
+arc_col(df, species, mass) |>
+  set_color(mass, palette = "Red 1")
 }

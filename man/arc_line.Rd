@@ -7,10 +7,19 @@
 arc_line(.data, x, y)
 }
 \arguments{
-\item{.data}{A data frame (or similar) the chart's fields will come from.}
+\item{.data}{Defines which data frame the chart draws its fields from.}
 
-\item{x, y}{Bare column names from \code{.data} (tidy eval).}
+\item{x, y}{Defines which columns supply the bar positions and heights.}
+}
+\value{
+An \code{ArcChart}.
 }
 \description{
-Line chart
+Joins one point per row in \code{x} order. Use \code{\link[=set_stat]{set_stat()}} to aggregate \code{y}
+first.
+}
+\examples{
+df <- data.frame(year = c(2020, 2021, 2022), mass = c(1, 5, 3))
+
+arc_line(df, year, mass)
 }

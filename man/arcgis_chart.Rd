@@ -14,28 +14,34 @@ arcgis_chart(
 )
 }
 \arguments{
-\item{i_layer}{A list giving the JSON layer definition (\code{IFeatureLayer}),
-e.g. built with \code{\link[=as_chart_layer]{as_chart_layer()}}.}
+\item{i_layer}{Defines the layer the chart reads, as built by
+\code{\link[=as_chart_layer]{as_chart_layer()}}.}
 
-\item{chart_type}{A \code{ModelTypes} string, e.g. \code{"barChart"}. Used to build
-the default model that \code{config} is merged over.}
+\item{chart_type}{Defines which default model the config merges over, such
+as \code{"barChart"}. See \link{ModelTypes}.}
 
-\item{config}{A list giving the chart config (\code{ChartConfig}, i.e. the
-\code{WebChart} shape). May be sparse - it is merged over the defaults
-client-side.}
+\item{config}{Defines the chart configuration in the \code{WebChart} shape. May
+be sparse because the browser merges it over the defaults.}
 
-\item{width, height}{Widget sizing, passed to \code{\link[htmlwidgets:createWidget]{htmlwidgets::createWidget()}}.}
+\item{width, height}{default \code{NULL}. Defines the widget size, passed to
+\code{\link[htmlwidgets:createWidget]{htmlwidgets::createWidget()}}.}
 
-\item{element_id}{Optional DOM element ID for the widget.}
+\item{element_id}{default \code{NULL}. Defines the DOM element id to render into.}
+}
+\value{
+An htmlwidget.
 }
 \description{
-Creates an htmlwidget wrapping the \verb{<arcgis-chart>} web component. The
-chart's model and layer are created client-side (in the browser) from
-\code{i_layer} and \code{config} via the JS \code{createModel()} function - no live
-ArcGIS Server feature service is required when \code{i_layer} is a
-self-contained feature collection (see \code{\link[=as_chart_layer]{as_chart_layer()}}).
+Wraps the \verb{<arcgis-chart>} web component directly. Most users want
+\code{\link[=arc_bar]{arc_bar()}}, \code{\link[=arc_scatter]{arc_scatter()}}, or \code{\link[=arc_line]{arc_line()}}, which build the arguments
+for you.
 }
-\details{
-Most users want \code{\link[=arc_bar]{arc_bar()}}/\code{\link[=arc_scatter]{arc_scatter()}}/\code{\link[=arc_line]{arc_line()}} instead, which
-build both arguments for you.
+\examples{
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+
+arcgis_chart(
+  i_layer = as_chart_layer(df),
+  chart_type = "barChart",
+  config = s7x::as_vector(arc_col(df, species, mass)@webchart)
+)
 }

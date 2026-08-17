@@ -1,3 +1,6 @@
+#' @include arc-chart.R
+NULL
+
 # Builds the createModel() payload. The contract it has to satisfy is
 # documented in CLAUDE.md ("Data transfer"); `gi` in
 # dist/chunks/index2.js is the function that actually reads `iLayer`.
@@ -6,16 +9,21 @@
 # against the layer, so `stat = "count"` can't use the SDK's `"*"` fallback.
 oid_field <- "object_id"
 
-#' Build an `IFeatureLayer` from a data frame
+#' Build a feature layer from a data frame
 #'
-#' Wraps `.data` as a self-contained client-side feature collection layer -
-#' the `iLayer` argument of the JS `createModel()`. No live feature service
-#' is involved.
+#' Wraps a data frame as a self-contained client side feature collection, the
+#' `iLayer` the browser builds the chart from. No live feature service is
+#' involved.
 #'
-#' @param .data A data frame (or `sf` object) to convert.
-#' @param name,title Layer name and human-readable title.
-#' @param id A unique layer id.
-#' @return A list with the `IFeatureLayer` JSON shape.
+#' @param .data Defines which data frame or `sf` object to convert.
+#' @param name default `"chart_data"`. Defines what the layer is named.
+#' @param title default `name`. Defines the human readable layer title.
+#' @param id default `"arcgisviz-layer"`. Defines the unique layer id.
+#' @return A list holding the `IFeatureLayer` JSON shape.
+#' @examples
+#' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+#'
+#' as_chart_layer(df)
 #' @export
 as_chart_layer <- function(
   .data,
@@ -121,15 +129,18 @@ widget_json <- function(x, ...) {
 
 #' Convert a chart to an htmlwidget
 #'
-#' Converts an [arc_chart()] object into a renderable htmlwidget: its data
-#' becomes a client-side feature collection layer, and its config is sent as
-#' the `config` argument of the JS `createModel()`.
+#' Turns an [arc_chart()] into a renderable widget. Printing an `ArcChart`
+#' calls this for you.
 #'
-#' @param chart An `ArcChart`, from [arc_chart()] or one of [arc_bar()],
-#'   [arc_scatter()], [arc_line()].
-#' @param width,height Widget sizing, passed to [htmlwidgets::createWidget()].
-#' @param element_id Optional DOM element ID for the widget.
+#' @param chart Defines which chart to render.
+#' @param width,height default `NULL`. Defines the widget size, passed to
+#'   [htmlwidgets::createWidget()].
+#' @param element_id default `NULL`. Defines the DOM element id to render into.
 #' @return An htmlwidget.
+#' @examples
+#' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+#'
+#' as_widget(arc_col(df, species, mass))
 #' @export
 as_widget <- function(chart, width = NULL, height = NULL, element_id = NULL) {
   check_chart_type_set(chart)
