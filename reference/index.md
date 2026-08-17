@@ -13,6 +13,12 @@
 - [`DateTimeFormatOptions()`](http://r.esri.com/arcgisviz/reference/DateTimeFormatOptions.md)
   : DateTimeFormatOptions
 
+- [`IColorStop`](http://r.esri.com/arcgisviz/reference/IColorStop.md) :
+  IColorStop
+
+- [`IColorVisualVariable`](http://r.esri.com/arcgisviz/reference/IColorVisualVariable.md)
+  : IColorVisualVariable
+
 - [`IFont()`](http://r.esri.com/arcgisviz/reference/IFont.md) : IFont
 
 - [`IFontDecoration()`](http://r.esri.com/arcgisviz/reference/IFontDecoration.md)
@@ -24,6 +30,9 @@
 - [`IFontWeight()`](http://r.esri.com/arcgisviz/reference/IFontWeight.md)
   : IFontWeight
 
+- [`IRendererRotationType()`](http://r.esri.com/arcgisviz/reference/IRendererRotationType.md)
+  : IRendererRotationType
+
 - [`ISimpleFillSymbol()`](http://r.esri.com/arcgisviz/reference/ISimpleFillSymbol.md)
   : ISimpleFillSymbol
 
@@ -32,6 +41,9 @@
 
 - [`ISimpleMarkerSymbol()`](http://r.esri.com/arcgisviz/reference/ISimpleMarkerSymbol.md)
   : ISimpleMarkerSymbol
+
+- [`ISimpleRenderer`](http://r.esri.com/arcgisviz/reference/ISimpleRenderer.md)
+  : ISimpleRenderer
 
 - [`IStatisticDefinition()`](http://r.esri.com/arcgisviz/reference/IStatisticDefinition.md)
   : IStatisticDefinition
@@ -44,6 +56,12 @@
 
 - [`IStatisticDefinitionStatisticType()`](http://r.esri.com/arcgisviz/reference/IStatisticDefinitionStatisticType.md)
   : IStatisticDefinitionStatisticType
+
+- [`IUniqueValueInfo`](http://r.esri.com/arcgisviz/reference/IUniqueValueInfo.md)
+  : IUniqueValueInfo
+
+- [`IUniqueValueRenderer`](http://r.esri.com/arcgisviz/reference/IUniqueValueRenderer.md)
+  : IUniqueValueRenderer
 
 - [`IntlDateTimeDigitStyle()`](http://r.esri.com/arcgisviz/reference/IntlDateTimeDigitStyle.md)
   : IntlDateTimeDigitStyle
@@ -254,6 +272,9 @@
 
 - [`as_widget()`](http://r.esri.com/arcgisviz/reference/as_widget.md) :
   Convert a chart to an htmlwidget
+
+- [`set_color()`](http://r.esri.com/arcgisviz/reference/set_color.md) :
+  Map a column to colour
 
 - [`set_labs()`](http://r.esri.com/arcgisviz/reference/set_labs.md) :
   Set a chart's labels

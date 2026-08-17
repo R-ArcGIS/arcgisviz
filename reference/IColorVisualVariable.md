@@ -1,0 +1,3 @@
+# IColorVisualVariable
+
+IColorVisualVariable

@@ -11,7 +11,8 @@ ArcChart(
   x = NA_character_,
   y = NA_character_,
   stat = NA_character_,
-  labs = list()
+  labs = list(),
+  color = list()
 )
 ```
 
