@@ -3,6 +3,9 @@
 \name{WebChartNullCategory}
 \alias{WebChartNullCategory}
 \title{WebChartNullCategory}
+\usage{
+WebChartNullCategory(text = NA_character_, symbol = NULL)
+}
 \description{
 WebChartNullCategory
 }

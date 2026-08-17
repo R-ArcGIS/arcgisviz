@@ -3,6 +3,12 @@
 \name{NumberFormatOptions}
 \alias{NumberFormatOptions}
 \title{NumberFormatOptions}
+\usage{
+NumberFormatOptions(
+  type = NA_character_,
+  intlOptions = IntlNumberFormatOptions()
+)
+}
 \description{
 NumberFormatOptions
 }

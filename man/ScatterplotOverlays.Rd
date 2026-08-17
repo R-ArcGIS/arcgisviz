@@ -3,6 +3,9 @@
 \name{ScatterplotOverlays}
 \alias{ScatterplotOverlays}
 \title{ScatterplotOverlays}
+\usage{
+ScatterplotOverlays(type = NA_character_, trendLine = NULL)
+}
 \description{
 ScatterplotOverlays
 }

@@ -20,13 +20,15 @@ library(S7)
 #' has no effect.
 #' @name ArcChart
 #' @export
-ArcChart := new_class(
+ArcChart <- new_class(
+  "ArcChart",
   properties = list(
     data = S7::class_any,
     chart_type = s7x::class_string,
     x = s7x::class_string,
     y = s7x::class_string,
     stat = s7x::class_string,
+    labs = class_list,
     webchart = S7::new_property(getter = function(self) build_webchart(self))
   )
 )
@@ -145,10 +147,9 @@ set_y <- function(chart, y) {
 
 #' Set a chart's statistical transformation
 #'
-#' How `y` is derived from the data, in the sense ggplot2's `stat` argument
-#' means it. `"identity"` plots `y` verbatim, one mark per row (`geom_col()`);
-#' every other value aggregates `y` grouped by `x` (`geom_bar()`, or
-#' `stat_summary()`). `"count"` needs no `y` - it counts rows per `x`.
+#' How `y` is derived from the data. `"identity"` plots `y` verbatim, one mark
+#' per row; every other value aggregates `y` grouped by `x`. `"count"` needs
+#' no `y` - it counts rows per `x`.
 #'
 #' Bar and line charts only; scatterplots ignore it.
 #'
@@ -200,21 +201,117 @@ series_aggregation <- function(chart, stat, call = rlang::caller_env()) {
   )
 }
 
+# An omitted label leaves the model's default alone, a string overrides it,
+# and NULL removes it. NULL can't be stored in a list without deleting the
+# key, so a removed label is held as "" - which is also how it goes over the
+# wire, since the client's own empty labels are empty strings.
+lab_keep <- structure(list(), class = "arcgisviz_lab_keep")
+
+lab_value <- function(value, arg, call = rlang::caller_env()) {
+  if (rlang::is_null(value)) {
+    return("")
+  }
+  if (!rlang::is_string(value)) {
+    cli::cli_abort(
+      c(
+        "{.arg {arg}} must be a single string or {.code NULL}.",
+        "x" = "You supplied {.obj_type_friendly {value}}.",
+        "i" = "{.code NULL} removes the label; omit {.arg {arg}} to keep the
+               default."
+      ),
+      call = call
+    )
+  }
+  value
+}
+
+#' Set a chart's labels
+#'
+#' Overrides the text a chart labels itself with. Omitting an argument leaves
+#' that label as it is; passing a string sets it, and passing `NULL` removes
+#' it. `x` and `y` default to the mapped column names.
+#'
+#' @param chart An `ArcChart`, from [arc_chart()].
+#' @param ... These dots are for future extensions and must be empty.
+#' @param title,subtitle,caption Chart-level text. `caption` is rendered as
+#'   the chart's footer. All three are absent unless set.
+#' @param x,y Axis titles. These also label the values in a tooltip.
+#' @return `chart`, with its labels set.
+#' @export
+set_labs <- function(
+  chart,
+  ...,
+  title = lab_keep,
+  subtitle = lab_keep,
+  caption = lab_keep,
+  x = lab_keep,
+  y = lab_keep
+) {
+  rlang::check_dots_empty()
+
+  supplied <- list(
+    title = title,
+    subtitle = subtitle,
+    caption = caption,
+    x = x,
+    y = y
+  )
+  supplied <- supplied[
+    !vapply(
+      supplied,
+      inherits,
+      logical(1),
+      "arcgisviz_lab_keep"
+    )
+  ]
+
+  labs <- chart@labs
+  for (arg in names(supplied)) {
+    labs[[arg]] <- lab_value(supplied[[arg]], arg)
+  }
+  chart@labs <- labs
+  chart
+}
+
+chart_text <- function(text) {
+  WebChartText(
+    type = "chartText",
+    content = WebChartTextSymbol(type = "esriTS", text = text)
+  )
+}
+
+# Chart-level labels are absent by default, so a removed one is just unset -
+# as_vector() nulls the title out to delete the client's own default.
+chart_titled <- function(text) {
+  if (rlang::is_null(text) || !nzchar(text)) {
+    return(NULL)
+  }
+  chart_text(text)
+}
+
 # Tooltips label each value with the axis title, falling back to the field
 # alias only when that title is empty (customElement.js:10170) - and the
 # model's defaults are the localized "X-axis"/"Count", so leaving them in
 # place mislabels both the axis and the tooltip.
 axis_titled <- function(text) {
+  # Nothing mapped to title the axis with, so leave those defaults alone.
   if (is.na(text)) {
     return(WebChartAxis())
   }
 
-  WebChartAxis(
-    title = WebChartText(
-      type = "chartText",
-      content = WebChartTextSymbol(type = "esriTS", text = text)
-    )
-  )
+  # A removed label has to blank the default rather than be dropped, and an
+  # invisible title reserves no height (customElement.js:12053).
+  if (!nzchar(text)) {
+    return(WebChartAxis(
+      title = WebChartText(
+        type = "chartText",
+        visible = FALSE,
+        content = WebChartTextSymbol(type = "esriTS", text = "")
+      )
+    ))
+  }
+
+  WebChartAxis(title = chart_text(text))
 }
 
 # NULL until set_type() has run - as_widget() reports that as an error.
@@ -240,10 +337,19 @@ build_webchart <- function(chart) {
     sprintf("%s(%s)", stat, chart@y)
   }
 
+  labs <- chart@labs
+  axis_lab <- function(lab, mapped) if (rlang::is_null(lab)) mapped else lab
+
   WebChart(
     version = "25.1.0",
     type = "chart",
-    axes = list(axis_titled(chart@x), axis_titled(y_label)),
+    title = chart_titled(labs$title),
+    subtitle = chart_titled(labs$subtitle),
+    footer = chart_titled(labs$caption),
+    axes = list(
+      axis_titled(axis_lab(labs$x, chart@x)),
+      axis_titled(axis_lab(labs$y, y_label))
+    ),
     series = list(
       spec$series_class(
         type = spec$series_type,
@@ -259,9 +365,8 @@ build_webchart <- function(chart) {
 
 #' Bar chart
 #'
-#' Counts rows per `x`, the way `ggplot2::geom_bar()` does. Use [arc_col()]
-#' to plot values you have already summarised, or [set_stat()] for any other
-#' aggregation.
+#' Counts rows per `x`. Use [arc_col()] to plot values you have already
+#' summarised, or [set_stat()] for any other aggregation.
 #'
 #' @inheritParams arc_chart
 #' @param x A bare column name from `.data` (tidy eval).
@@ -273,7 +378,7 @@ arc_bar <- function(.data, x) {
 
 #' Column chart
 #'
-#' Plots `y` verbatim, one bar per row, the way `ggplot2::geom_col()` does.
+#' Plots `y` verbatim, one bar per row.
 #'
 #' @inheritParams arc_chart
 #' @param x,y Bare column names from `.data` (tidy eval).

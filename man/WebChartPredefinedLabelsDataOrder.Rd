@@ -3,6 +3,13 @@
 \name{WebChartPredefinedLabelsDataOrder}
 \alias{WebChartPredefinedLabelsDataOrder}
 \title{WebChartPredefinedLabelsDataOrder}
+\usage{
+WebChartPredefinedLabelsDataOrder(
+  orderType = NA_character_,
+  orderBy = character(0),
+  preferLabel = NA
+)
+}
 \description{
 WebChartPredefinedLabelsDataOrder
 }

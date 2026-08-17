@@ -34,8 +34,25 @@ test_that("unset properties are dropped rather than sent as null", {
 
   # createModel() layers `config` over its own defaults, so an explicit
   # null would override a default instead of falling back to it.
-  expect_named(cfg, c("version", "type", "axes", "series"))
+  # `title` is the deliberate exception - see the test below.
+  expect_named(cfg, c("version", "type", "axes", "series", "title"))
   expect_false(any(vapply(cfg, is.null, logical(1))))
+})
+
+test_that("an unset title sends a null to delete the model's default", {
+  # Every default config titles the chart with the localized "Chart" (m(),
+  # dist/chunks/index.js:289), so an absent key would leave that in place.
+  cfg <- s7x::as_vector(arc_scatter(test_df(), category, value)@webchart)
+  expect_identical(cfg$title, json_null)
+  expect_identical(widget_json(cfg$title), "null")
+
+  titled <- WebChart(
+    title = WebChartText(
+      type = "chartText",
+      content = WebChartTextSymbol(type = "esriTS", text = "Penguins")
+    )
+  )
+  expect_identical(s7x::as_vector(titled)$title$content$text, "Penguins")
 })
 
 test_that("axis titles come from the mapping, not the model's defaults", {
@@ -58,6 +75,55 @@ test_that("axis titles come from the mapping, not the model's defaults", {
     s7x::as_vector(agg@webchart)$axes[[2]]$title$content$text,
     "mean(value)"
   )
+})
+
+test_that("set_labs() overrides chart-level text", {
+  chart <- arc_scatter(test_df(), category, value) |>
+    set_labs(
+      title = "Values by category",
+      subtitle = "a subtitle",
+      caption = "a caption"
+    )
+  cfg <- s7x::as_vector(chart@webchart)
+
+  expect_identical(cfg$title$content$text, "Values by category")
+  expect_identical(cfg$subtitle$content$text, "a subtitle")
+  # `caption` is the chart's footer; there is no `caption` in the spec.
+  expect_identical(cfg$footer$content$text, "a caption")
+})
+
+test_that("set_labs() overrides axis titles and NULL removes them", {
+  titled <- arc_scatter(test_df(), category, value) |>
+    set_labs(x = "Category", y = "Value")
+  axes <- s7x::as_vector(titled@webchart)$axes
+  expect_identical(axes[[1]]$title$content$text, "Category")
+  expect_identical(axes[[2]]$title$content$text, "Value")
+
+  # A removed label has to blank the model's "X-axis"/"Count" default, so it
+  # is sent as an invisible empty title rather than dropped.
+  removed <- s7x::as_vector(
+    (arc_scatter(test_df(), category, value) |> set_labs(x = NULL))@webchart
+  )$axes
+  expect_false(removed[[1]]$title$visible)
+  expect_identical(removed[[1]]$title$content$text, "")
+  expect_identical(removed[[2]]$title$content$text, "value")
+})
+
+test_that("set_labs() leaves omitted labels alone and rejects bad input", {
+  chart <- arc_scatter(test_df(), category, value) |> set_labs(x = "Category")
+  cfg <- s7x::as_vector(chart@webchart)
+
+  expect_identical(cfg$title, json_null)
+  expect_null(cfg$subtitle)
+  expect_null(cfg$footer)
+
+  # A later call only touches the labels it names.
+  again <- s7x::as_vector((chart |> set_labs(title = "Hi"))@webchart)
+  expect_identical(again$axes[[1]]$title$content$text, "Category")
+  expect_identical(again$title$content$text, "Hi")
+
+  expect_error(set_labs(chart, title = 1), "must be a single string")
+  expect_error(set_labs(chart, "Hi"), class = "rlib_error_dots_nonempty")
 })
 
 test_that("stat = 'identity' sends a null query to delete the default", {

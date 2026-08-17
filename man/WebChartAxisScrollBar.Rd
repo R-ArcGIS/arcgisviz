@@ -3,6 +3,15 @@
 \name{WebChartAxisScrollBar}
 \alias{WebChartAxisScrollBar}
 \title{WebChartAxisScrollBar}
+\usage{
+WebChartAxisScrollBar(
+  visible = NA,
+  width = NA_real_,
+  color = NULL,
+  gripSize = NA_real_,
+  margin = NA_real_
+)
+}
 \description{
 WebChartAxisScrollBar
 }

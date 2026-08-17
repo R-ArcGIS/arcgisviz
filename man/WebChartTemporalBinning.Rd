@@ -3,6 +3,20 @@
 \name{WebChartTemporalBinning}
 \alias{WebChartTemporalBinning}
 \title{WebChartTemporalBinning}
+\usage{
+WebChartTemporalBinning(
+  unit = WebChartTemporalBinningUnits(),
+  size = NA_real_,
+  timeAggregationType = WebChartTimeAggregationTypes(),
+  trimIncompleteTimeInterval = NA,
+  start = NA_real_,
+  end = NA_real_,
+  offset = NULL,
+  outTimeZone = NA_character_,
+  firstDayOfWeek = NA_real_,
+  nullPolicy = WebChartNullPolicyTypes()
+)
+}
 \description{
 WebChartTemporalBinning
 }

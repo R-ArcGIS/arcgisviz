@@ -3,6 +3,9 @@
 \name{TimeIntervalInfo}
 \alias{TimeIntervalInfo}
 \title{TimeIntervalInfo}
+\usage{
+TimeIntervalInfo(unit = WebChartTemporalBinningUnits(), size = NA_real_)
+}
 \description{
 TimeIntervalInfo
 }

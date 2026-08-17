@@ -3,6 +3,14 @@
 \name{WebChartCursorCrosshair}
 \alias{WebChartCursorCrosshair}
 \title{WebChartCursorCrosshair}
+\usage{
+WebChartCursorCrosshair(
+  type = NA_character_,
+  style = NULL,
+  verticalLineVisible = NA,
+  horizontalLineVisible = NA
+)
+}
 \description{
 WebChartCursorCrosshair
 }

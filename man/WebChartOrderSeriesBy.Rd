@@ -3,6 +3,9 @@
 \name{WebChartOrderSeriesBy}
 \alias{WebChartOrderSeriesBy}
 \title{WebChartOrderSeriesBy}
+\usage{
+WebChartOrderSeriesBy(preferLabel = NA, orderBy = WebChartSortOrderKinds())
+}
 \description{
 WebChartOrderSeriesBy
 }

@@ -17,10 +17,9 @@ called.}
 \code{chart}, with its stat set.
 }
 \description{
-How \code{y} is derived from the data, in the sense ggplot2's \code{stat} argument
-means it. \code{"identity"} plots \code{y} verbatim, one mark per row (\code{geom_col()});
-every other value aggregates \code{y} grouped by \code{x} (\code{geom_bar()}, or
-\code{stat_summary()}). \code{"count"} needs no \code{y} - it counts rows per \code{x}.
+How \code{y} is derived from the data. \code{"identity"} plots \code{y} verbatim, one mark
+per row; every other value aggregates \code{y} grouped by \code{x}. \code{"count"} needs
+no \code{y} - it counts rows per \code{x}.
 }
 \details{
 Bar and line charts only; scatterplots ignore it.

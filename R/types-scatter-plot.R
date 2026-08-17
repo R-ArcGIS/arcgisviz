@@ -19,7 +19,8 @@ library(S7)
 #' WebChartOverlay
 #' @name WebChartOverlay
 #' @export
-WebChartOverlay := new_class(
+WebChartOverlay <- new_class(
+  "WebChartOverlay",
   properties = list(
     type = s7x::class_string,
     created = s7x::class_boolean,
@@ -31,7 +32,8 @@ WebChartOverlay := new_class(
 #' ScatterplotOverlays
 #' @name ScatterplotOverlays
 #' @export
-ScatterplotOverlays := new_class(
+ScatterplotOverlays <- new_class(
+  "ScatterplotOverlays",
   properties = list(
     type = s7x::class_string,
     trendLine = s7x::property_union(WebChartOverlay, NULL, default = NULL)
@@ -41,7 +43,8 @@ ScatterplotOverlays := new_class(
 #' ISimpleMarkerSymbol
 #' @name ISimpleMarkerSymbol
 #' @export
-ISimpleMarkerSymbol := new_class(
+ISimpleMarkerSymbol <- new_class(
+  "ISimpleMarkerSymbol",
   properties = list(
     type = s7x::class_string,
     style = SimpleMarkerSymbolStyle,
@@ -57,7 +60,8 @@ ISimpleMarkerSymbol := new_class(
 #' SizePolicy
 #' @name SizePolicy
 #' @export
-SizePolicy := new_class(
+SizePolicy <- new_class(
+  "SizePolicy",
   properties = list(
     type = s7x::class_string,
     scaleType = SizePolicyScaleTypes,
@@ -70,7 +74,8 @@ SizePolicy := new_class(
 #' WebChartScatterplotSeries
 #' @name WebChartScatterplotSeries
 #' @export
-WebChartScatterplotSeries := new_class(
+WebChartScatterplotSeries <- new_class(
+  "WebChartScatterplotSeries",
   properties = list(
     type = s7x::class_string,
     y = s7x::class_string,

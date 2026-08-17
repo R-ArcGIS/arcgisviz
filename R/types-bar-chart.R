@@ -40,7 +40,8 @@ library(S7)
 #' WebChartBarChartSeries
 #' @name WebChartBarChartSeries
 #' @export
-WebChartBarChartSeries := new_class(
+WebChartBarChartSeries <- new_class(
+  "WebChartBarChartSeries",
   properties = list(
     type = s7x::class_string,
     y = s7x::class_string,
@@ -89,7 +90,8 @@ WebChartBarChartSeries := new_class(
 #' WebChart
 #' @name WebChart
 #' @export
-WebChart := new_class(
+WebChart <- new_class(
+  "WebChart",
   properties = list(
     version = s7x::class_string,
     type = s7x::class_string,

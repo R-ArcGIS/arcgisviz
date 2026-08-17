@@ -3,6 +3,12 @@
 \name{IStatisticDefinitionStatisticParameters}
 \alias{IStatisticDefinitionStatisticParameters}
 \title{IStatisticDefinitionStatisticParameters}
+\usage{
+IStatisticDefinitionStatisticParameters(
+  value = NA_real_,
+  orderBy = IStatisticDefinitionStatisticParametersOrderBy()
+)
+}
 \description{
 IStatisticDefinitionStatisticParameters
 }

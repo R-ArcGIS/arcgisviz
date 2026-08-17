@@ -7,7 +7,8 @@ library(S7)
 #'
 #' @name Color
 #' @export
-Color := new_class(
+Color <- new_class(
+  "Color",
   properties = list(
     r = s7x::class_double,
     g = s7x::class_double,

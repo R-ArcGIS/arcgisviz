@@ -3,6 +3,13 @@
 \name{WebChartText}
 \alias{WebChartText}
 \title{WebChartText}
+\usage{
+WebChartText(
+  type = NA_character_,
+  visible = NA,
+  content = WebChartTextSymbol()
+)
+}
 \description{
 WebChartText
 }

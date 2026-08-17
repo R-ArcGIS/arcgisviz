@@ -21,7 +21,8 @@ library(S7)
 #' WebChartLineChartSeries
 #' @name WebChartLineChartSeries
 #' @export
-WebChartLineChartSeries := new_class(
+WebChartLineChartSeries <- new_class(
+  "WebChartLineChartSeries",
   properties = list(
     type = s7x::class_string,
     y = s7x::property_union(S7::class_character, s7x::class_string),

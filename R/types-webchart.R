@@ -26,7 +26,8 @@ library(S7)
 #' ISimpleFillSymbol
 #' @name ISimpleFillSymbol
 #' @export
-ISimpleFillSymbol := new_class(
+ISimpleFillSymbol <- new_class(
+  "ISimpleFillSymbol",
   properties = list(
     type = s7x::class_string,
     style = SimpleFillSymbolStyle,
@@ -38,7 +39,8 @@ ISimpleFillSymbol := new_class(
 #' WebChartTextSymbol
 #' @name WebChartTextSymbol
 #' @export
-WebChartTextSymbol := new_class(
+WebChartTextSymbol <- new_class(
+  "WebChartTextSymbol",
   properties = list(
     type = s7x::class_string,
     style = s7x::class_string,
@@ -63,7 +65,8 @@ WebChartTextSymbol := new_class(
 #' WebChartText
 #' @name WebChartText
 #' @export
-WebChartText := new_class(
+WebChartText <- new_class(
+  "WebChartText",
   properties = list(
     type = s7x::class_string,
     visible = s7x::class_boolean,
@@ -74,7 +77,8 @@ WebChartText := new_class(
 #' WebChartCursorCrosshair
 #' @name WebChartCursorCrosshair
 #' @export
-WebChartCursorCrosshair := new_class(
+WebChartCursorCrosshair <- new_class(
+  "WebChartCursorCrosshair",
   properties = list(
     type = s7x::class_string,
     style = s7x::property_union(ISimpleLineSymbol, NULL, default = NULL),
@@ -86,7 +90,8 @@ WebChartCursorCrosshair := new_class(
 #' WebChartLegend
 #' @name WebChartLegend
 #' @export
-WebChartLegend := new_class(
+WebChartLegend <- new_class(
+  "WebChartLegend",
   properties = list(
     type = s7x::class_string,
     visible = s7x::class_boolean,
@@ -101,7 +106,8 @@ WebChartLegend := new_class(
 #' WebChartGuide
 #' @name WebChartGuide
 #' @export
-WebChartGuide := new_class(
+WebChartGuide <- new_class(
+  "WebChartGuide",
   properties = list(
     type = s7x::class_string,
     start = s7x::property_union(s7x::class_string, s7x::class_double),
@@ -118,7 +124,8 @@ WebChartGuide := new_class(
 #' WebChartAxis
 #' @name WebChartAxis
 #' @export
-WebChartAxis := new_class(
+WebChartAxis <- new_class(
+  "WebChartAxis",
   properties = list(
     type = s7x::class_string,
     visible = s7x::class_boolean,
@@ -156,7 +163,8 @@ WebChartAxis := new_class(
 #' WebChartDirectionalDataOrder
 #' @name WebChartDirectionalDataOrder
 #' @export
-WebChartDirectionalDataOrder := new_class(
+WebChartDirectionalDataOrder <- new_class(
+  "WebChartDirectionalDataOrder",
   properties = list(
     orderType = WebChartDirectionalDataOrderOrderType,
     orderBy = WebChartSortOrderKinds,
@@ -167,7 +175,8 @@ WebChartDirectionalDataOrder := new_class(
 #' WebChartMultiAxesDataOrder
 #' @name WebChartMultiAxesDataOrder
 #' @export
-WebChartMultiAxesDataOrder := new_class(
+WebChartMultiAxesDataOrder <- new_class(
+  "WebChartMultiAxesDataOrder",
   properties = list(
     orderType = s7x::class_string,
     orderByX = s7x::property_union(
@@ -188,7 +197,8 @@ WebChartMultiAxesDataOrder := new_class(
 #' WebChartDataFilters
 #' @name WebChartDataFilters
 #' @export
-WebChartDataFilters := new_class(
+WebChartDataFilters <- new_class(
+  "WebChartDataFilters",
   properties = list(
     distance = s7x::class_double,
     gdbVersion = s7x::class_string,
@@ -204,7 +214,8 @@ WebChartDataFilters := new_class(
 #' WebChartOrderOptions
 #' @name WebChartOrderOptions
 #' @export
-WebChartOrderOptions := new_class(
+WebChartOrderOptions <- new_class(
+  "WebChartOrderOptions",
   properties = list(
     series = s7x::property_union(WebChartOrderSeriesBy, NULL, default = NULL),
     data = s7x::property_union(

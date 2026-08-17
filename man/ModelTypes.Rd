@@ -4,9 +4,23 @@
 \alias{ModelTypes}
 \title{ModelTypes}
 \usage{
-ModelTypes(value = resolved_default)
+ModelTypes(value = NA_character_)
+}
+\arguments{
+\item{value}{String. One of \code{"barChart"}, \code{"lineChart"}, \code{"comboBarLineChart"}, \code{"boxPlot"}, \code{"pieChart"}, \code{"scatterplot"}, \code{"histogram"}, \code{"gauge"}, \code{"radarChart"}, \code{"heatChart"}, \code{NA}.}
+}
+\value{
+An object of class \code{ModelTypes}.
 }
 \description{
 The \verb{@arcgis/charts-components} chart-type strings accepted by
 \code{createModel()}, e.g. \code{"barChart"}, \code{"lineChart"}, \code{"scatterplot"}.
 }
+\section{Additional properties}{
+
+\describe{
+\item{\code{@variants}}{Character vector. The values this enum allows.}
+
+\item{\code{@allow_na}}{Bool. Whether \code{NA_character_} is allowed.}
+}}
+

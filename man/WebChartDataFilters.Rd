@@ -3,6 +3,18 @@
 \name{WebChartDataFilters}
 \alias{WebChartDataFilters}
 \title{WebChartDataFilters}
+\usage{
+WebChartDataFilters(
+  distance = NA_real_,
+  gdbVersion = NA_character_,
+  geometry = NULL,
+  objectIds = list(),
+  spatialRelationship = WebChartQuerySpatialRelationship(),
+  timeExtent = list(),
+  units = RESTUnits(),
+  where = NA_character_
+)
+}
 \description{
 WebChartDataFilters
 }

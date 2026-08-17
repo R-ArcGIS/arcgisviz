@@ -12,7 +12,8 @@ library(S7)
 #' IStatisticDefinitionStatisticParameters
 #' @name IStatisticDefinitionStatisticParameters
 #' @export
-IStatisticDefinitionStatisticParameters := new_class(
+IStatisticDefinitionStatisticParameters <- new_class(
+  "IStatisticDefinitionStatisticParameters",
   properties = list(
     value = s7x::class_double,
     orderBy = IStatisticDefinitionStatisticParametersOrderBy
@@ -22,7 +23,8 @@ IStatisticDefinitionStatisticParameters := new_class(
 #' IStatisticDefinition
 #' @name IStatisticDefinition
 #' @export
-IStatisticDefinition := new_class(
+IStatisticDefinition <- new_class(
+  "IStatisticDefinition",
   properties = list(
     statisticType = IStatisticDefinitionStatisticType,
     statisticParameters = s7x::property_union(
@@ -38,7 +40,8 @@ IStatisticDefinition := new_class(
 #' WebChartSeriesQuery
 #' @name WebChartSeriesQuery
 #' @export
-WebChartSeriesQuery := new_class(
+WebChartSeriesQuery <- new_class(
+  "WebChartSeriesQuery",
   properties = list(
     outFields = S7::class_character,
     where = s7x::class_string,

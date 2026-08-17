@@ -3,6 +3,19 @@
 \name{WebChartGuide}
 \alias{WebChartGuide}
 \title{WebChartGuide}
+\usage{
+WebChartGuide(
+  type = NA_character_,
+  start = NA_character_,
+  end = NA_character_,
+  style = ISimpleLineSymbol(),
+  name = NA_character_,
+  label = NULL,
+  visible = NA,
+  above = NA,
+  tooltipReverseColor = NA
+)
+}
 \description{
 WebChartGuide
 }

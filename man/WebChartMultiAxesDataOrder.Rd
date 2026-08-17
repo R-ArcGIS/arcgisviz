@@ -3,6 +3,13 @@
 \name{WebChartMultiAxesDataOrder}
 \alias{WebChartMultiAxesDataOrder}
 \title{WebChartMultiAxesDataOrder}
+\usage{
+WebChartMultiAxesDataOrder(
+  orderType = NA_character_,
+  orderByX = NULL,
+  orderByY = NULL
+)
+}
 \description{
 WebChartMultiAxesDataOrder
 }

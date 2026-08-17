@@ -8,7 +8,8 @@ library(S7)
 #' WebChartDateTimeUnitFormatOptions
 #' @name WebChartDateTimeUnitFormatOptions
 #' @export
-WebChartDateTimeUnitFormatOptions := new_class(
+WebChartDateTimeUnitFormatOptions <- new_class(
+  "WebChartDateTimeUnitFormatOptions",
   properties = list(
     year = s7x::property_union(IntlDateTimeFormatOptions, NULL, default = NULL),
     month = s7x::property_union(
@@ -34,7 +35,8 @@ WebChartDateTimeUnitFormatOptions := new_class(
 #' NumberFormatOptions
 #' @name NumberFormatOptions
 #' @export
-NumberFormatOptions := new_class(
+NumberFormatOptions <- new_class(
+  "NumberFormatOptions",
   properties = list(
     type = s7x::class_string,
     intlOptions = IntlNumberFormatOptions
@@ -44,7 +46,8 @@ NumberFormatOptions := new_class(
 #' DateTimeFormatOptions
 #' @name DateTimeFormatOptions
 #' @export
-DateTimeFormatOptions := new_class(
+DateTimeFormatOptions <- new_class(
+  "DateTimeFormatOptions",
   properties = list(
     type = s7x::class_string,
     intlOptions = IntlDateTimeFormatOptions,

@@ -3,6 +3,13 @@
 \name{DateTimeFormatOptions}
 \alias{DateTimeFormatOptions}
 \title{DateTimeFormatOptions}
+\usage{
+DateTimeFormatOptions(
+  type = NA_character_,
+  intlOptions = IntlDateTimeFormatOptions(),
+  formatPerDateTimeUnit = NULL
+)
+}
 \description{
 DateTimeFormatOptions
 }

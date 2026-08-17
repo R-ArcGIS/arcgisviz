@@ -3,6 +3,14 @@
 \name{ISimpleFillSymbol}
 \alias{ISimpleFillSymbol}
 \title{ISimpleFillSymbol}
+\usage{
+ISimpleFillSymbol(
+  type = NA_character_,
+  style = SimpleFillSymbolStyle(),
+  color = NULL,
+  outline = NULL
+)
+}
 \description{
 ISimpleFillSymbol
 }

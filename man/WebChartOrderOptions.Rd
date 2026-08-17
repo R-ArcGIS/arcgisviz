@@ -3,6 +3,9 @@
 \name{WebChartOrderOptions}
 \alias{WebChartOrderOptions}
 \title{WebChartOrderOptions}
+\usage{
+WebChartOrderOptions(series = NULL, data = NULL, orderByFields = character(0))
+}
 \description{
 WebChartOrderOptions
 }

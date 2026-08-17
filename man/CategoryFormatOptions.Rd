@@ -3,6 +3,9 @@
 \name{CategoryFormatOptions}
 \alias{CategoryFormatOptions}
 \title{CategoryFormatOptions}
+\usage{
+CategoryFormatOptions(type = NA_character_, characterLimit = NA_real_)
+}
 \description{
 CategoryFormatOptions
 }

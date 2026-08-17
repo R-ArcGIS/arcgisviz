@@ -3,6 +3,18 @@
 \name{ISimpleMarkerSymbol}
 \alias{ISimpleMarkerSymbol}
 \title{ISimpleMarkerSymbol}
+\usage{
+ISimpleMarkerSymbol(
+  type = NA_character_,
+  style = SimpleMarkerSymbolStyle(),
+  color = NULL,
+  size = NA_real_,
+  outline = NULL,
+  angle = NA_real_,
+  xoffset = NA_real_,
+  yoffset = NA_real_
+)
+}
 \description{
 ISimpleMarkerSymbol
 }

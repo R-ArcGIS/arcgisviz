@@ -3,6 +3,16 @@
 \name{WebChartSeriesQuery}
 \alias{WebChartSeriesQuery}
 \title{WebChartSeriesQuery}
+\usage{
+WebChartSeriesQuery(
+  outFields = character(0),
+  where = NA_character_,
+  groupByFieldsForStatistics = character(0),
+  outStatistics = list(),
+  returnDistinctValues = NA,
+  fetchNullValues = NA
+)
+}
 \description{
 WebChartSeriesQuery
 }

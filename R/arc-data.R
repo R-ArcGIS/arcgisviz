@@ -69,8 +69,15 @@ compact_config <- function(x) {
   out[!vapply(out, is_unset, logical(1))]
 }
 
+# `title` goes the other way: every default config titles the chart with the
+# localized "Chart" (m(), dist/chunks/index.js:289), so dropping our unset
+# one would leave that in place. Unset means null here.
 S7::method(as_vector, WebChart) <- function(x, ...) {
-  compact_config(as_vector(S7::super(x, S7::S7_object), ...))
+  out <- compact_config(as_vector(S7::super(x, S7::S7_object), ...))
+  if (rlang::is_null(x@title)) {
+    out$title <- json_null
+  }
+  out
 }
 
 # (2) `stat = "identity"` needs the series to carry *no* outStatistics -

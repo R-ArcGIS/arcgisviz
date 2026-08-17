@@ -3,6 +3,14 @@
 \name{ISimpleLineSymbol}
 \alias{ISimpleLineSymbol}
 \title{ISimpleLineSymbol}
+\usage{
+ISimpleLineSymbol(
+  type = NA_character_,
+  style = SimpleLineSymbolStyle(),
+  color = NULL,
+  width = NA_real_
+)
+}
 \description{
 ISimpleLineSymbol
 }

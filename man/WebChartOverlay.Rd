@@ -3,6 +3,14 @@
 \name{WebChartOverlay}
 \alias{WebChartOverlay}
 \title{WebChartOverlay}
+\usage{
+WebChartOverlay(
+  type = NA_character_,
+  created = NA,
+  visible = NA,
+  symbol = NULL
+)
+}
 \description{
 WebChartOverlay
 }

@@ -16,7 +16,8 @@ library(S7)
 #' WebChartAxisScrollBar
 #' @name WebChartAxisScrollBar
 #' @export
-WebChartAxisScrollBar := new_class(
+WebChartAxisScrollBar <- new_class(
+  "WebChartAxisScrollBar",
   properties = list(
     visible = s7x::class_boolean,
     width = s7x::class_double,
@@ -29,7 +30,8 @@ WebChartAxisScrollBar := new_class(
 #' ISimpleLineSymbol
 #' @name ISimpleLineSymbol
 #' @export
-ISimpleLineSymbol := new_class(
+ISimpleLineSymbol <- new_class(
+  "ISimpleLineSymbol",
   properties = list(
     type = s7x::class_string,
     style = SimpleLineSymbolStyle,
@@ -41,7 +43,8 @@ ISimpleLineSymbol := new_class(
 #' CategoryFormatOptions
 #' @name CategoryFormatOptions
 #' @export
-CategoryFormatOptions := new_class(
+CategoryFormatOptions <- new_class(
+  "CategoryFormatOptions",
   properties = list(
     type = s7x::class_string,
     characterLimit = s7x::class_double
@@ -51,7 +54,8 @@ CategoryFormatOptions := new_class(
 #' WebChartOrderSeriesBy
 #' @name WebChartOrderSeriesBy
 #' @export
-WebChartOrderSeriesBy := new_class(
+WebChartOrderSeriesBy <- new_class(
+  "WebChartOrderSeriesBy",
   properties = list(
     preferLabel = s7x::class_boolean,
     orderBy = WebChartSortOrderKinds
@@ -61,7 +65,8 @@ WebChartOrderSeriesBy := new_class(
 #' WebChartPredefinedLabelsDataOrder
 #' @name WebChartPredefinedLabelsDataOrder
 #' @export
-WebChartPredefinedLabelsDataOrder := new_class(
+WebChartPredefinedLabelsDataOrder <- new_class(
+  "WebChartPredefinedLabelsDataOrder",
   properties = list(
     orderType = s7x::class_string,
     orderBy = S7::class_character,
@@ -72,7 +77,8 @@ WebChartPredefinedLabelsDataOrder := new_class(
 #' TimeIntervalInfo
 #' @name TimeIntervalInfo
 #' @export
-TimeIntervalInfo := new_class(
+TimeIntervalInfo <- new_class(
+  "TimeIntervalInfo",
   properties = list(
     unit = WebChartTemporalBinningUnits,
     size = s7x::class_double
@@ -82,7 +88,8 @@ TimeIntervalInfo := new_class(
 #' IFont
 #' @name IFont
 #' @export
-IFont := new_class(
+IFont <- new_class(
+  "IFont",
   properties = list(
     family = s7x::class_string,
     size = s7x::class_double,
@@ -95,7 +102,8 @@ IFont := new_class(
 #' IntlDateTimeFormatOptions
 #' @name IntlDateTimeFormatOptions
 #' @export
-IntlDateTimeFormatOptions := new_class(
+IntlDateTimeFormatOptions <- new_class(
+  "IntlDateTimeFormatOptions",
   properties = list(
     localeMatcher = IntlLocaleMatcher,
     weekday = IntlFormatWidth,
@@ -123,7 +131,8 @@ IntlDateTimeFormatOptions := new_class(
 #' IntlNumberFormatOptions
 #' @name IntlNumberFormatOptions
 #' @export
-IntlNumberFormatOptions := new_class(
+IntlNumberFormatOptions <- new_class(
+  "IntlNumberFormatOptions",
   properties = list(
     localeMatcher = IntlLocaleMatcher,
     style = IntlNumberFormatOptionsStyle,

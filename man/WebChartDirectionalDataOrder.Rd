@@ -3,6 +3,13 @@
 \name{WebChartDirectionalDataOrder}
 \alias{WebChartDirectionalDataOrder}
 \title{WebChartDirectionalDataOrder}
+\usage{
+WebChartDirectionalDataOrder(
+  orderType = WebChartDirectionalDataOrderOrderType(),
+  orderBy = WebChartSortOrderKinds(),
+  preferLabel = NA
+)
+}
 \description{
 WebChartDirectionalDataOrder
 }

@@ -3,6 +3,16 @@
 \name{WebChartDateTimeUnitFormatOptions}
 \alias{WebChartDateTimeUnitFormatOptions}
 \title{WebChartDateTimeUnitFormatOptions}
+\usage{
+WebChartDateTimeUnitFormatOptions(
+  year = NULL,
+  month = NULL,
+  day = NULL,
+  hour = NULL,
+  minute = NULL,
+  second = NULL
+)
+}
 \description{
 WebChartDateTimeUnitFormatOptions
 }

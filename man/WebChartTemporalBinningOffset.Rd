@@ -3,6 +3,12 @@
 \name{WebChartTemporalBinningOffset}
 \alias{WebChartTemporalBinningOffset}
 \title{WebChartTemporalBinningOffset}
+\usage{
+WebChartTemporalBinningOffset(
+  unit = WebChartTemporalBinningUnits(),
+  size = NA_real_
+)
+}
 \description{
 WebChartTemporalBinningOffset
 }

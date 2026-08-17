@@ -3,6 +3,14 @@
 \name{IStatisticDefinition}
 \alias{IStatisticDefinition}
 \title{IStatisticDefinition}
+\usage{
+IStatisticDefinition(
+  statisticType = IStatisticDefinitionStatisticType(),
+  statisticParameters = NULL,
+  onStatisticField = NA_character_,
+  outStatisticFieldName = NA_character_
+)
+}
 \description{
 IStatisticDefinition
 }

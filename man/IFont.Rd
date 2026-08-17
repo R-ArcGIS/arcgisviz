@@ -3,6 +3,15 @@
 \name{IFont}
 \alias{IFont}
 \title{IFont}
+\usage{
+IFont(
+  family = NA_character_,
+  size = NA_real_,
+  style = IFontStyle(),
+  weight = IFontWeight(),
+  decoration = IFontDecoration()
+)
+}
 \description{
 IFont
 }

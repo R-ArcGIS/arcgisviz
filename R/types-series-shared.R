@@ -8,7 +8,8 @@ library(S7)
 #' WebChartNullCategory
 #' @name WebChartNullCategory
 #' @export
-WebChartNullCategory := new_class(
+WebChartNullCategory <- new_class(
+  "WebChartNullCategory",
   properties = list(
     text = s7x::class_string,
     symbol = s7x::property_union(ISimpleFillSymbol, NULL, default = NULL)
@@ -22,7 +23,8 @@ WebChartNullCategory := new_class(
 #' WebChartTemporalBinningOffset
 #' @name WebChartTemporalBinningOffset
 #' @export
-WebChartTemporalBinningOffset := new_class(
+WebChartTemporalBinningOffset <- new_class(
+  "WebChartTemporalBinningOffset",
   properties = list(
     unit = WebChartTemporalBinningUnits,
     size = s7x::class_double
@@ -35,7 +37,8 @@ WebChartTemporalBinningOffset := new_class(
 #' WebChartTemporalBinning
 #' @name WebChartTemporalBinning
 #' @export
-WebChartTemporalBinning := new_class(
+WebChartTemporalBinning <- new_class(
+  "WebChartTemporalBinning",
   properties = list(
     unit = WebChartTemporalBinningUnits,
     size = s7x::class_double,

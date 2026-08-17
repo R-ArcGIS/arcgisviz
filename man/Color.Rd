@@ -3,6 +3,9 @@
 \name{Color}
 \alias{Color}
 \title{Color}
+\usage{
+Color(r = NA_real_, g = NA_real_, b = NA_real_, a = NA_real_)
+}
 \description{
 An RGBA color, as \code{r}/\code{g}/\code{b}/\code{a} components rather than the spec's raw
 \verb{[r,g,b,a]} tuple.
