@@ -3,11 +3,11 @@ devtools::load_all()
 
 penguins <- datasets::penguins
 
-# --- bar: count rows per category (geom_bar) ------------------------------
+# --- bar: count rows per category -----------------------------------------
 arc_bar(penguins, species)
 arc_bar(penguins, island)
 
-# --- col: plot y as-is, one bar per row (geom_col) -------------------------
+# --- col: plot y as-is, one bar per row ------------------------------------
 by_species <- aggregate(body_mass ~ species, penguins, mean)
 arc_col(by_species, species, body_mass)
 

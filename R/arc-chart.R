@@ -730,8 +730,7 @@ discrete_renderer <- function(field, values, stops, spec, call, chart) {
   )
 }
 
-# Numeric -> gradient, everything else -> one colour per value, the same split
-# ggplot2 makes between continuous and discrete scales.
+# Numeric -> gradient, everything else -> one colour per value.
 color_renderer <- function(chart, spec, call = rlang::caller_env()) {
   color <- chart@color
   if (rlang::is_empty(color)) {
