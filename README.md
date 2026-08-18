@@ -11,6 +11,7 @@ Shiny.
 
 <!-- badges: start -->
 
+[![R-CMD-check](https://github.com/R-ArcGIS/arcgisviz/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/R-ArcGIS/arcgisviz/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 ## Installation
