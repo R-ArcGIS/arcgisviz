@@ -51,8 +51,9 @@ ArcChart <- new_class(
 # discriminator), series_class (which WebChart*Series S7 class to build),
 # config_class (WebChart, or the subtype the spec gives this chart type),
 # aggregates (whether the series honours `stat` at all), has_y (whether the
-# series takes a y field), symbol_* (the symbol a chartRenderer carries for
-# this chart type - see color_renderer())}
+# series takes a y field), axis_defaults (axis properties every chart of this
+# type needs), symbol_* (the symbol a chartRenderer carries for this chart
+# type - see color_renderer())}
 chart_type_map <- list(
   bar = list(
     model_type = "barChart",
@@ -116,6 +117,12 @@ chart_type_map <- list(
     config_class = WebHeatChart,
     aggregates = FALSE,
     has_y = TRUE,
+    # Without a category valueFormat on both axes the client reads the config
+    # as a half-built calendar heat chart and renders a placeholder asking
+    # for a date field (Io(), dist/chunks/index2.js:4144).
+    axis_defaults = list(
+      valueFormat = CategoryFormatOptions(type = "category")
+    ),
     symbol_class = ISimpleFillSymbol,
     symbol_type = "esriSFS",
     symbol_style = SimpleFillSymbolStyle("esriSFSSolid")
@@ -161,7 +168,7 @@ arc_chart <- function(.data) {
 #'
 #' @param chart Defines which chart to modify.
 #' @param type Defines which series the chart draws. One of `"bar"`,
-#'   `"scatter"`, or `"line"`.
+#'   `"scatter"`, `"line"`, `"histogram"`, `"boxplot"`, or `"heat"`.
 #' @return `chart`, with its series type set.
 #' @examples
 #' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
@@ -884,8 +891,14 @@ build_webchart <- function(chart) {
     colorMatch = if (rlang::is_null(renderer)) NA else TRUE,
     rotated = chart@flipped,
     axes = list(
-      chart_axis(axis_lab(labs$x, chart@x), chart@axes$x),
-      chart_axis(axis_lab(labs$y, y_label), chart@axes$y)
+      chart_axis(
+        axis_lab(labs$x, chart@x),
+        c(spec$axis_defaults, chart@axes$x)
+      ),
+      chart_axis(
+        axis_lab(labs$y, y_label),
+        c(spec$axis_defaults, chart@axes$y)
+      )
     ),
     series = list(rlang::exec(spec$series_class, !!!series))
   )

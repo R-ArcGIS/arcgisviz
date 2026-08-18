@@ -395,6 +395,21 @@ test_that("a heat chart grids two columns", {
   expect_identical(cfg$series[[1]]$y, "value")
   expect_null(cfg$series[[1]]$query)
 
+  # Without a category valueFormat on both axes the client reads this as a
+  # half-built calendar heat chart (Io(), index2.js:4144) and renders a
+  # placeholder asking for a date field.
+  expect_identical(cfg$axes[[1]]$valueFormat$type, "category")
+  expect_identical(cfg$axes[[2]]$valueFormat$type, "category")
+  # Only heat charts get it.
+  expect_null(
+    s7x::as_vector(arc_bar(test_df(), category)@webchart)$axes[[1]]$valueFormat
+  )
+
+  # A set_axis() option still lands alongside the default.
+  limited <- s7x::as_vector((chart |> set_axis("x", visible = FALSE))@webchart)
+  expect_identical(limited$axes[[1]]$valueFormat$type, "category")
+  expect_false(limited$axes[[1]]$visible)
+
   # Cells are shaded by their own heat rules, not by a chartRenderer.
   expect_error(set_color(chart, category), "does not apply to heat")
 })
