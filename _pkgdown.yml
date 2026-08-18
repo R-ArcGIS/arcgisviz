@@ -59,6 +59,14 @@ reference:
       - set_flipped
       - set_position
 
+  - title: Palettes
+    desc: >
+      Every colour ramp `set_color()` accepts by name, searchable by the tags
+      the ArcGIS SDK ships alongside them.
+    contents:
+      - esri_palettes
+      - palette_tags
+
   - title: Rendering
     desc: Turn a chart into an htmlwidget, in a document or in Shiny.
     contents:

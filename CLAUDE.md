@@ -300,6 +300,16 @@ palette at `chunks/index.js:45`) and `esri_default_ramp` (`"Blue 3"`, its
 `defaultColorRampForCharts` at `chunks/class-breaks.js:475`). `palette` also
 takes any vector of R colours, parsed by `grDevices::col2rgb()` in `R/color.R`.
 
+`R/palettes.R` turns that catalogue into the user-facing `esri_palettes()`,
+one row per ramp, filterable by `type`/`color_mode`/`hue`/`tag`. Two facts
+about the tag vocabulary hold across all 521 and are what let those be scalar
+columns rather than list ones: every ramp carries **exactly one** of
+`light`/`dark`, and **at most one** of `sequential`/`diverging`/`categorical`
+(118 carry none - the `centered-on`, `extremes`, and `heatmap` families).
+`palette_tags()` is the full vocabulary. It builds the frame with
+`arcgisutils::data_frame()`, which adds a `tbl` class for printing without
+pulling in tibble.
+
 ## Deliberately deferred (don't "fix" these without asking)
 
 - **Live FeatureLayer / non-featureCollection layer types.** `WebChart$iLayer`
