@@ -47,7 +47,7 @@ or <code><a href="set_stat.html">set_stat()</a></code> for any other aggregation
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">arc_bar</span><span class="op">(</span><span class="va">.data</span>, <span class="va">x</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">arc_bar</span><span class="op">(</span><span class="va">.data</span>, <span class="va">x</span>, position <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -60,6 +60,11 @@ or <code><a href="set_stat.html">set_stat()</a></code> for any other aggregation
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
 <dd><p>Defines which column the bars are grouped by.</p></dd>
+
+
+<dt id="arg-position">position<a class="anchor" aria-label="anchor" href="#arg-position"></a></dt>
+<dd><p>default <code>NULL</code>. Defines how <code><a href="set_color.html">set_color()</a></code> groups are
+placed, one of <code>"dodge"</code>, <code>"stack"</code>, or <code>"fill"</code>. See <code><a href="set_position.html">set_position()</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

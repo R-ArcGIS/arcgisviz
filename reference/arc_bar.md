@@ -9,7 +9,7 @@ any other aggregation.
 ## Usage
 
 ``` r
-arc_bar(.data, x)
+arc_bar(.data, x, position = NULL)
 ```
 
 ## Arguments
@@ -21,6 +21,13 @@ arc_bar(.data, x)
 - x:
 
   Defines which column the bars are grouped by.
+
+- position:
+
+  default `NULL`. Defines how
+  [`set_color()`](http://r.esri.com/arcgisviz/reference/set_color.md)
+  groups are placed, one of `"dodge"`, `"stack"`, or `"fill"`. See
+  [`set_position()`](http://r.esri.com/arcgisviz/reference/set_position.md).
 
 ## Value
 

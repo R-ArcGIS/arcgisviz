@@ -136,6 +136,8 @@ How the axes are scaled and which way the chart is drawn.
   Set an axis
 - [`set_flipped()`](http://r.esri.com/arcgisviz/reference/set_flipped.md)
   : Swap a chart's axes
+- [`set_position()`](http://r.esri.com/arcgisviz/reference/set_position.md)
+  : Arrange grouped bars and lines
 
 ## Rendering
 

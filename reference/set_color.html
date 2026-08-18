@@ -78,7 +78,11 @@ uses the ramp the ArcGIS SDK itself defaults to.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Heat charts shade cells by how many rows fall into each, so there is no
+    <p>On a bar or line chart, colouring by a column other than <code>x</code> also groups
+the chart: it gains one series per distinct value, dodged side by side.
+Use <code><a href="set_position.html">set_position()</a></code> to stack them instead. Numeric columns are always a
+gradient and never a group, the same rule as ggplot2.</p>
+<p>Heat charts shade cells by how many rows fall into each, so there is no
 column to map. Give them <code>palette</code> on its own.</p>
     </div>
 

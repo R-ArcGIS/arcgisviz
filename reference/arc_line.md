@@ -7,7 +7,7 @@ aggregate `y` first.
 ## Usage
 
 ``` r
-arc_line(.data, x, y)
+arc_line(.data, x, y, position = NULL)
 ```
 
 ## Arguments
@@ -19,6 +19,13 @@ arc_line(.data, x, y)
 - x, y:
 
   Defines which columns supply the bar positions and heights.
+
+- position:
+
+  default `NULL`. Defines how
+  [`set_color()`](http://r.esri.com/arcgisviz/reference/set_color.md)
+  groups are placed, one of `"dodge"`, `"stack"`, or `"fill"`. See
+  [`set_position()`](http://r.esri.com/arcgisviz/reference/set_position.md).
 
 ## Value
 
