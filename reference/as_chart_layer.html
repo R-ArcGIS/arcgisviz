@@ -88,7 +88,102 @@ involved.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>species <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span><span class="op">)</span>, mass <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">as_chart_layer</span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in loadNamespace(x):</span> there is no package called ‘arcgisutils’</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $id</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "arcgisviz-layer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $title</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "chart_data"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $layerType</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "ArcGISFeatureLayer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet$spatialReference</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> named list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet$features</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet$features[[1]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet$features[[1]]$attributes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet$features[[1]]$attributes$mass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet$features[[1]]$attributes$object_id</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet$features[[1]]$attributes$species</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet$features[[2]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet$features[[2]]$attributes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet$features[[2]]$attributes$mass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet$features[[2]]$attributes$object_id</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet$features[[2]]$attributes$species</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "b"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet$features[[3]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet$features[[3]]$attributes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet$features[[3]]$attributes$mass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet$features[[3]]$attributes$object_id</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$featureSet$features[[3]]$attributes$species</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "c"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$layerDefinition</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$layerDefinition$name</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "chart_data"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$layerDefinition$objectIdField</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "object_id"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$layerDefinition$fields</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                name                type     alias length editable nullable</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1         object_id    esriFieldTypeOID object_id     NA    FALSE    FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> character   species esriFieldTypeString   species     NA     TRUE     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> double         mass esriFieldTypeDouble      mass     NA     TRUE     TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$layerDefinition$hasAttachments</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$layerDefinition$maxScale</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$layerDefinition$minScale</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$layerDefinition$type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Table"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$name</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "chart_data"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$layers[[1]]$title</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "chart_data"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $featureCollection$showLegend</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

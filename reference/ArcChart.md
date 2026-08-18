@@ -16,7 +16,9 @@ ArcChart(
   labs = list(),
   color = list(),
   axes = list(),
-  flipped = NA
+  flipped = NA,
+  series_opts = list(),
+  config_opts = list()
 )
 ```
 
@@ -39,7 +41,7 @@ arc_col(df, species, mass)@webchart
 #>  @ legend                      : NULL
 #>  @ axes                        :List of 2
 #>  .. $ : <arcgisviz::WebChartAxis>
-#>  ..  ..@ type                : chr NA
+#>  ..  ..@ type                : chr "chartAxis"
 #>  ..  ..@ visible             : logi NA
 #>  ..  ..@ isLogarithmic       : logi NA
 #>  ..  ..@ title               : <arcgisviz::WebChartText>
@@ -153,7 +155,7 @@ arc_col(df, species, mass)@webchart
 #>  ..  ..@ tickSpacing         : num NA
 #>  ..  ..@ dateBaseInterval    : NULL
 #>  .. $ : <arcgisviz::WebChartAxis>
-#>  ..  ..@ type                : chr NA
+#>  ..  ..@ type                : chr "chartAxis"
 #>  ..  ..@ visible             : logi NA
 #>  ..  ..@ isLogarithmic       : logi NA
 #>  ..  ..@ title               : <arcgisviz::WebChartText>

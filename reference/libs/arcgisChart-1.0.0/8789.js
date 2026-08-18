@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[8789],{38789(s,r,e){e.d(r,{default:()=>u});var t=e(26863);class u extends t.p{constructor(){super(...arguments),this.errors=null}syntaxError(s,r,e,t,u,h){this.errors||(this.errors=[]),this.errors.push({line:e,column:t,msg:u,e:h})}}}}]);

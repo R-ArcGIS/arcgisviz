@@ -3,7 +3,11 @@
 ## Charts
 
 Start a chart. Each shortcut is the equivalent pipeline of `set_*()`
-calls, ready to pipe further.
+calls, ready to pipe further. Chart types with their own options
+document them alongside the shortcut, as
+[`set_histogram()`](http://r.esri.com/arcgisviz/reference/arc_histogram.md)
+and
+[`set_boxplot()`](http://r.esri.com/arcgisviz/reference/arc_boxplot.md).
 
 - [`arc_chart()`](http://r.esri.com/arcgisviz/reference/arc_chart.md) :
   Start a chart
@@ -15,10 +19,18 @@ calls, ready to pipe further.
   : Scatterplot
 - [`arc_line()`](http://r.esri.com/arcgisviz/reference/arc_line.md) :
   Line chart
+- [`arc_histogram()`](http://r.esri.com/arcgisviz/reference/arc_histogram.md)
+  [`set_histogram()`](http://r.esri.com/arcgisviz/reference/arc_histogram.md)
+  : Histogram
+- [`arc_boxplot()`](http://r.esri.com/arcgisviz/reference/arc_boxplot.md)
+  [`set_boxplot()`](http://r.esri.com/arcgisviz/reference/arc_boxplot.md)
+  : Box plot
+- [`arc_heat()`](http://r.esri.com/arcgisviz/reference/arc_heat.md) :
+  Heat chart
 - [`ArcChart()`](http://r.esri.com/arcgisviz/reference/ArcChart.md) : A
   chart specification
 
-## Mapping
+## Aesthetics
 
 Bind columns and text to a chart.
 
@@ -64,6 +76,10 @@ for you by the functions above.
 
 - [`WebChart()`](http://r.esri.com/arcgisviz/reference/WebChart.md) :
   WebChart
+- [`WebBoxPlot`](http://r.esri.com/arcgisviz/reference/WebBoxPlot.md) :
+  WebBoxPlot
+- [`WebHeatChart`](http://r.esri.com/arcgisviz/reference/WebHeatChart.md)
+  : WebHeatChart
 - [`WebChartAxis()`](http://r.esri.com/arcgisviz/reference/WebChartAxis.md)
   : WebChartAxis
 - [`WebChartAxisScrollBar()`](http://r.esri.com/arcgisviz/reference/WebChartAxisScrollBar.md)
@@ -110,16 +126,39 @@ One class per chart type, plus the query that feeds it.
   : WebChartLineChartSeries
 - [`WebChartScatterplotSeries()`](http://r.esri.com/arcgisviz/reference/WebChartScatterplotSeries.md)
   : WebChartScatterplotSeries
+- [`WebChartHistogramSeries`](http://r.esri.com/arcgisviz/reference/WebChartHistogramSeries.md)
+  : WebChartHistogramSeries
+- [`WebChartBoxPlotSeries`](http://r.esri.com/arcgisviz/reference/WebChartBoxPlotSeries.md)
+  : WebChartBoxPlotSeries
+- [`WebChartHeatChartSeries`](http://r.esri.com/arcgisviz/reference/WebChartHeatChartSeries.md)
+  : WebChartHeatChartSeries
 - [`WebChartSeriesQuery()`](http://r.esri.com/arcgisviz/reference/WebChartSeriesQuery.md)
   : WebChartSeriesQuery
 - [`WebChartTemporalBinning()`](http://r.esri.com/arcgisviz/reference/WebChartTemporalBinning.md)
   : WebChartTemporalBinning
 - [`WebChartTemporalBinningOffset()`](http://r.esri.com/arcgisviz/reference/WebChartTemporalBinningOffset.md)
   : WebChartTemporalBinningOffset
+- [`WebChartCalendarDatePartsBinning`](http://r.esri.com/arcgisviz/reference/WebChartCalendarDatePartsBinning.md)
+  : WebChartCalendarDatePartsBinning
 - [`ScatterplotOverlays()`](http://r.esri.com/arcgisviz/reference/ScatterplotOverlays.md)
   : ScatterplotOverlays
+- [`HistogramOverlays`](http://r.esri.com/arcgisviz/reference/HistogramOverlays.md)
+  : HistogramOverlays
 - [`SizePolicy()`](http://r.esri.com/arcgisviz/reference/SizePolicy.md)
   : SizePolicy
+
+## Heat rules
+
+How heat chart cells are shaded and how empty ones are drawn.
+
+- [`WebChartHeatChartGradient`](http://r.esri.com/arcgisviz/reference/WebChartHeatChartGradient.md)
+  : WebChartHeatChartGradient
+- [`WebChartHeatChartHeatClassBreaks`](http://r.esri.com/arcgisviz/reference/WebChartHeatChartHeatClassBreaks.md)
+  : WebChartHeatChartHeatClassBreaks
+- [`WebChartHeatChartHeatClassBreaksColorRampInfo`](http://r.esri.com/arcgisviz/reference/WebChartHeatChartHeatClassBreaksColorRampInfo.md)
+  : WebChartHeatChartHeatClassBreaksColorRampInfo
+- [`WebChartHeatChartEmptyCell`](http://r.esri.com/arcgisviz/reference/WebChartHeatChartEmptyCell.md)
+  : WebChartHeatChartEmptyCell
 
 ## Renderers
 
@@ -222,6 +261,16 @@ single property of the classes above.
   : WebChartSortOrderKinds
 - [`WebChartStackedKinds()`](http://r.esri.com/arcgisviz/reference/WebChartStackedKinds.md)
   : WebChartStackedKinds
+- [`WebChartDataTransformations()`](http://r.esri.com/arcgisviz/reference/WebChartDataTransformations.md)
+  : WebChartDataTransformations
+- [`WebChartClassBreakTypes()`](http://r.esri.com/arcgisviz/reference/WebChartClassBreakTypes.md)
+  : WebChartClassBreakTypes
+- [`WebChartHeatChartHeatRulesTypes()`](http://r.esri.com/arcgisviz/reference/WebChartHeatChartHeatRulesTypes.md)
+  : WebChartHeatChartHeatRulesTypes
+- [`WebChartHeatChartViewTypes()`](http://r.esri.com/arcgisviz/reference/WebChartHeatChartViewTypes.md)
+  : WebChartHeatChartViewTypes
+- [`WebChartCalendarDatePartsUnits()`](http://r.esri.com/arcgisviz/reference/WebChartCalendarDatePartsUnits.md)
+  : WebChartCalendarDatePartsUnits
 - [`WebChartTemporalBinningUnits()`](http://r.esri.com/arcgisviz/reference/WebChartTemporalBinningUnits.md)
   : WebChartTemporalBinningUnits
 - [`WebChartTextSymbolHorizontalAlignment()`](http://r.esri.com/arcgisviz/reference/WebChartTextSymbolHorizontalAlignment.md)

@@ -32,5 +32,4 @@ An `ArcChart`.
 df <- data.frame(species = c("a", "a", "b"), mass = c(1, 5, 3))
 
 arc_bar(df, species)
-#> Error in loadNamespace(x): there is no package called ‘arcgisutils’
 ```

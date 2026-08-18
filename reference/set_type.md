@@ -17,8 +17,8 @@ set_type(chart, type)
 
 - type:
 
-  Defines which series the chart draws. One of `"bar"`, `"scatter"`, or
-  `"line"`.
+  Defines which series the chart draws. One of `"bar"`, `"scatter"`,
+  `"line"`, `"histogram"`, `"boxplot"`, or `"heat"`.
 
 ## Value
 
@@ -33,5 +33,4 @@ arc_chart(df) |>
   set_type("scatter") |>
   set_x(mass) |>
   set_y(mass)
-#> Error in loadNamespace(x): there is no package called ‘arcgisutils’
 ```

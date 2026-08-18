@@ -1,0 +1,3 @@
+# WebChartHeatChartEmptyCell
+
+WebChartHeatChartEmptyCell

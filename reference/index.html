@@ -39,7 +39,7 @@
     <div class="section level2">
       <h2 id="charts">Charts<a class="anchor" aria-label="anchor" href="#charts"></a></h2>
 
-      <div class="section-desc"><p>Start a chart. Each shortcut is the equivalent pipeline of <code>set_*()</code> calls, ready to pipe further.</p></div>
+      <div class="section-desc"><p>Start a chart. Each shortcut is the equivalent pipeline of <code>set_*()</code> calls, ready to pipe further. Chart types with their own options document them alongside the shortcut, as <code><a href="../reference/arc_histogram.html">set_histogram()</a></code> and <code><a href="../reference/arc_boxplot.html">set_boxplot()</a></code>.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -83,12 +83,33 @@
 
         <dt>
 
+          <code><a href="arc_histogram.html">arc_histogram()</a></code> <code><a href="arc_histogram.html">set_histogram()</a></code>
+
+        </dt>
+        <dd>Histogram</dd>
+
+        <dt>
+
+          <code><a href="arc_boxplot.html">arc_boxplot()</a></code> <code><a href="arc_boxplot.html">set_boxplot()</a></code>
+
+        </dt>
+        <dd>Box plot</dd>
+
+        <dt>
+
+          <code><a href="arc_heat.html">arc_heat()</a></code>
+
+        </dt>
+        <dd>Heat chart</dd>
+
+        <dt>
+
           <code><a href="ArcChart.html">ArcChart()</a></code>
 
         </dt>
         <dd>A chart specification</dd>
       </dl></div><div class="section level2">
-      <h2 id="mapping">Mapping<a class="anchor" aria-label="anchor" href="#mapping"></a></h2>
+      <h2 id="aesthetics">Aesthetics<a class="anchor" aria-label="anchor" href="#aesthetics"></a></h2>
 
       <div class="section-desc"><p>Bind columns and text to a chart.</p></div>
 
@@ -207,6 +228,20 @@
 
         </dt>
         <dd>WebChart</dd>
+
+        <dt>
+
+          <code><a href="WebBoxPlot.html">WebBoxPlot</a></code>
+
+        </dt>
+        <dd>WebBoxPlot</dd>
+
+        <dt>
+
+          <code><a href="WebHeatChart.html">WebHeatChart</a></code>
+
+        </dt>
+        <dd>WebHeatChart</dd>
 
         <dt>
 
@@ -354,6 +389,27 @@
 
         <dt>
 
+          <code><a href="WebChartHistogramSeries.html">WebChartHistogramSeries</a></code>
+
+        </dt>
+        <dd>WebChartHistogramSeries</dd>
+
+        <dt>
+
+          <code><a href="WebChartBoxPlotSeries.html">WebChartBoxPlotSeries</a></code>
+
+        </dt>
+        <dd>WebChartBoxPlotSeries</dd>
+
+        <dt>
+
+          <code><a href="WebChartHeatChartSeries.html">WebChartHeatChartSeries</a></code>
+
+        </dt>
+        <dd>WebChartHeatChartSeries</dd>
+
+        <dt>
+
           <code><a href="WebChartSeriesQuery.html">WebChartSeriesQuery()</a></code>
 
         </dt>
@@ -375,6 +431,13 @@
 
         <dt>
 
+          <code><a href="WebChartCalendarDatePartsBinning.html">WebChartCalendarDatePartsBinning</a></code>
+
+        </dt>
+        <dd>WebChartCalendarDatePartsBinning</dd>
+
+        <dt>
+
           <code><a href="ScatterplotOverlays.html">ScatterplotOverlays()</a></code>
 
         </dt>
@@ -382,10 +445,54 @@
 
         <dt>
 
+          <code><a href="HistogramOverlays.html">HistogramOverlays</a></code>
+
+        </dt>
+        <dd>HistogramOverlays</dd>
+
+        <dt>
+
           <code><a href="SizePolicy.html">SizePolicy()</a></code>
 
         </dt>
         <dd>SizePolicy</dd>
+      </dl></div><div class="section level2">
+      <h2 id="heat-rules">Heat rules<a class="anchor" aria-label="anchor" href="#heat-rules"></a></h2>
+
+      <div class="section-desc"><p>How heat chart cells are shaded and how empty ones are drawn.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="WebChartHeatChartGradient.html">WebChartHeatChartGradient</a></code>
+
+        </dt>
+        <dd>WebChartHeatChartGradient</dd>
+
+        <dt>
+
+          <code><a href="WebChartHeatChartHeatClassBreaks.html">WebChartHeatChartHeatClassBreaks</a></code>
+
+        </dt>
+        <dd>WebChartHeatChartHeatClassBreaks</dd>
+
+        <dt>
+
+          <code><a href="WebChartHeatChartHeatClassBreaksColorRampInfo.html">WebChartHeatChartHeatClassBreaksColorRampInfo</a></code>
+
+        </dt>
+        <dd>WebChartHeatChartHeatClassBreaksColorRampInfo</dd>
+
+        <dt>
+
+          <code><a href="WebChartHeatChartEmptyCell.html">WebChartHeatChartEmptyCell</a></code>
+
+        </dt>
+        <dd>WebChartHeatChartEmptyCell</dd>
       </dl></div><div class="section level2">
       <h2 id="renderers">Renderers<a class="anchor" aria-label="anchor" href="#renderers"></a></h2>
 
@@ -697,6 +804,41 @@
 
         </dt>
         <dd>WebChartStackedKinds</dd>
+
+        <dt>
+
+          <code><a href="WebChartDataTransformations.html">WebChartDataTransformations()</a></code>
+
+        </dt>
+        <dd>WebChartDataTransformations</dd>
+
+        <dt>
+
+          <code><a href="WebChartClassBreakTypes.html">WebChartClassBreakTypes()</a></code>
+
+        </dt>
+        <dd>WebChartClassBreakTypes</dd>
+
+        <dt>
+
+          <code><a href="WebChartHeatChartHeatRulesTypes.html">WebChartHeatChartHeatRulesTypes()</a></code>
+
+        </dt>
+        <dd>WebChartHeatChartHeatRulesTypes</dd>
+
+        <dt>
+
+          <code><a href="WebChartHeatChartViewTypes.html">WebChartHeatChartViewTypes()</a></code>
+
+        </dt>
+        <dd>WebChartHeatChartViewTypes</dd>
+
+        <dt>
+
+          <code><a href="WebChartCalendarDatePartsUnits.html">WebChartCalendarDatePartsUnits()</a></code>
+
+        </dt>
+        <dd>WebChartCalendarDatePartsUnits</dd>
 
         <dt>
 

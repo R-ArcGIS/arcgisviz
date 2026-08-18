@@ -18,7 +18,8 @@ set_color(chart, color, palette = NULL)
 
 - color:
 
-  Defines which column the colours are drawn from.
+  Defines which column the colours are drawn from. Omitted for heat
+  charts.
 
 - palette:
 
@@ -28,7 +29,12 @@ set_color(chart, color, palette = NULL)
 
 ## Value
 
-`chart`, with its colour mapping set.
+`chart`, with its colour set.
+
+## Details
+
+Heat charts shade cells by how many rows fall into each, so there is no
+column to map. Give them `palette` on its own.
 
 ## Examples
 
@@ -37,5 +43,4 @@ df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
 
 arc_col(df, species, mass) |>
   set_color(mass, palette = "Red 1")
-#> Error in loadNamespace(x): there is no package called ‘arcgisutils’
 ```

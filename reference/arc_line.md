@@ -30,5 +30,4 @@ An `ArcChart`.
 df <- data.frame(year = c(2020, 2021, 2022), mass = c(1, 5, 3))
 
 arc_line(df, year, mass)
-#> Error in loadNamespace(x): there is no package called ‘arcgisutils’
 ```

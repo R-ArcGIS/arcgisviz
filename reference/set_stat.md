@@ -34,5 +34,4 @@ arc_chart(df) |>
   set_x(species) |>
   set_y(mass) |>
   set_stat("mean")
-#> Error in loadNamespace(x): there is no package called ‘arcgisutils’
 ```

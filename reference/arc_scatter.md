@@ -29,5 +29,4 @@ An `ArcChart`.
 df <- data.frame(len = c(1, 5, 3), dep = c(2, 4, 6))
 
 arc_scatter(df, len, dep)
-#> Error in loadNamespace(x): there is no package called ‘arcgisutils’
 ```

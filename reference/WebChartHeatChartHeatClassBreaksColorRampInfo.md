@@ -1,0 +1,3 @@
+# WebChartHeatChartHeatClassBreaksColorRampInfo
+
+WebChartHeatChartHeatClassBreaksColorRampInfo

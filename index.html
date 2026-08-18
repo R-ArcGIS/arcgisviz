@@ -53,8 +53,62 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9">
-What the package does (one paragraph).
+  <main id="main" class="col-md-9"><div class="section level1">
+<div class="page-header"><h1 id="arcgisviz">arcgisviz<a class="anchor" aria-label="anchor" href="#arcgisviz"></a>
+</h1></div>
+<p><a href="http://r.esri.com/arcgisviz/">arcgisviz</a> builds interactive charts with the <a href="https://developers.arcgis.com/javascript/latest/" class="external-link">ArcGIS Maps SDK for JavaScript</a>. Charts render as htmlwidgets, so they work in the Viewer, in Quarto, and in Shiny.</p>
+<!-- badges: start -->
+<!-- badges: end -->
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"R-ArcGIS/arcgisviz"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h2>
+<p>Start with <code><a href="reference/arc_chart.html">arc_chart()</a></code> and pipe. Each <code>set_*()</code> function maps one thing.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://r.esri.com/arcgisviz/">arcgisviz</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/arc_chart.html">arc_chart</a></span><span class="op">(</span><span class="va">penguins</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/set_type.html">set_type</a></span><span class="op">(</span><span class="st">"bar"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/set_x.html">set_x</a></span><span class="op">(</span><span class="va">species</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/set_x.html">set_y</a></span><span class="op">(</span><span class="va">body_mass</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/set_stat.html">set_stat</a></span><span class="op">(</span><span class="st">"mean"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/set_color.html">set_color</a></span><span class="op">(</span><span class="va">species</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/set_labs.html">set_labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Palmer penguins"</span>, y <span class="op">=</span> <span class="st">"Mean body mass (g)"</span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="reference/arc_bar.html">arc_bar()</a></code>, <code><a href="reference/arc_col.html">arc_col()</a></code>, <code><a href="reference/arc_scatter.html">arc_scatter()</a></code>, and <code><a href="reference/arc_line.html">arc_line()</a></code> are shorthand for the common pipelines.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/arc_scatter.html">arc_scatter</a></span><span class="op">(</span><span class="va">penguins</span>, <span class="va">bill_len</span>, <span class="va">bill_dep</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/set_color.html">set_color</a></span><span class="op">(</span><span class="va">body_mass</span>, palette <span class="op">=</span> <span class="st">"Blue 3"</span><span class="op">)</span></span></code></pre></div>
+<p>A numeric column becomes a continuous gradient and a categorical one gets a colour per value. <code>palette</code> takes any of the 521 Esri colour ramps or a vector of R colours.</p>
+</div>
+<div class="section level2">
+<h2 id="axes">Axes<a class="anchor" aria-label="anchor" href="#axes"></a>
+</h2>
+<p><code><a href="reference/set_axis.html">set_axis()</a></code> handles one axis at a time. <code><a href="reference/set_flipped.html">set_flipped()</a></code> draws bars sideways.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/arc_bar.html">arc_bar</a></span><span class="op">(</span><span class="va">penguins</span>, <span class="va">island</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/set_axis.html">set_axis</a></span><span class="op">(</span><span class="st">"y"</span>, limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span>, integer_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/set_flipped.html">set_flipped</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="configuration">Configuration<a class="anchor" aria-label="anchor" href="#configuration"></a>
+</h2>
+<p>Every chart is backed by S7 classes mirroring the SDK’s <code>WebChart</code> JSON. Reach for them when you need something the <code>set_*()</code> functions do not cover.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://r.esri.com/arcgisviz/">arcgisviz</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">chart</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/arc_bar.html">arc_bar</a></span><span class="op">(</span><span class="va">penguins</span>, <span class="va">species</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">chart</span><span class="op">@</span><span class="va">webchart</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "arcgisviz::WebChart" "S7_object"</span></span>
+<span><span class="va">chart</span><span class="op">@</span><span class="va">webchart</span><span class="op">@</span><span class="va">series</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">@</span><span class="va">type</span></span>
+<span><span class="co">#&gt; [1] "barSeries"</span></span></code></pre></div>
+</div>
+</div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">

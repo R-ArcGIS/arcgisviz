@@ -1,0 +1,6 @@
+dependencies:
+  - name: arcgisChart
+    version: 1.0.0
+    src: htmlwidgets
+    script: arcgisChart.js
+    stylesheet: arcgisChart.css

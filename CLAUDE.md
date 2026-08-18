@@ -102,9 +102,21 @@ colour
 ([`set_color()`](http://r.esri.com/arcgisviz/reference/set_color.md),
 see below), and scales
 ([`set_axis()`](http://r.esri.com/arcgisviz/reference/set_axis.md)/[`set_flipped()`](http://r.esri.com/arcgisviz/reference/set_flipped.md)).
-Box plot, pie, gauge, histogram, and radar chart types are not yet
-modeled, and there is no legend surface yet (`WebChart$legend` is
-modeled but nothing sets it), which colour has made worth adding.
+Six chart types are modeled: bar, line, scatter, histogram, box plot,
+and heat (plus combo bar-line for free). Pie, gauge, and radar are not.
+There is no legend surface yet (`WebChart$legend` is modeled but nothing
+sets it), which colour has made worth adding.
+
+Two shapes worth knowing before adding a seventh chart type.
+`chart_type_map` (`R/arc-chart.R`) carries `config_class`, `has_y`, and
+`aggregates` per type, and `build_webchart()` reads them rather than
+branching on the type name. Chart types whose spec defines a `WebChart`
+subtype get it as a real S7 subclass (`WebBoxPlot`, `WebHeatChart`),
+which is how they inherit the `as_vector()` method that drops unset
+properties. And **every axis must carry `type = "chartAxis"`**:
+`deepMerge()` maps over the source array
+(`srcjs/widgets/arcgisChart.js:24`), so an axis that compacts away to
+nothing shortens `axes` and deletes one of the model’s own.
 
 ## Serialization
 
@@ -176,7 +188,9 @@ shapes. The non-obvious parts:
   at `featureCollection$layers[[1]]$featureSet` / `$layerDefinition`.
   The converter (`gi`, `dist/chunks/index2.js`) reads *only* those paths
   plus `fields`/`objectIdField`/`geometryType`/`spatialReference` -
-  which is precisely what `arcgisutils::as_feature_collection()` emits.
+  which is precisely what
+  [`arcgisutils::as_feature_collection()`](https://rdrr.io/pkg/arcgisutils/man/layer_json.html)
+  emits.
 - Unset properties must be **dropped**, not sent as JSON `null` - the
   default `as_vector()` method materializes every property (16 of
   `WebChart`’s 20 top-level ones are NA/NULL for a minimal chart), and
@@ -198,10 +212,10 @@ shapes. The non-obvious parts:
   htmlwidgets hands the function the whole payload (`x`, `evals`,
   `jsHooks`), not just `x`, and expects a JSON string back.
 - Single-shot only: the whole collection goes over in one payload.
-  `arcgisutils::as_esri_features()` is the per-feature JSON a future
-  batched path would stream (cf. the SDK’s large-collection sample,
-  which does that via `applyEdits()` on a *live* layer), but nothing
-  needs it yet.
+  [`arcgisutils::as_esri_features()`](https://rdrr.io/pkg/arcgisutils/man/features.html)
+  is the per-feature JSON a future batched path would stream (cf. the
+  SDK’s large-collection sample, which does that via `applyEdits()` on a
+  *live* layer), but nothing needs it yet.
 
 ## Colour (`set_color()`), and the two mechanisms it needs
 
@@ -231,6 +245,17 @@ type**, and both branches were established empirically:
   colouring by any column other than `x` while aggregating is an error,
   not a silent no-op.
 
+**Heat charts are the exception**: cells are shaded by the series’ own
+`gradientRules`/`classBreaksRules`, not by `chartRenderer`, and the
+value is the cell count so there is no column to map.
+`set_color(chart, palette =)` takes `palette` alone. An Esri ramp
+travels by *name* in `classBreaksRules$colorRampInfo` and the client
+generates the class breaks itself (`serial-chart-data.js:487`, and
+`generateHeatChartClassBreaks()` at `customElement.js:18668`, which runs
+for heat and nothing else). Any other palette collapses to the
+two-colour `gradientRules$colorList` the spec allows. Ramps tagged
+`heatmap` in `esri_color_ramps` are the ones built for this.
+
 Palettes live in `R/sysdata.rda`, built by `data-raw/color-palettes.R`
 from `@arcgis/core/smartMapping/symbology/support/colors.js`: 521 ramps
 (name, tags, stops), plus `esri_series_palette` (ColorBrewer Paired-10,
@@ -247,17 +272,38 @@ colours, parsed by
   `WebChart$iLayer` is
   `IFeatureLayer | IImageServiceLayer | ITiledImageServiceLayer | IWCSLayer`
   in the spec but stays `class_any` here - charts are built from a
-  `type: "featureCollection"` JSON blob via `arcgisutils::as_layer()`,
+  `type: "featureCollection"` JSON blob via
+  [`arcgisutils::as_layer()`](https://rdrr.io/pkg/arcgisutils/man/layer_json.html),
   not a live layer reference. Don’t model the live-layer types.
 - **Geometry types** (`IPoint`/`IPolygon`/etc.) - handled elsewhere, not
   modeled in this package’s type registry.
   `WebChartDataFilters$geometry` stays `class_any`.
-- **Other chart types’ series shapes** (pie, gauge, histogram, box plot,
-  radar, heat) - `web-chart.d.ts` has all of these in one file now (no
-  per-chart-type `.d.ts` sprawl to resolve), so adding one is just
-  reading the relevant interface(s) there and following the
-  `arcgis-spec-types` skill’s conventions - not fundamentally blocked on
-  anything, just not done yet.
+- **Pie, gauge, and radar series shapes** - `web-chart.d.ts` has all of
+  these in one file, so adding one is reading the relevant interface(s)
+  there and following the `arcgis-spec-types` skill’s conventions plus
+  the `chart_type_map` notes above. Not blocked on anything, just not
+  done yet.
+- **Calendar heat charts.** `WebChartCalendarDatePartsBinning` is
+  modeled but nothing sets it. A heat series with `xTemporalBinning`
+  takes the client’s calendar branch instead of the matrix one (`Te()`,
+  `dist/chunks/index4.js:10833`), which is also why a matrix heat chart
+  has to send a category `valueFormat` on both axes.
+
+## Naming
+
+**Never name a function or argument `*_for` or `resolve_*`.** No
+`palette_for()`, no `resolve_stops()`. Both read as machine-generated.
+Name the thing it returns or the thing it does: `palette_stops()`,
+`discrete_colors()`, `chart_axis()`.
+
+The public API takes its vocabulary from the grammar of graphics. A user
+who knows ggplot2 should be able to guess a name and be right:
+[`arc_histogram()`](http://r.esri.com/arcgisviz/reference/arc_histogram.md)
+not `arc_binned_bar()`, `bins` not `binCount`,
+[`set_color()`](http://r.esri.com/arcgisviz/reference/set_color.md) not
+`set_color_mapping()`. Friendly values stay kebab-case with no spec
+prefixes (“side-by-side”, not “sideBySide”). Nothing in the public
+surface exposes an S7 class or a spec enum value.
 
 ## Comments
 
