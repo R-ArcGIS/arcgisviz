@@ -220,6 +220,16 @@ and both branches were established empirically:
   colouring by any column other than `x` while aggregating is an error, not a
   silent no-op.
 
+**Heat charts are the exception**: cells are shaded by the series' own
+`gradientRules`/`classBreaksRules`, not by `chartRenderer`, and the value is
+the cell count so there is no column to map. `set_color(chart, palette =)`
+takes `palette` alone. An Esri ramp travels by *name* in
+`classBreaksRules$colorRampInfo` and the client generates the class breaks
+itself (`serial-chart-data.js:487`, and `generateHeatChartClassBreaks()` at
+`customElement.js:18668`, which runs for heat and nothing else). Any other
+palette collapses to the two-colour `gradientRules$colorList` the spec allows.
+Ramps tagged `heatmap` in `esri_color_ramps` are the ones built for this.
+
 Palettes live in `R/sysdata.rda`, built by `data-raw/color-palettes.R` from
 `@arcgis/core/smartMapping/symbology/support/colors.js`: 521 ramps (name, tags,
 stops), plus `esri_series_palette` (ColorBrewer Paired-10, the SDK's own series
@@ -241,10 +251,11 @@ takes any vector of R colours, parsed by `grDevices::col2rgb()` in `R/color.R`.
   in one file, so adding one is reading the relevant interface(s) there and
   following the `arcgis-spec-types` skill's conventions plus the
   `chart_type_map` notes above. Not blocked on anything, just not done yet.
-- **Heat chart colour.** Cells are shaded by the series' own `gradientRules`
-  or `classBreaksRules`, not by `chartRenderer`, so `set_color()` errors on a
-  heat chart rather than silently building a renderer the engine ignores. A
-  heat colour surface is worth adding, it is just a different mechanism.
+- **Calendar heat charts.** `WebChartCalendarDatePartsBinning` is modeled but
+  nothing sets it. A heat series with `xTemporalBinning` takes the client's
+  calendar branch instead of the matrix one (`Te()`,
+  `dist/chunks/index4.js:10833`), which is also why a matrix heat chart has
+  to send a category `valueFormat` on both axes.
 
 ## Naming
 

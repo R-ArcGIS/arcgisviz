@@ -9,19 +9,24 @@ set_color(chart, color, palette = NULL)
 \arguments{
 \item{chart}{Defines which chart to modify.}
 
-\item{color}{Defines which column the colours are drawn from.}
+\item{color}{Defines which column the colours are drawn from. Omitted for
+heat charts.}
 
 \item{palette}{default \code{NULL}. Defines which colours to use, either the
 name of an Esri ramp such as \code{"Blue 3"} or a vector of R colours. \code{NULL}
 uses the ramp the ArcGIS SDK itself defaults to.}
 }
 \value{
-\code{chart}, with its colour mapping set.
+\code{chart}, with its colour set.
 }
 \description{
 Colours each mark by the value of a column. A numeric column becomes a
 continuous gradient and a character or factor column gets one colour per
 distinct value.
+}
+\details{
+Heat charts shade cells by how many rows fall into each, so there is no
+column to map. Give them \code{palette} on its own.
 }
 \examples{
 df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))

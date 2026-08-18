@@ -410,8 +410,30 @@ test_that("a heat chart grids two columns", {
   expect_identical(limited$axes[[1]]$valueFormat$type, "category")
   expect_false(limited$axes[[1]]$visible)
 
-  # Cells are shaded by their own heat rules, not by a chartRenderer.
+  # Cells are shaded by their own heat rules, not by a chartRenderer, so
+  # there is no column to map.
   expect_error(set_color(chart, category), "does not apply to heat")
+  expect_error(set_color(chart), "required for a heat chart")
+
+  # An Esri ramp goes over by name and the client builds the class breaks
+  # itself (serial-chart-data.js:487).
+  named <- s7x::as_vector(set_color(chart, palette = "Heatmap 3")@webchart)
+  expect_identical(named$series[[1]]$heatRulesType, "renderer")
+  expect_identical(
+    named$series[[1]]$classBreaksRules$colorRampInfo$name,
+    "Heatmap 3"
+  )
+  expect_null(named$chartRenderer)
+
+  # Anything else collapses to the two colour gradient the spec allows.
+  ramped <- s7x::as_vector(
+    set_color(chart, palette = c("white", "navy"))@webchart
+  )
+  expect_identical(ramped$series[[1]]$heatRulesType, "gradient")
+  expect_identical(
+    ramped$series[[1]]$gradientRules$colorList,
+    list(c(255, 255, 255, 255), c(0, 0, 128, 255))
+  )
 })
 
 test_that("stat = 'identity' sends a null query to delete the default", {

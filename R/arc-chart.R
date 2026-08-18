@@ -595,12 +595,16 @@ set_flipped <- function(chart, flipped = TRUE) {
 #' continuous gradient and a character or factor column gets one colour per
 #' distinct value.
 #'
+#' Heat charts shade cells by how many rows fall into each, so there is no
+#' column to map. Give them `palette` on its own.
+#'
 #' @param chart Defines which chart to modify.
-#' @param color Defines which column the colours are drawn from.
+#' @param color Defines which column the colours are drawn from. Omitted for
+#'   heat charts.
 #' @param palette default `NULL`. Defines which colours to use, either the
 #'   name of an Esri ramp such as `"Blue 3"` or a vector of R colours. `NULL`
 #'   uses the ramp the ArcGIS SDK itself defaults to.
-#' @return `chart`, with its colour mapping set.
+#' @return `chart`, with its colour set.
 #' @examples
 #' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
 #'
@@ -610,14 +614,31 @@ set_flipped <- function(chart, flipped = TRUE) {
 set_color <- function(chart, color, palette = NULL) {
   check_chart_type_set(chart)
 
-  # Heat cells are shaded by the series' own heat rules, so a chartRenderer
-  # would be ignored rather than applied.
+  # Heat cells are shaded by the series' own heat rules rather than by a
+  # chartRenderer, and the value is the cell count, so there is no column to
+  # map. A ramp name goes over by name and the client generates the class
+  # breaks itself (serial-chart-data.js:487).
   if (identical(chart@chart_type, "heat")) {
+    if (!missing(color)) {
+      cli::cli_abort(
+        c(
+          "{.arg color} does not apply to heat charts.",
+          "i" = "Cells are shaded by how many rows fall into each, so pass
+                 only {.arg palette}."
+        ),
+        call = rlang::caller_env()
+      )
+    }
+    chart@series_opts <- merge_opts(
+      chart@series_opts,
+      heat_color_rules(palette, call = rlang::caller_env())
+    )
+    return(chart)
+  }
+
+  if (missing(color)) {
     cli::cli_abort(
-      c(
-        "{.fn set_color} does not apply to heat charts.",
-        "i" = "Cells are shaded by how many rows fall into each."
-      ),
+      "{.arg color} must name a column.",
       call = rlang::caller_env()
     )
   }
@@ -914,6 +935,44 @@ merge_opts <- function(stored, opts) {
     stored[[nm]] <- opts[[nm]]
   }
   stored
+}
+
+# An Esri ramp travels by name so the client can build the class breaks with
+# its full stop list. Anything else collapses to the two colour gradient the
+# spec allows, first stop to last.
+heat_color_rules <- function(palette, call = rlang::caller_env()) {
+  if (rlang::is_null(palette)) {
+    cli::cli_abort(
+      c(
+        "{.arg palette} is required for a heat chart.",
+        "i" = "Ramps tagged {.val heatmap} suit these best, such as
+               {.val Heatmap 3}."
+      ),
+      call = call
+    )
+  }
+
+  if (rlang::is_string(palette) && palette %in% names(esri_color_ramps)) {
+    return(list(
+      heatRulesType = WebChartHeatChartHeatRulesTypes("renderer"),
+      classBreaksRules = WebChartHeatChartHeatClassBreaks(
+        colorRampInfo = WebChartHeatChartHeatClassBreaksColorRampInfo(
+          name = palette
+        )
+      )
+    ))
+  }
+
+  stops <- palette_stops(palette, call = call)
+  list(
+    heatRulesType = WebChartHeatChartHeatRulesTypes("gradient"),
+    gradientRules = WebChartHeatChartGradient(
+      colorList = list(
+        rgba_color(stops[1, ]),
+        rgba_color(stops[nrow(stops), ])
+      )
+    )
+  )
 }
 
 check_chart_type_is <- function(chart, type, call = rlang::caller_env()) {

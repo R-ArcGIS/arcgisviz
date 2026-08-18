@@ -40,12 +40,26 @@ arc_boxplot(penguins, species, bill_len) |>
 # A grid of cells, shaded by how many rows fall into each pair.
 arc_heat(penguins, species, island)
 
+# --- heat chart: an Esri heatmap ramp --------------------------------------
+# There is no column to map because the value is the cell count, so palette
+# travels on its own. Ramps tagged "heatmap" suit these best.
+arc_heat(penguins, species, island) |>
+  set_color(palette = "Heatmap 3")
+
+# --- heat chart: your own two colours --------------------------------------
+arc_heat(penguins, species, island) |>
+  set_color(palette = c("white", "navy"))
+
 # --- heat chart: labelled --------------------------------------------------
 arc_heat(penguins, species, island) |>
-  set_labs(title = "Penguins by species and island", x = "Species", y = "Island")
+  set_labs(
+    title = "Penguins by species and island",
+    x = "Species",
+    y = "Island"
+  )
 
 # --- everything else still composes ----------------------------------------
 arc_histogram(penguins, body_mass, bins = 12) |>
   set_color(body_mass, palette = "Blue 3") |>
-  set_axis("x", limits = c(2500, 6500)) |>
+  set_axis("x", limits = c(2500, 6500), ) |>
   set_labs(title = "Body mass", x = "Body mass (g)")
