@@ -1,17 +1,15 @@
-default_install_hook_types: [pre-commit, commit-msg]
-
+# Run with prek (https://github.com/j178/prek). Install the hook once with
+#
+#     prek install --hook-type commit-msg
+#
+# The check is git-sv itself, so the accepted types are exactly the ones it
+# reads when working out the next version. To change them, edit
+# `commit-message.types` in `.gitsv/config.yml` and nothing here.
 repos:
-  - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v3.4.0
-    hooks:
-      - id: conventional-pre-commit
-        stages: [commit-msg]
-
   - repo: local
     hooks:
-      - id: just-lint
-        name: just lint
-        entry: just lint
+      - id: conventional-commit
+        name: conventional commit message
+        entry: git-sv validate-commit-message --path . --source message --file
         language: system
-        pass_filenames: false
-        stages: [pre-commit]
+        stages: [commit-msg]

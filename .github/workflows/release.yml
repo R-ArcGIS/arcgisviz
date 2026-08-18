@@ -1,0 +1,54 @@
+# Everything that happens when a version tag lands: sync the DESCRIPTION
+# Version field, and publish the release notes git-sv derives from the
+# commit log.
+#
+# Tag a release with `git sv tag` (or by hand). The tag pattern lives in
+# .gitsv/config.yml.
+name: release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+      - "v*.*.*.*"
+
+jobs:
+  set-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: JosiahParry/updatethis@v1
+
+  release-notes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GIT_SV_VERSION: v3.0.1
+    steps:
+      # git-sv walks the whole commit log, so a shallow clone finds nothing
+      # to write notes from.
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install git-sv
+        run: |
+          mkdir -p "$RUNNER_TEMP/bin"
+          curl -fsSL -o "$RUNNER_TEMP/bin/git-sv" \
+            "https://github.com/thegeeklab/git-sv/releases/download/${GIT_SV_VERSION}/git-sv-linux-amd64"
+          chmod +x "$RUNNER_TEMP/bin/git-sv"
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+
+      - name: Generate release notes
+        run: git sv release-notes --tag "$GITHUB_REF_NAME" --output release-notes.md
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file release-notes.md

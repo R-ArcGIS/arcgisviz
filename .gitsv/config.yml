@@ -1,0 +1,12 @@
+# Overrides layered over git-sv's defaults; `git sv config show` prints the
+# merged result. Everything not named here keeps its default.
+tag:
+  pattern: "v%d.%d.%d"
+
+branches:
+  # Empty so `validate-commit-message` also runs on the default branch, which
+  # is where this repo's commits land. The default skips main/master.
+  skip: []
+  # This repo tracks no JIRA-style issue keys, and leaving it on warns on
+  # every valid commit that it could not find one.
+  disable-issue: true
