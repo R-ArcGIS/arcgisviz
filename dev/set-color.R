@@ -7,12 +7,12 @@ devtools::load_all()
 # --- continuous: a numeric column -----------------------------------------
 # Defaults to "Blue 3", the ramp the ArcGIS SDK itself uses for gradients.
 arc_scatter(penguins, bill_len, bill_dep) |>
-  set_color(body_mass, palette = "Candy Shop")
+  set_color(body_mass, palette = "Prairie Summer")
 
 # --- continuous: a named Esri ramp ----------------------------------------
 # Any of the 521 smart-mapping ramp names works.
 arc_scatter(penguins, bill_len, bill_dep) |>
-  set_color(body_mass, palette = "Candy Shop")
+  set_color(body_mass, palette = "Watermelon Sugar")
 
 # --- continuous: your own colours -----------------------------------------
 # A vector of R colours becomes the ramp; the client interpolates between them.
