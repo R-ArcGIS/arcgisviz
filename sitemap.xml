@@ -1,6 +1,8 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>http://r.esri.com/arcgisviz/404.html</loc></url>
 <url><loc>http://r.esri.com/arcgisviz/CLAUDE.html</loc></url>
+<url><loc>http://r.esri.com/arcgisviz/LICENSE-text.html</loc></url>
+<url><loc>http://r.esri.com/arcgisviz/LICENSE.html</loc></url>
 <url><loc>http://r.esri.com/arcgisviz/authors.html</loc></url>
 <url><loc>http://r.esri.com/arcgisviz/index.html</loc></url>
 <url><loc>http://r.esri.com/arcgisviz/reference/ArcChart.html</loc></url>
