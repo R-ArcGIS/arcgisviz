@@ -2,9 +2,9 @@ url: http://r.esri.com/arcgisviz/
 
 repo:
   url:
-    home: https://github.com/JosiahParry/arcgisviz
-    source: https://github.com/JosiahParry/arcgisviz/blob/main/
-    issue: https://github.com/JosiahParry/arcgisviz/issues/
+    home: https://github.com/R-ArcGIS/arcgisviz
+    source: https://github.com/R-ArcGIS/arcgisviz/blob/main/
+    issue: https://github.com/R-ArcGISarcgisviz/issues/
     user: https://github.com/
 
 template:
