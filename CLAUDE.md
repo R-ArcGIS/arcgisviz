@@ -90,22 +90,32 @@ set_x() |> set_y()`, plus `arc_bar()`/`arc_scatter()`/`arc_line()` sugar,
 tidy-eval bare column names, friendly kebab-case type names) and a data
 -transfer layer (`R/arc-data.R`) that turns a data frame + config into the
 widget payload. That public API now covers mapping (`set_x()`/`set_y()`/
-`set_stat()`), text (`set_labs()`), colour (`set_color()`, see below), and
-scales (`set_axis()`/`set_flipped()`). Six chart types are modeled: bar,
-line, scatter, histogram, box plot, and heat (plus combo bar-line for free).
-Pie, gauge, and radar are not. There is no legend surface yet
-(`WebChart$legend` is modeled but nothing sets it), which colour has made
-worth adding.
+`set_stat()`), text (`set_labs()`), colour and grouping (`set_color()`, see
+below), and scales (`set_axis()`/`set_flipped()`/`set_position()`). Six chart
+types are modeled: bar, line, scatter, histogram, box plot, and heat (plus
+combo bar-line for free). Pie, gauge, and radar are not. There is no legend
+surface yet (`WebChart$legend` is modeled but nothing sets it), which grouped
+charts have made worth adding - they are the first thing here that produces
+more than one series, and each series' `name` is what a legend would show.
 
 Two shapes worth knowing before adding a seventh chart type. `chart_type_map`
-(`R/arc-chart.R`) carries `config_class`, `has_y`, and `aggregates` per type,
-and `build_webchart()` reads them rather than branching on the type name.
+(`R/arc-chart.R`) carries `config_class`, `has_y`, `aggregates`, and
+`tooltip_fields` per type, and `build_webchart()` reads them rather than
+branching on the type name.
 Chart types whose spec defines a `WebChart` subtype get it as a real S7
 subclass (`WebBoxPlot`, `WebHeatChart`), which is how they inherit the
 `as_vector()` method that drops unset properties. And **every axis must carry
 `type = "chartAxis"`**: `deepMerge()` maps over the source array
 (`srcjs/widgets/arcgisChart.js:24`), so an axis that compacts away to nothing
 shortens `axes` and deletes one of the model's own.
+
+Options that belong to one chart type get a `set_<type>()` function
+(`set_histogram()`, `set_boxplot()`) whose arguments are also arguments on the
+`arc_<type>()` shortcut, both documented in one Rd via `@rdname`. Not one
+exported function per property - that contradicts `set_axis()` and doesn't
+scale. They land in `ArcChart@series_opts`/`@config_opts` (already keyed by
+spec property name) and are spliced in by `build_webchart()`; `merge_opts()`
+makes repeated calls layer rather than reset, the same rule as `set_labs()`.
 
 ## Serialization
 
@@ -116,7 +126,7 @@ a generic `S7_object` method in `s7x`.
 **`as_vector()` is the single extension point for the wire format.** It
 recurses through the generic (`as_vector_value()`, `s7x/R/as_vector.R:30`),
 so a method on a nested class fires during the parent's walk. `R/arc-data.R`
-registers three, and `to_json()` inherits all of them for free:
+registers these, and `to_json()` inherits all of them for free:
 
 - `WebChart` - drops unset (NA/NULL) properties via `compact_config()`.
 - the three `WebChart*Series` classes - emit `query: null` when the query is
@@ -124,6 +134,12 @@ registers three, and `to_json()` inherits all of them for free:
 - `Color` - the spec's raw `[r,g,b,a]` tuple, undoing this package's
   deliberate r/g/b/a exception. A partly-specified color returns `NULL` and
   drops out.
+- `WebChartScatterplotSeries` also returns `additionalTooltipFields` as a
+  list. `auto_unbox = TRUE` would send a one-element `class_character` as a
+  bare string, and the client spreads that value into the query's `outFields`
+  (`fu()`, `dist/chunks/index2.js:7857`) - a string spreads to its own
+  characters. **Any spec property typed `string[]` needs this**, whatever
+  the R property's type.
 
 Two mechanics this depends on: `S7::super(x, S7::S7_object)` to reach the
 default method from an override (otherwise infinite recursion), and
@@ -216,9 +232,9 @@ and both branches were established empirically:
   `label`s carry the level names.
 - **Aggregating** - a `uniqueValue` renderer on the grouped column. A derived
   code column can't work here because the query returns only
-  `groupByFieldsForStatistics` plus the statistics. For the same reason,
-  colouring by any column other than `x` while aggregating is an error, not a
-  silent no-op.
+  `groupByFieldsForStatistics` plus the statistics. For the same reason, a
+  *numeric* colour column while aggregating is an error, not a silent no-op -
+  it can only be a gradient, so it can't become a group either.
 
 **Heat charts are the exception**: cells are shaded by the series' own
 `gradientRules`/`classBreaksRules`, not by `chartRenderer`, and the value is
@@ -229,6 +245,53 @@ itself (`serial-chart-data.js:487`, and `generateHeatChartClassBreaks()` at
 `customElement.js:18668`, which runs for heat and nothing else). Any other
 palette collapses to the two-colour `gradientRules$colorList` the spec allows.
 Ramps tagged `heatmap` in `esri_color_ramps` are the ones built for this.
+
+**Colouring by a column other than `x` groups the chart**, on the types that
+support it. Dodging and stacking need *multiple series* - `stackedType` is
+documented as "how the bars/lines should be placed when multiple series are
+rendered" - and the client decides a chart is split purely from the **`where`
+clause on each series' query**, not from the chart type: `ga()`
+(`dist/chunks/index2.js:593`) returns `BarAndLineSplitBy` when `where` is a
+real filter alongside `outStatistics`, and `BarAndLineSplitByNoAggregation`
+when there is no `outStatistics`. So `chart_split()` emits one series per
+level, each with `where = "col='level'"` (single quotes doubled, mirroring
+`normalizeWhereClause()`), a unique `id`, and `name = level` for the legend.
+
+**The `where` clauses never actually run.** Having read them, the client
+builds *one* query grouped by `[x, splitField]` (`os()`, `index2.js:1816`)
+and reshapes that single result, keying each series' values by its own
+statistic output field - which `ns()` (`:1793`) takes verbatim from
+`outStatisticFieldName` when it is set. So every split series needs a
+**distinct** `outStatisticFieldName`, and its `y` must equal it. Sharing one
+name makes all series read the same column and draw identical bars, which
+looks like the filter being ignored. Hence `series_aggregation(suffix =)`:
+`_0` unsplit (the SDK's own convention), `_<level>` per split series.
+
+Only **bar, line, combo, and box plot** have split-by subtypes
+(`utils/misc/interfaces.d.ts:7`); scatter reads `series[0]` and ignores the
+rest. `chart_type_map$splits` gates it, so the other types keep colouring per
+item through `chartRenderer`.
+
+A split series carries its colour on **its own symbol** (`fillSymbol` /
+`lineSymbol`, per `chart_type_map$symbol_property`) and the chart sends no
+`chartRenderer` at all. A `uniqueValue` renderer would also work - the client
+honours one when `renderer.field` equals the split field (`index2.js:1405`) -
+but the symbol path is what `colorMatch = false` documents ("the colors from
+the config, and then from the color ramps will be used"), and it doesn't
+depend on that match holding.
+
+`set_position()` / the `position` argument on `arc_bar()`/`arc_col()`/
+`arc_line()` map ggplot2's `dodge`/`stack`/`fill` onto
+`sideBySide`/`stacked`/`stacked100`. A split chart defaults to `dodge`; an
+unsplit one sends no `stackedType` at all.
+
+A colour mapping is otherwise unreadable on hover, so the coloured-by column
+also goes into `series$additionalTooltipFields`. That property exists **only
+on the scatterplot series** (`web-chart.d.ts:845`) - the shared
+`WebChartSeries` has `dataTooltip*` formatting and nothing that names a field
+- so bar, line, histogram, box, and heat tooltips still show only x and y.
+`tooltipFormatter` would cover them but it's a JS callback on the component,
+not config JSON, so it can't travel from R.
 
 Palettes live in `R/sysdata.rda`, built by `data-raw/color-palettes.R` from
 `@arcgis/core/smartMapping/symbology/support/colors.js`: 521 ramps (name, tags,
@@ -329,6 +392,11 @@ before writing any of it.
   first `devtools::document()` pass can report a stale "could not resolve
   link" warning for a topic documented in the same run; it clears on the
   second pass once the new Rd file is on disk.
+- Two functions sharing one Rd via `@rdname` share a pkgdown topic too, so
+  `_pkgdown.yml` must list exactly one of them or `check_pkgdown()` reports
+  it double-listed. Deleting an exported function also needs its `man/*.Rd`
+  removed by hand - `document()` won't, and `R CMD check` then fails with
+  "listed as exports, but not present in namespace".
 
 ## Standing rule from global config
 

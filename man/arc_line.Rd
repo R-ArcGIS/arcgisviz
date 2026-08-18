@@ -4,12 +4,15 @@
 \alias{arc_line}
 \title{Line chart}
 \usage{
-arc_line(.data, x, y)
+arc_line(.data, x, y, position = NULL)
 }
 \arguments{
 \item{.data}{Defines which data frame the chart draws its fields from.}
 
 \item{x, y}{Defines which columns supply the bar positions and heights.}
+
+\item{position}{default \code{NULL}. Defines how \code{\link[=set_color]{set_color()}} groups are
+placed, one of \code{"dodge"}, \code{"stack"}, or \code{"fill"}. See \code{\link[=set_position]{set_position()}}.}
 }
 \value{
 An \code{ArcChart}.

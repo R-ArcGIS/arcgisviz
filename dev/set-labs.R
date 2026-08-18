@@ -28,14 +28,22 @@ arc_scatter(penguins, bill_len, bill_dep) |>
 # --- NULL removes a label -------------------------------------------------
 # Blanks both axis titles; the tooltip falls back to the field names.
 arc_scatter(penguins, bill_len, bill_dep) |>
-  set_labs(title = "Bill dimensions", x = NULL, y = NULL)
+  set_labs(title = "Bill dimensions", x = NULL, y = NULL) |>
+  set_color(sex, palette = "")
 
 # --- calls accumulate -----------------------------------------------------
-arc_bar(penguins, island) |>
+arc_bar(penguins, island, group = ) |>
   set_labs(x = "Island") |>
-  set_labs(y = "Penguins counted", title = "Penguins per island")
+  set_labs(y = "Penguins counted", title = "Penguins per island") |>
+  set_color(sex)
 
 # --- a title is absent unless set -----------------------------------------
 # Without set_labs() the client would title this "Chart"; we send an explicit
 # null to delete that default.
-arc_bar(penguins, species)
+arc_bar(penguins, island) |>
+  set_color(sex, palette = "Watermelon Sugar")
+
+# library(ggplot2)
+
+# ggplot(penguins, aes(bill_len, bill_dep, color = island)) +
+#   geom_point()

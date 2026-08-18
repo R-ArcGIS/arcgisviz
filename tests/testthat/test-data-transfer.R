@@ -198,20 +198,11 @@ test_that("an aggregating chart colours categories with a uniqueValue renderer",
   )
   expect_identical(infos[[1]]$symbol$color, c(31, 120, 180, 255))
 
-  # Nothing but `x` survives the query, so nothing else can be coloured.
-  grouped <- data.frame(
-    category = c("a", "b"),
-    grp = c("x", "y"),
-    value = c(1, 2)
-  )
+  # A numeric column can only be a gradient, and an aggregating query never
+  # returns it.
   expect_error(
-    (arc_chart(grouped) |>
-      set_type("bar") |>
-      set_x(category) |>
-      set_y(value) |>
-      set_stat("mean") |>
-      set_color(grp))@webchart,
-    "same column as"
+    (arc_bar(test_df(), category) |> set_color(value))@webchart,
+    "grouping column"
   )
 })
 
@@ -541,4 +532,179 @@ test_that("widget_json() unboxes scalars and nulls out NA", {
 
 test_that("rendering a chart without a type or data is an error", {
   expect_error(as_widget(arc_chart(test_df())), "set_type\\(\\)")
+})
+
+test_that("a coloured scatterplot names the column in its tooltip", {
+  cfg <- s7x::as_vector(
+    (arc_scatter(test_df(), category, value) |> set_color(category))@webchart
+  )
+  # An array, not a bare string - the client spreads it into outFields.
+  expect_identical(
+    cfg$series[[1]]$additionalTooltipFields,
+    list("category")
+  )
+
+  plain <- s7x::as_vector(arc_scatter(test_df(), category, value)@webchart)
+  expect_null(plain$series[[1]]$additionalTooltipFields)
+
+  # Only the scatterplot series takes extra tooltip fields.
+  bars <- s7x::as_vector(
+    (arc_col(test_df(), category, value) |> set_color(category))@webchart
+  )
+  expect_null(bars$series[[1]]$additionalTooltipFields)
+})
+
+test_that("colouring by a column other than x splits into one series each", {
+  grouped <- data.frame(
+    category = c("a", "a", "b", "b"),
+    grp = c("x", "y", "x", "y"),
+    value = c(1, 2, 3, 4)
+  )
+  cfg <- s7x::as_vector(
+    (arc_bar(grouped, category) |> set_color(grp))@webchart
+  )
+
+  expect_length(cfg$series, 2)
+  # ga() (index2.js:593) reads the where clause, so the split rides there.
+  expect_identical(
+    vapply(cfg$series, function(s) s$query$where, character(1)),
+    c("grp='x'", "grp='y'")
+  )
+  # `name` is what the legend shows; `id` only has to be unique.
+  expect_identical(
+    vapply(cfg$series, function(s) s$name, character(1)),
+    c("x", "y")
+  )
+  expect_identical(
+    vapply(cfg$series, function(s) s$id, character(1)),
+    c("series1", "series2")
+  )
+
+  # Each series keeps the aggregation, and carries its own colour rather
+  # than leaning on a renderer.
+  expect_identical(
+    as.character(cfg$series[[1]]$query$groupByFieldsForStatistics),
+    "category"
+  )
+  expect_length(cfg$series[[1]]$query$outStatistics, 1)
+  expect_identical(cfg$series[[1]]$fillSymbol$color, c(31, 120, 180, 255))
+  expect_identical(cfg$series[[2]]$fillSymbol$color, c(166, 206, 227, 255))
+  expect_null(cfg$chartRenderer)
+  expect_null(cfg$colorMatch)
+
+  # Dodged unless asked otherwise.
+  expect_identical(cfg$stackedType, "sideBySide")
+  expect_null(
+    s7x::as_vector(arc_bar(grouped, category)@webchart)$stackedType
+  )
+})
+
+test_that("a split chart needs no derived colour column", {
+  grouped <- data.frame(
+    category = c("a", "b"),
+    grp = c("x", "y"),
+    value = c(1, 2)
+  )
+  chart <- arc_col(grouped, category, value) |> set_color(grp)
+  expect_identical(names(chart_data(chart)), names(grouped))
+
+  # No aggregation means no outStatistics, which is what the client keys
+  # BarAndLineSplitByNoAggregation off.
+  cfg <- s7x::as_vector(chart@webchart)
+  expect_identical(cfg$series[[1]]$query$where, "grp='x'")
+  expect_null(cfg$series[[1]]$query$outStatistics)
+})
+
+test_that("position maps ggplot2's vocabulary onto stackedType", {
+  grouped <- data.frame(
+    category = c("a", "b"),
+    grp = c("x", "y")
+  )
+  stacked <- s7x::as_vector(
+    (arc_bar(grouped, category, position = "stack") |> set_color(grp))@webchart
+  )
+  expect_identical(stacked$stackedType, "stacked")
+
+  filled <- s7x::as_vector(
+    (arc_bar(grouped, category) |>
+      set_color(grp) |>
+      set_position("fill"))@webchart
+  )
+  expect_identical(filled$stackedType, "stacked100")
+
+  expect_error(arc_bar(grouped, category, position = "nope"), "position")
+  expect_error(set_position(arc_bar(grouped, category), "nope"), "position")
+})
+
+test_that("a split where clause escapes quotes the way the client parses it", {
+  quoted <- data.frame(
+    category = c("a", "b"),
+    grp = c("O'Hare", "Dulles")
+  )
+  cfg <- s7x::as_vector(
+    (arc_bar(quoted, category) |> set_color(grp))@webchart
+  )
+  expect_identical(
+    vapply(cfg$series, function(s) s$query$where, character(1)),
+    c("grp='Dulles'", "grp='O''Hare'")
+  )
+})
+
+test_that("only bar and line split; other types keep colouring per item", {
+  grouped <- data.frame(
+    category = c("a", "b"),
+    grp = c("x", "y"),
+    value = c(1, 2)
+  )
+  cfg <- s7x::as_vector(
+    (arc_scatter(grouped, value, value) |> set_color(grp))@webchart
+  )
+  expect_length(cfg$series, 1)
+  expect_identical(cfg$chartRenderer$type, "simple")
+
+  # A continuous colour is a scale, not a group, so it never splits.
+  numeric <- s7x::as_vector(
+    (arc_col(grouped, category, value) |> set_color(value))@webchart
+  )
+  expect_length(numeric$series, 1)
+})
+
+test_that("each split series names its statistic after its own level", {
+  # The client folds every series into one query and reshapes the result
+  # keyed by outStatisticFieldName (ns(), index2.js:1793), so a shared name
+  # makes every series read the same column and draw identical bars.
+  grouped <- data.frame(
+    category = c("a", "a", "b", "b"),
+    grp = c("x", "y", "x", "y"),
+    value = c(1, 2, 3, 4)
+  )
+
+  counted <- s7x::as_vector(
+    (arc_bar(grouped, category) |> set_color(grp))@webchart
+  )
+  out <- vapply(
+    counted$series,
+    function(s) s$query$outStatistics[[1]]$outStatisticFieldName,
+    character(1)
+  )
+  expect_identical(out, c("COUNT_OBJECT_ID_x", "COUNT_OBJECT_ID_y"))
+  # The series reads the reshaped data by `y`, so the two have to agree.
+  expect_identical(vapply(counted$series, function(s) s$y, character(1)), out)
+
+  averaged <- s7x::as_vector(
+    (arc_chart(grouped) |>
+      set_type("bar") |>
+      set_x(category) |>
+      set_y(value) |>
+      set_stat("mean") |>
+      set_color(grp))@webchart
+  )
+  expect_identical(
+    vapply(averaged$series, function(s) s$y, character(1)),
+    c("AVG_VALUE_x", "AVG_VALUE_y")
+  )
+
+  # An unsplit chart keeps the SDK's own `_0` convention.
+  plain <- s7x::as_vector(arc_bar(grouped, category)@webchart)
+  expect_identical(plain$series[[1]]$y, "COUNT_OBJECT_ID_0")
 })

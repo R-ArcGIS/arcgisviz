@@ -14,6 +14,7 @@ ArcChart(
   color = list(),
   axes = list(),
   flipped = NA,
+  position = NA_character_,
   series_opts = list(),
   config_opts = list()
 )

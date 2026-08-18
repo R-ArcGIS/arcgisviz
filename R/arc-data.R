@@ -103,7 +103,18 @@ series_as_vector <- function(x, ...) {
 
 S7::method(as_vector, WebChartBarChartSeries) <- series_as_vector
 S7::method(as_vector, WebChartLineChartSeries) <- series_as_vector
-S7::method(as_vector, WebChartScatterplotSeries) <- series_as_vector
+
+# `additionalTooltipFields` is `string[]`, and the client both iterates it
+# and spreads it into the query's outFields (fu(), index2.js:7857) - a bare
+# string would spread to its own characters. A list keeps it an array.
+S7::method(as_vector, WebChartScatterplotSeries) <- function(x, ...) {
+  out <- series_as_vector(x, ...)
+  out$additionalTooltipFields <- as.list(x@additionalTooltipFields)
+  if (rlang::is_empty(out$additionalTooltipFields)) {
+    out$additionalTooltipFields <- NULL
+  }
+  out
+}
 
 # (3) The spec wants a raw [r,g,b,a] tuple; we store r/g/b/a scalars. A
 # partly-specified color isn't one, so it drops out as unset.

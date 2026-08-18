@@ -40,6 +40,7 @@ ArcChart <- new_class(
     color = class_list,
     axes = class_list,
     flipped = s7x::class_boolean,
+    position = s7x::class_string,
     series_opts = class_list,
     config_opts = class_list,
     webchart = S7::new_property(getter = function(self) build_webchart(self))
@@ -51,7 +52,10 @@ ArcChart <- new_class(
 # discriminator), series_class (which WebChart*Series S7 class to build),
 # config_class (WebChart, or the subtype the spec gives this chart type),
 # aggregates (whether the series honours `stat` at all), has_y (whether the
-# series takes a y field), axis_defaults (axis properties every chart of this
+# series takes a y field), tooltip_fields (whether the series can name extra
+# fields for its tooltip), splits (whether the client understands one series
+# per group - see chart_split()), symbol_property (where a split series
+# carries its own colour), axis_defaults (axis properties every chart of this
 # type needs), symbol_* (the symbol a chartRenderer carries for this chart
 # type - see color_renderer())}
 chart_type_map <- list(
@@ -62,6 +66,8 @@ chart_type_map <- list(
     config_class = WebChart,
     aggregates = TRUE,
     has_y = TRUE,
+    splits = TRUE,
+    symbol_property = "fillSymbol",
     symbol_class = ISimpleFillSymbol,
     symbol_type = "esriSFS",
     symbol_style = SimpleFillSymbolStyle("esriSFSSolid")
@@ -73,6 +79,7 @@ chart_type_map <- list(
     config_class = WebChart,
     aggregates = FALSE,
     has_y = TRUE,
+    tooltip_fields = TRUE,
     symbol_class = ISimpleMarkerSymbol,
     symbol_type = "esriSMS",
     symbol_style = SimpleMarkerSymbolStyle("esriSMSCircle")
@@ -84,6 +91,8 @@ chart_type_map <- list(
     config_class = WebChart,
     aggregates = TRUE,
     has_y = TRUE,
+    splits = TRUE,
+    symbol_property = "lineSymbol",
     symbol_class = ISimpleLineSymbol,
     symbol_type = "esriSLS",
     symbol_style = SimpleLineSymbolStyle("esriSLSSolid")
@@ -140,6 +149,15 @@ stat_map <- c(
   max = "max",
   sd = "stddev",
   var = "var"
+)
+
+# ggplot2's position adjustments -> WebChart$stackedType. Only meaningful
+# once a chart has more than one series, which is what set_color() on a
+# column other than `x` produces (see chart_split()).
+position_map <- c(
+  dodge = "sideBySide",
+  stack = "stacked",
+  fill = "stacked100"
 )
 
 #' Start a chart
@@ -273,7 +291,12 @@ set_stat <- function(chart, stat) {
 # The series' `y` has to name the aggregate's output field, not the source
 # column - the query engine returns the former. Naming follows the SDK's own
 # `${statisticType}_${field}_0` convention (dist/chunks/index.js, $e()).
-series_aggregation <- function(chart, stat, call = rlang::caller_env()) {
+series_aggregation <- function(
+  chart,
+  stat,
+  suffix = "0",
+  call = rlang::caller_env()
+) {
   if (identical(stat, "count")) {
     on_field <- oid_field
   } else {
@@ -288,7 +311,12 @@ series_aggregation <- function(chart, stat, call = rlang::caller_env()) {
     }
     on_field <- chart@y
   }
-  out_field <- toupper(sprintf("%s_%s_0", stat_map[[stat]], on_field))
+  # The suffix is only a key, never SQL, so a level name goes in verbatim.
+  out_field <- paste0(
+    toupper(sprintf("%s_%s", stat_map[[stat]], on_field)),
+    "_",
+    suffix
+  )
 
   list(
     y = out_field,
@@ -589,11 +617,57 @@ set_flipped <- function(chart, flipped = TRUE) {
   chart
 }
 
+#' Arrange grouped bars and lines
+#'
+#' Places the groups that [set_color()] creates beside each other, on top of
+#' each other, or stretched to fill the axis. A chart with a single group has
+#' nothing to arrange, so this does nothing until a colour column other than
+#' `x` splits it.
+#'
+#' @param chart Defines which chart to modify.
+#' @param position default `"dodge"`. Defines how the groups are placed, one
+#'   of `"dodge"`, `"stack"`, or `"fill"`.
+#' @return `chart`, with its position adjustment set.
+#' @examples
+#' df <- data.frame(
+#'   species = c("a", "a", "b"),
+#'   island = c("x", "y", "x")
+#' )
+#'
+#' arc_bar(df, species) |>
+#'   set_color(island) |>
+#'   set_position("stack")
+#' @export
+set_position <- function(chart, position = "dodge") {
+  chart@position <- rlang::arg_match0(position, names(position_map))
+  chart
+}
+
+# The `position` argument the arc_*() shortcuts share. NULL leaves the
+# default alone; anything else routes through set_position()'s validation.
+chart_positioned <- function(chart, position, call = rlang::caller_env()) {
+  if (rlang::is_null(position)) {
+    return(chart)
+  }
+  chart@position <- rlang::arg_match0(
+    position,
+    names(position_map),
+    arg_nm = "position",
+    error_call = call
+  )
+  chart
+}
+
 #' Map a column to colour
 #'
 #' Colours each mark by the value of a column. A numeric column becomes a
 #' continuous gradient and a character or factor column gets one colour per
 #' distinct value.
+#'
+#' On a bar or line chart, colouring by a column other than `x` also groups
+#' the chart: it gains one series per distinct value, dodged side by side.
+#' Use [set_position()] to stack them instead. Numeric columns are always a
+#' gradient and never a group, the same rule as ggplot2.
 #'
 #' Heat charts shade cells by how many rows fall into each, so there is no
 #' column to map. Give them `palette` on its own.
@@ -738,6 +812,85 @@ chart_aggregates <- function(chart) {
   isTRUE(spec$aggregates) && stat != "identity"
 }
 
+# Colouring by a column other than `x` splits the chart into one series per
+# level, each filtered by its own `where`. That is the only shape the client
+# will dodge or stack - ga() (dist/chunks/index2.js:593) reads the where
+# clause, not the chart type. Continuous colour stays a scale, as in ggplot2.
+chart_split <- function(chart, spec) {
+  color <- chart@color
+  if (
+    rlang::is_empty(color) ||
+      !isTRUE(spec$splits) ||
+      identical(color$field, chart@x)
+  ) {
+    return(NULL)
+  }
+
+  values <- chart@data[[color$field]]
+  if (is.numeric(values)) {
+    return(NULL)
+  }
+  list(field = color$field, levels = color_levels(values))
+}
+
+# Groups sit side by side unless asked otherwise. An unsplit chart has one
+# series and nothing to arrange, so it sends nothing at all.
+chart_position <- function(chart, split) {
+  position <- if (!is.na(chart@position)) {
+    chart@position
+  } else if (!rlang::is_null(split)) {
+    "dodge"
+  } else {
+    return(WebChartStackedKinds())
+  }
+  WebChartStackedKinds(position_map[[position]])
+}
+
+# Mirrors normalizeWhereClause(): single quotes double. getSplitByField()
+# parses the field back out of this, so the `=` form is required.
+split_where <- function(field, level) {
+  sprintf("%s='%s'", field, gsub("'", "''", level, fixed = TRUE))
+}
+
+split_query <- function(query, field, level) {
+  where <- split_where(field, level)
+  if (rlang::is_null(query)) {
+    return(WebChartSeriesQuery(where = where))
+  }
+  query@where <- where
+  query
+}
+
+# Each group carries its colour on its own symbol rather than through a
+# chartRenderer: with colorMatch off the client takes the symbol straight
+# from the config (web-chart.d.ts:1313), so nothing rides on a renderer
+# field matching the split. `name` is what the legend shows.
+split_series <- function(series, split, chart, spec, stat, aggregating) {
+  colors <- discrete_colors(chart@color$stops, length(split$levels))
+  unname(Map(
+    function(level, color, i) {
+      # The where clauses never run: the client folds every series into one
+      # query grouped by x and the split field (os(), index2.js:1816), then
+      # reshapes the result keyed by each series' outStatisticFieldName
+      # (ns(), :1793). Sharing that name makes every series read the same
+      # column, so the statistic has to be named per level.
+      if (aggregating) {
+        agg <- series_aggregation(chart, stat, suffix = level)
+        series$y <- agg$y
+        series$query <- agg$query
+      }
+      series$id <- sprintf("series%d", i)
+      series$name <- level
+      series$query <- split_query(series$query, split$field, level)
+      series[[spec$symbol_property]] <- renderer_symbol(spec, color)
+      rlang::exec(spec$series_class, !!!series)
+    },
+    split$levels,
+    colors,
+    seq_along(split$levels)
+  ))
+}
+
 # Under aggregation the query returns only the group-by field and the
 # statistics, so a derived code column never comes back - but the grouped
 # column itself does, and uniqueValue resolves against it (index2.js:1436).
@@ -827,6 +980,20 @@ color_renderer <- function(chart, spec, call = rlang::caller_env()) {
 
   values <- chart@data[[color$field]]
   if (is.numeric(values)) {
+    # A continuous scale can't split, so an aggregating query would leave the
+    # column behind entirely.
+    if (chart_aggregates(chart) && !identical(color$field, chart@x)) {
+      cli::cli_abort(
+        c(
+          "{.arg color} must be a grouping column when the chart aggregates.",
+          "x" = "{.field {color$field}} is numeric, so it becomes a gradient
+                 rather than a group.",
+          "i" = "An aggregating query only returns {.field {chart@x}} and the
+                 statistic, so no other column reaches the chart."
+        ),
+        call = call
+      )
+    }
     return(continuous_renderer(color$field, values, color$stops, spec, call))
   }
   discrete_renderer(color$field, values, color$stops, spec, call, chart)
@@ -844,7 +1011,8 @@ chart_data <- function(chart) {
   }
 
   values <- chart@data[[color$field]]
-  if (is.numeric(values) || chart_aggregates(chart)) {
+  split <- chart_split(chart, chart_type_map[[chart@chart_type]])
+  if (is.numeric(values) || chart_aggregates(chart) || !rlang::is_null(split)) {
     return(chart@data)
   }
 
@@ -882,7 +1050,9 @@ build_webchart <- function(chart) {
   labs <- chart@labs
   axis_lab <- function(lab, mapped) if (rlang::is_null(lab)) mapped else lab
 
-  renderer <- color_renderer(chart, spec)
+  # A split chart colours its series directly, so it needs no renderer.
+  split <- chart_split(chart, spec)
+  renderer <- if (rlang::is_null(split)) color_renderer(chart, spec)
 
   series <- list(
     type = spec$series_type,
@@ -899,8 +1069,21 @@ build_webchart <- function(chart) {
   if (isTRUE(spec$aggregates)) {
     series$query <- agg$query
   }
+  # A colour mapping is otherwise invisible on hover: the tooltip names x and
+  # y and nothing else. Only the scatterplot series takes extra fields
+  # (web-chart.d.ts:845), and they land in the query's outFields too
+  # (fu(), dist/chunks/index2.js:7857).
+  if (isTRUE(spec$tooltip_fields) && !rlang::is_empty(chart@color)) {
+    series$additionalTooltipFields <- chart@color$field
+  }
   # Chart-type options, already keyed by spec property name.
   series <- c(series, chart@series_opts)
+
+  series_list <- if (rlang::is_null(split)) {
+    list(rlang::exec(spec$series_class, !!!series))
+  } else {
+    split_series(series, split, chart, spec, stat, aggregating)
+  }
 
   config <- list(
     version = "25.1.0",
@@ -911,6 +1094,7 @@ build_webchart <- function(chart) {
     chartRenderer = renderer,
     colorMatch = if (rlang::is_null(renderer)) NA else TRUE,
     rotated = chart@flipped,
+    stackedType = chart_position(chart, split),
     axes = list(
       chart_axis(
         axis_lab(labs$x, chart@x),
@@ -921,7 +1105,7 @@ build_webchart <- function(chart) {
         c(spec$axis_defaults, chart@axes$y)
       )
     ),
-    series = list(rlang::exec(spec$series_class, !!!series))
+    series = series_list
   )
 
   rlang::exec(spec$config_class, !!!c(config, chart@config_opts))
@@ -1027,14 +1211,20 @@ check_bins <- function(bins, call = rlang::caller_env()) {
 #'
 #' @inheritParams arc_chart
 #' @param x Defines which column the bars are grouped by.
+#' @param position default `NULL`. Defines how [set_color()] groups are
+#'   placed, one of `"dodge"`, `"stack"`, or `"fill"`. See [set_position()].
 #' @return An `ArcChart`.
 #' @examples
 #' df <- data.frame(species = c("a", "a", "b"), mass = c(1, 5, 3))
 #'
 #' arc_bar(df, species)
 #' @export
-arc_bar <- function(.data, x) {
-  arc_chart(.data) |> set_type("bar") |> set_x({{ x }}) |> set_stat("count")
+arc_bar <- function(.data, x, position = NULL) {
+  chart <- arc_chart(.data) |>
+    set_type("bar") |>
+    set_x({{ x }}) |>
+    set_stat("count")
+  chart_positioned(chart, position)
 }
 
 #' Column chart
@@ -1042,6 +1232,7 @@ arc_bar <- function(.data, x) {
 #' Plots `y` verbatim, one bar per row. Use [arc_bar()] to count rows instead.
 #'
 #' @inheritParams arc_chart
+#' @inheritParams arc_bar
 #' @param x,y Defines which columns supply the bar positions and heights.
 #' @return An `ArcChart`.
 #' @examples
@@ -1049,8 +1240,12 @@ arc_bar <- function(.data, x) {
 #'
 #' arc_col(df, species, mass)
 #' @export
-arc_col <- function(.data, x, y) {
-  arc_chart(.data) |> set_type("bar") |> set_x({{ x }}) |> set_y({{ y }})
+arc_col <- function(.data, x, y, position = NULL) {
+  chart <- arc_chart(.data) |>
+    set_type("bar") |>
+    set_x({{ x }}) |>
+    set_y({{ y }})
+  chart_positioned(chart, position)
 }
 
 #' Scatterplot
@@ -1192,6 +1387,10 @@ arc_heat <- function(.data, x, y) {
 #'
 #' arc_line(df, year, mass)
 #' @export
-arc_line <- function(.data, x, y) {
-  arc_chart(.data) |> set_type("line") |> set_x({{ x }}) |> set_y({{ y }})
+arc_line <- function(.data, x, y, position = NULL) {
+  chart <- arc_chart(.data) |>
+    set_type("line") |>
+    set_x({{ x }}) |>
+    set_y({{ y }})
+  chart_positioned(chart, position)
 }

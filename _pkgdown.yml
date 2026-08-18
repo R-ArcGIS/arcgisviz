@@ -57,6 +57,7 @@ reference:
     contents:
       - set_axis
       - set_flipped
+      - set_position
 
   - title: Rendering
     desc: Turn a chart into an htmlwidget, in a document or in Shiny.

@@ -4,12 +4,15 @@
 \alias{arc_bar}
 \title{Bar chart}
 \usage{
-arc_bar(.data, x)
+arc_bar(.data, x, position = NULL)
 }
 \arguments{
 \item{.data}{Defines which data frame the chart draws its fields from.}
 
 \item{x}{Defines which column the bars are grouped by.}
+
+\item{position}{default \code{NULL}. Defines how \code{\link[=set_color]{set_color()}} groups are
+placed, one of \code{"dodge"}, \code{"stack"}, or \code{"fill"}. See \code{\link[=set_position]{set_position()}}.}
 }
 \value{
 An \code{ArcChart}.

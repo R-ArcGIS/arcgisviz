@@ -17,18 +17,21 @@ arc_scatter(penguins, bill_len, bill_dep) |>
 # --- continuous: your own colours -----------------------------------------
 # A vector of R colours becomes the ramp; the client interpolates between them.
 arc_scatter(penguins, bill_len, bill_dep) |>
-  set_color(body_mass, palette = c("white", "#4682B4", "navy"))
+  set_color(body_mass, palette = c("white", "#f52424", "navy"))
 
 # --- discrete: a factor column --------------------------------------------
 # Defaults to the SDK's own series palette, cycled.
-arc_scatter(penguins, bill_len, bill_dep) |>
-  set_color(species, palette = "Candy Shop")
+arc_scatter(penguins, bill_len, flipper_len) |>
+  set_color(species, palette = "Watercolor Surprise")
 
 # --- discrete: colours pulled from a ramp ---------------------------------
 arc_bar(penguins, island) |>
-  set_color(island, palette = "Purple 1")
+  set_color(island, palette = "Purple 1") |>
+  set_flipped()
 
 # --- colour composes with everything else ---------------------------------
+library(arcgisviz)
+
 arc_chart(penguins) |>
   set_type("bar") |>
   set_x(species) |>
@@ -41,3 +44,9 @@ arc_chart(penguins) |>
     x = "Species",
     y = "Mean body mass (g)"
   )
+
+# --- hover to see the colour's value --------------------------------------
+# A scatterplot tooltip names x and y. The coloured-by column joins them, so
+# a mapping you can see is a value you can read.
+arc_scatter(penguins, bill_len, bill_dep) |>
+  set_color(species)

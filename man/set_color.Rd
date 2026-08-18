@@ -25,6 +25,11 @@ continuous gradient and a character or factor column gets one colour per
 distinct value.
 }
 \details{
+On a bar or line chart, colouring by a column other than \code{x} also groups
+the chart: it gains one series per distinct value, dodged side by side.
+Use \code{\link[=set_position]{set_position()}} to stack them instead. Numeric columns are always a
+gradient and never a group, the same rule as ggplot2.
+
 Heat charts shade cells by how many rows fall into each, so there is no
 column to map. Give them \code{palette} on its own.
 }
