@@ -340,6 +340,19 @@ colours, parsed by
 [`grDevices::col2rgb()`](https://rdrr.io/r/grDevices/col2rgb.html) in
 `R/color.R`.
 
+`R/palettes.R` turns that catalogue into the user-facing
+[`esri_palettes()`](http://r.esri.com/arcgisviz/reference/esri_palettes.md),
+one row per ramp, filterable by `type`/`color_mode`/`hue`/`tag`. Two
+facts about the tag vocabulary hold across all 521 and are what let
+those be scalar columns rather than list ones: every ramp carries
+**exactly one** of `light`/`dark`, and **at most one** of
+`sequential`/`diverging`/`categorical` (118 carry none - the
+`centered-on`, `extremes`, and `heatmap` families).
+[`palette_tags()`](http://r.esri.com/arcgisviz/reference/palette_tags.md)
+is the full vocabulary. It builds the frame with
+[`arcgisutils::data_frame()`](https://rdrr.io/pkg/arcgisutils/man/utilities.html),
+which adds a `tbl` class for printing without pulling in tibble.
+
 ## Deliberately deferred (don’t “fix” these without asking)
 
 - **Live FeatureLayer / non-featureCollection layer types.**

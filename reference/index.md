@@ -57,6 +57,18 @@ How the axes are scaled and which way the chart is drawn.
 - [`set_position()`](http://r.esri.com/arcgisviz/reference/set_position.md)
   : Arrange grouped bars and lines
 
+## Palettes
+
+Every colour ramp
+[`set_color()`](http://r.esri.com/arcgisviz/reference/set_color.md)
+accepts by name, searchable by the tags the ArcGIS SDK ships alongside
+them.
+
+- [`esri_palettes()`](http://r.esri.com/arcgisviz/reference/esri_palettes.md)
+  : Browse the Esri colour ramps
+- [`palette_tags()`](http://r.esri.com/arcgisviz/reference/palette_tags.md)
+  : The tags the Esri ramps are labelled with
+
 ## Rendering
 
 Turn a chart into an htmlwidget, in a document or in Shiny.
