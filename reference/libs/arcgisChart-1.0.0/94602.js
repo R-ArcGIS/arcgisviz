@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[94602],{94602(e,c,s){s.r(c);var a=s(80937);const r=["#2888B8","#EB7028","#48A375","#9370B1","#e55035","#3d9ccc","#DC7B04","#b87bb0","#3fa681","#EE6386"].map(e=>(0,a.yW)(e));s.d(c,["esriChartColorSet",0,r])}}]);

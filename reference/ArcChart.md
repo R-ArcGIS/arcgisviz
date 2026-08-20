@@ -15,6 +15,8 @@ ArcChart(
   stat = NA_character_,
   labs = list(),
   color = list(),
+  size = list(),
+  tooltip = character(0),
   axes = list(),
   flipped = NA,
   position = NA_character_,

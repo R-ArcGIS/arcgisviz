@@ -148,10 +148,24 @@
 
         <dt>
 
+          <code><a href="set_size.html">set_size()</a></code>
+
+        </dt>
+        <dd>Map a column to marker size</dd>
+
+        <dt>
+
           <code><a href="set_labs.html">set_labs()</a></code>
 
         </dt>
         <dd>Set a chart's labels</dd>
+
+        <dt>
+
+          <code><a href="set_tooltip.html">set_tooltip()</a></code>
+
+        </dt>
+        <dd>Add columns to a chart's tooltip</dd>
       </dl></div><div class="section level2">
       <h2 id="scales-and-orientation">Scales and orientation<a class="anchor" aria-label="anchor" href="#scales-and-orientation"></a></h2>
 
@@ -182,6 +196,57 @@
 
         </dt>
         <dd>Arrange grouped bars and lines</dd>
+      </dl></div><div class="section level2">
+      <h2 id="maps">Maps<a class="anchor" aria-label="anchor" href="#maps"></a></h2>
+
+      <div class="section-desc"><p>Draw an <code>sf</code> object as a client side feature layer. The data travels as a feature collection, so no feature service is involved.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="arc_map.html">arc_map()</a></code>
+
+        </dt>
+        <dd>Start a map</dd>
+
+        <dt>
+
+          <code><a href="add_layer.html">add_layer()</a></code>
+
+        </dt>
+        <dd>Add a layer to a map</dd>
+
+        <dt>
+
+          <code><a href="set_basemap.html">set_basemap()</a></code>
+
+        </dt>
+        <dd>Set the basemap</dd>
+
+        <dt>
+
+          <code><a href="set_view.html">set_view()</a></code>
+
+        </dt>
+        <dd>Set the initial view</dd>
+
+        <dt>
+
+          <code><a href="ArcMap.html">ArcMap</a></code>
+
+        </dt>
+        <dd>A map</dd>
+
+        <dt>
+
+          <code><a href="MapLayer.html">MapLayer</a></code>
+
+        </dt>
+        <dd>A layer on a map</dd>
       </dl></div><div class="section level2">
       <h2 id="palettes">Palettes<a class="anchor" aria-label="anchor" href="#palettes"></a></h2>
 
@@ -220,14 +285,21 @@
           <code><a href="as_widget.html">as_widget()</a></code>
 
         </dt>
-        <dd>Convert a chart to an htmlwidget</dd>
+        <dd>Convert a chart or map to an htmlwidget</dd>
 
         <dt>
 
-          <code><a href="as_chart_layer.html">as_chart_layer()</a></code>
+          <code><a href="as_feature_layer.html">as_feature_layer()</a></code>
 
         </dt>
         <dd>Build a feature layer from a data frame</dd>
+
+        <dt>
+
+          <code><a href="IFeatureLayer.html">IFeatureLayer</a></code>
+
+        </dt>
+        <dd>IFeatureLayer</dd>
 
         <dt>
 
@@ -242,6 +314,71 @@
 
         </dt>
         <dd>Shiny bindings for arcgis_chart</dd>
+
+        <dt>
+
+          <code><a href="arcgis_map.html">arcgis_map()</a></code>
+
+        </dt>
+        <dd>Render an ArcGIS map</dd>
+
+        <dt>
+
+          <code><a href="arcgisMapOutput.html">arcgisMapOutput()</a></code> <code><a href="arcgisMapOutput.html">renderArcgisMap()</a></code>
+
+        </dt>
+        <dd>Shiny bindings for arcgis_map</dd>
+      </dl></div><div class="section level2">
+      <h2 id="shiny">Shiny<a class="anchor" aria-label="anchor" href="#shiny"></a></h2>
+
+      <div class="section-desc"><p>Update a chart that is already on screen without resending its data, and read back what the reader did to it.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="ArcProxy.html">ArcProxy()</a></code> <code><a href="ArcProxy.html">arc_proxy()</a></code>
+
+        </dt>
+        <dd>Update a rendered chart from the Shiny server</dd>
+
+        <dt>
+
+          <code><a href="arc_update.html">arc_update()</a></code>
+
+        </dt>
+        <dd>Send a proxy's changes to the browser</dd>
+
+        <dt>
+
+          <code><a href="set_filter.html">set_filter()</a></code>
+
+        </dt>
+        <dd>Filter a rendered chart in the browser</dd>
+
+        <dt>
+
+          <code><a href="set_selection.html">set_selection()</a></code>
+
+        </dt>
+        <dd>Select marks on a rendered chart</dd>
+
+        <dt>
+
+          <code><a href="set_legend.html">set_legend()</a></code>
+
+        </dt>
+        <dd>Control a rendered chart's legend</dd>
+
+        <dt>
+
+          <code><a href="arc_refresh.html">arc_refresh()</a></code> <code><a href="arc_refresh.html">arc_reset_zoom()</a></code> <code><a href="arc_refresh.html">arc_clear_selection()</a></code> <code><a href="arc_refresh.html">arc_export_image()</a></code> <code><a href="arc_refresh.html">arc_export_csv()</a></code> <code><a href="arc_refresh.html">arc_notify()</a></code>
+
+        </dt>
+        <dd>Invoke a rendered chart's own methods</dd>
       </dl></div><div class="section level2">
       <h2 id="chart-configuration">Chart configuration<a class="anchor" aria-label="anchor" href="#chart-configuration"></a></h2>
 
@@ -708,6 +845,20 @@
 
         </dt>
         <dd>ModelTypes</dd>
+
+        <dt>
+
+          <code><a href="IFeatureLayerFeatureCollectionType.html">IFeatureLayerFeatureCollectionType()</a></code>
+
+        </dt>
+        <dd>IFeatureLayerFeatureCollectionType</dd>
+
+        <dt>
+
+          <code><a href="Basemaps.html">Basemaps()</a></code>
+
+        </dt>
+        <dd>Basemaps</dd>
 
         <dt>
 

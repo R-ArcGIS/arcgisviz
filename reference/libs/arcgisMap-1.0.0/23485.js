@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[23485],{23485(e,o,u){u.r(o),u.d(o,["default",0,{"Zoom Out":"Отдалечаване","From %1 to %2":"От %1 до %2","From %1":"От %1","To %1":"До %1"}])}}]);

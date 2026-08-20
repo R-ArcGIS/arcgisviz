@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[80435],{80435(e,s,r){r.r(s),r.d(s,{default:()=>d});var t=r(31635),a=r(69636),l=r(72939),c=r(76084);class n extends c.A{constructor(){super(...arguments),this.layer=null}}let u=class extends((0,l.C)(n)){};u=(0,t.Cg)([(0,a.$K)("esri.views.2d.layers.OrientedImageryLayerView2D")],u);const d=u}}]);

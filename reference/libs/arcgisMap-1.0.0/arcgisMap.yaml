@@ -1,0 +1,6 @@
+dependencies:
+  - name: arcgisMap
+    version: 1.0.0
+    src: htmlwidgets
+    script: arcgisMap.js
+    stylesheet: arcgisMap.css

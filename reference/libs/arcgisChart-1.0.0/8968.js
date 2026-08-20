@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[8968],{8968(e,s,l){l.r(s),l.d(s,{default:()=>d});var r=l(31635),a=l(69636),t=l(72939),u=l(76084);class c extends u.A{constructor(){super(...arguments),this.layer=null}}let n=class extends((0,t.C)(c)){};n=(0,r.Cg)([(0,a.$K)("esri.views.2d.layers.KnowledgeGraphSublayerView2D")],n);const d=n}}]);

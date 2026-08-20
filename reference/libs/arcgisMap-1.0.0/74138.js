@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[74138],{74138(e,s,l){l.r(s),l.d(s,{default:()=>d});var r=l(31635),t=l(69636),a=l(72939),c=l(76084);class u extends c.A{constructor(){super(...arguments),this.layer=null}}let n=class extends((0,a.C)(u)){};n=(0,r.Cg)([(0,t.$K)("esri.views.2d.layers.WFSLayerView2D")],n);const d=n}}]);

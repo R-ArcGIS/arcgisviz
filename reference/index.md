@@ -43,8 +43,12 @@ Bind columns and text to a chart.
   Set a chart's statistical transformation
 - [`set_color()`](http://r.esri.com/arcgisviz/reference/set_color.md) :
   Map a column to colour
+- [`set_size()`](http://r.esri.com/arcgisviz/reference/set_size.md) :
+  Map a column to marker size
 - [`set_labs()`](http://r.esri.com/arcgisviz/reference/set_labs.md) :
   Set a chart's labels
+- [`set_tooltip()`](http://r.esri.com/arcgisviz/reference/set_tooltip.md)
+  : Add columns to a chart's tooltip
 
 ## Scales and orientation
 
@@ -56,6 +60,23 @@ How the axes are scaled and which way the chart is drawn.
   : Swap a chart's axes
 - [`set_position()`](http://r.esri.com/arcgisviz/reference/set_position.md)
   : Arrange grouped bars and lines
+
+## Maps
+
+Draw an `sf` object as a client side feature layer. The data travels as
+a feature collection, so no feature service is involved.
+
+- [`arc_map()`](http://r.esri.com/arcgisviz/reference/arc_map.md) :
+  Start a map
+- [`add_layer()`](http://r.esri.com/arcgisviz/reference/add_layer.md) :
+  Add a layer to a map
+- [`set_basemap()`](http://r.esri.com/arcgisviz/reference/set_basemap.md)
+  : Set the basemap
+- [`set_view()`](http://r.esri.com/arcgisviz/reference/set_view.md) :
+  Set the initial view
+- [`ArcMap`](http://r.esri.com/arcgisviz/reference/ArcMap.md) : A map
+- [`MapLayer`](http://r.esri.com/arcgisviz/reference/MapLayer.md) : A
+  layer on a map
 
 ## Palettes
 
@@ -74,14 +95,45 @@ them.
 Turn a chart into an htmlwidget, in a document or in Shiny.
 
 - [`as_widget()`](http://r.esri.com/arcgisviz/reference/as_widget.md) :
-  Convert a chart to an htmlwidget
-- [`as_chart_layer()`](http://r.esri.com/arcgisviz/reference/as_chart_layer.md)
+  Convert a chart or map to an htmlwidget
+- [`as_feature_layer()`](http://r.esri.com/arcgisviz/reference/as_feature_layer.md)
   : Build a feature layer from a data frame
+- [`IFeatureLayer`](http://r.esri.com/arcgisviz/reference/IFeatureLayer.md)
+  : IFeatureLayer
 - [`arcgis_chart()`](http://r.esri.com/arcgisviz/reference/arcgis_chart.md)
   : Render an ArcGIS chart
 - [`arcgisChartOutput()`](http://r.esri.com/arcgisviz/reference/arcgisChartOutput.md)
   [`renderArcgisChart()`](http://r.esri.com/arcgisviz/reference/arcgisChartOutput.md)
   : Shiny bindings for arcgis_chart
+- [`arcgis_map()`](http://r.esri.com/arcgisviz/reference/arcgis_map.md)
+  : Render an ArcGIS map
+- [`arcgisMapOutput()`](http://r.esri.com/arcgisviz/reference/arcgisMapOutput.md)
+  [`renderArcgisMap()`](http://r.esri.com/arcgisviz/reference/arcgisMapOutput.md)
+  : Shiny bindings for arcgis_map
+
+## Shiny
+
+Update a chart that is already on screen without resending its data, and
+read back what the reader did to it.
+
+- [`ArcProxy()`](http://r.esri.com/arcgisviz/reference/ArcProxy.md)
+  [`arc_proxy()`](http://r.esri.com/arcgisviz/reference/ArcProxy.md) :
+  Update a rendered chart from the Shiny server
+- [`arc_update()`](http://r.esri.com/arcgisviz/reference/arc_update.md)
+  : Send a proxy's changes to the browser
+- [`set_filter()`](http://r.esri.com/arcgisviz/reference/set_filter.md)
+  : Filter a rendered chart in the browser
+- [`set_selection()`](http://r.esri.com/arcgisviz/reference/set_selection.md)
+  : Select marks on a rendered chart
+- [`set_legend()`](http://r.esri.com/arcgisviz/reference/set_legend.md)
+  : Control a rendered chart's legend
+- [`arc_refresh()`](http://r.esri.com/arcgisviz/reference/arc_refresh.md)
+  [`arc_reset_zoom()`](http://r.esri.com/arcgisviz/reference/arc_refresh.md)
+  [`arc_clear_selection()`](http://r.esri.com/arcgisviz/reference/arc_refresh.md)
+  [`arc_export_image()`](http://r.esri.com/arcgisviz/reference/arc_refresh.md)
+  [`arc_export_csv()`](http://r.esri.com/arcgisviz/reference/arc_refresh.md)
+  [`arc_notify()`](http://r.esri.com/arcgisviz/reference/arc_refresh.md)
+  : Invoke a rendered chart's own methods
 
 ## Chart configuration
 
@@ -239,6 +291,10 @@ single property of the classes above.
 
 - [`ModelTypes()`](http://r.esri.com/arcgisviz/reference/ModelTypes.md)
   : ModelTypes
+- [`IFeatureLayerFeatureCollectionType()`](http://r.esri.com/arcgisviz/reference/IFeatureLayerFeatureCollectionType.md)
+  : IFeatureLayerFeatureCollectionType
+- [`Basemaps()`](http://r.esri.com/arcgisviz/reference/Basemaps.md) :
+  Basemaps
 - [`RESTUnits()`](http://r.esri.com/arcgisviz/reference/RESTUnits.md) :
   RESTUnits
 - [`IFontDecoration()`](http://r.esri.com/arcgisviz/reference/IFontDecoration.md)
