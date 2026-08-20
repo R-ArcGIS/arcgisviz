@@ -146,3 +146,17 @@ test_that("a map refuses what it cannot draw", {
     "must have geometry"
   )
 })
+
+test_that("a geometry only layer gets a real message, not an internal one", {
+  skip_if_not_installed("sf")
+  bare <- sf::st_as_sf(
+    data.frame(x = -80, y = 35),
+    coords = c("x", "y"),
+    crs = 4326
+  )
+
+  expect_error(
+    as_widget(add_layer(arc_map(), bare)),
+    "at least one column besides its geometry"
+  )
+})

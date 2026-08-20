@@ -42,13 +42,15 @@ Collate:
     'zzz.R'
 Imports:
     S7,
-    s7x,
+    s7x (>= 1.0.1),
     htmlwidgets,
     rlang,
     cli,
     arcgisutils,
     yyjsonr,
     grDevices
+Remotes:
+    josiahparry/s7x
 URL: http://r.esri.com/arcgisviz/
 Config/roxygen2/version: 8.1.0.9000
 Depends: 

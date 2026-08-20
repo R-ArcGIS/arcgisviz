@@ -9,6 +9,27 @@ NULL
 # against the layer, so `stat = "count"` can't use the SDK's `"*"` fallback.
 oid_field <- "object_id"
 
+# arcgisutils::as_fields() needs at least one non-geometry column and fails
+# with "arguments imply differing number of rows" without one.
+check_attribute_columns <- function(.data, call = rlang::caller_env()) {
+  n <- if (inherits(.data, "sf")) {
+    ncol(sf::st_drop_geometry(.data))
+  } else {
+    ncol(.data)
+  }
+  if (n > 0L) {
+    return(invisible(.data))
+  }
+
+  cli::cli_abort(
+    c(
+      "{.arg .data} must have at least one column besides its geometry.",
+      "i" = "Add an id or a value column to describe each feature."
+    ),
+    call = call
+  )
+}
+
 #' Build a feature layer from a data frame
 #'
 #' Wraps a data frame as a self-contained client side feature collection. This
@@ -38,6 +59,8 @@ as_feature_layer <- function(
   opacity = NULL,
   visibility = NULL
 ) {
+  check_attribute_columns(.data)
+
   definition <- arcgisutils::as_layer_definition(
     .data,
     name = name,
