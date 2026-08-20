@@ -9,9 +9,8 @@ NULL
 # packages).
 #
 # Deferred (see CLAUDE.md):
-#  - WebChart$iLayer (IFeatureLayer | IImageServiceLayer | ...) -> class_any.
-#    We build this JSON directly via arcgisutils::as_layer(), not by
-#    modeling every live-layer type.
+#  - WebChart$iLayer is IFeatureLayer only. The other three live-layer types
+#    in the union (image service, tiled image service, WCS) aren't modeled.
 #  - WebChart$chartRenderer -> class_any. Complex ArcGIS renderer type, out
 #    of scope for the chart model itself.
 #  - WebChart$legend is spec'd as WebChartLegend | WebChartPieChartLegend;
@@ -132,6 +131,6 @@ WebChart <- new_class(
       NULL,
       default = NULL
     ),
-    iLayer = class_any
+    iLayer = s7x::property_union(IFeatureLayer, NULL, default = NULL)
   )
 )

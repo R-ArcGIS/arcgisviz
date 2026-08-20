@@ -12,11 +12,13 @@ NULL
 #' for you.
 #'
 #' @param i_layer Defines the layer the chart reads, as built by
-#'   [as_chart_layer()].
+#'   [as_feature_layer()].
 #' @param chart_type Defines which default model the config merges over, such
 #'   as `"barChart"`. See [ModelTypes].
 #' @param config Defines the chart configuration in the `WebChart` shape. May
 #'   be sparse because the browser merges it over the defaults.
+#' @param tooltip default `NULL`. Defines extra tooltip rows as `labels` plus
+#'   a `lookup` keyed by series and mark, as built by [set_tooltip()].
 #' @param width,height default `NULL`. Defines the widget size, passed to
 #'   [htmlwidgets::createWidget()].
 #' @param element_id default `NULL`. Defines the DOM element id to render into.
@@ -25,15 +27,16 @@ NULL
 #' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
 #'
 #' arcgis_chart(
-#'   i_layer = as_chart_layer(df),
+#'   i_layer = as_feature_layer(df),
 #'   chart_type = "barChart",
-#'   config = s7x::as_vector(arc_col(df, species, mass)@webchart)
+#'   config = arc_col(df, species, mass)@webchart
 #' )
 #' @export
 arcgis_chart <- function(
   i_layer,
   chart_type,
   config,
+  tooltip = NULL,
   width = NULL,
   height = NULL,
   element_id = NULL
@@ -41,7 +44,8 @@ arcgis_chart <- function(
   x <- list(
     iLayer = i_layer,
     chartType = as.character(ModelTypes(chart_type)),
-    config = config
+    config = config,
+    tooltip = tooltip
   )
 
   attr(x, "TOJSON_FUNC") <- widget_json

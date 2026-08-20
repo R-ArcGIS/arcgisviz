@@ -149,3 +149,11 @@ IStatisticDefinitionStatisticParametersOrderBy <- s7x::new_enum(
   "IStatisticDefinitionStatisticParametersOrderBy",
   c("asc", "desc")
 )
+
+# IFeatureLayer$featureCollectionType (rest-js-types.d.ts:1962). Absent means a
+# regular single- or multi-layer feature collection, which is what we build.
+#' @export
+IFeatureLayerFeatureCollectionType <- s7x::new_enum(
+  "IFeatureLayerFeatureCollectionType",
+  c("markup", "notes", "route")
+)

@@ -50,7 +50,9 @@ reference:
       - set_x
       - set_stat
       - set_color
+      - set_size
       - set_labs
+      - set_tooltip
 
   - title: Scales and orientation
     desc: How the axes are scaled and which way the chart is drawn.
@@ -58,6 +60,18 @@ reference:
       - set_axis
       - set_flipped
       - set_position
+
+  - title: Maps
+    desc: >
+      Draw an `sf` object as a client side feature layer. The data travels as
+      a feature collection, so no feature service is involved.
+    contents:
+      - arc_map
+      - add_layer
+      - set_basemap
+      - set_view
+      - ArcMap
+      - MapLayer
 
   - title: Palettes
     desc: >
@@ -71,9 +85,24 @@ reference:
     desc: Turn a chart into an htmlwidget, in a document or in Shiny.
     contents:
       - as_widget
-      - as_chart_layer
+      - as_feature_layer
+      - IFeatureLayer
       - arcgis_chart
       - arcgisChartOutput
+      - arcgis_map
+      - arcgisMapOutput
+
+  - title: Shiny
+    desc: >
+      Update a chart that is already on screen without resending its data,
+      and read back what the reader did to it.
+    contents:
+      - ArcProxy
+      - arc_update
+      - set_filter
+      - set_selection
+      - set_legend
+      - arc_refresh
 
   - title: Chart configuration
     desc: >
@@ -171,6 +200,8 @@ reference:
       single property of the classes above.
     contents:
       - ModelTypes
+      - IFeatureLayerFeatureCollectionType
+      - Basemaps
       - RESTUnits
       - IFontDecoration
       - IFontStyle

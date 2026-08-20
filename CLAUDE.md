@@ -91,17 +91,23 @@ tidy-eval bare column names, friendly kebab-case type names) and a data
 -transfer layer (`R/arc-data.R`) that turns a data frame + config into the
 widget payload. That public API now covers mapping (`set_x()`/`set_y()`/
 `set_stat()`), text (`set_labs()`), colour and grouping (`set_color()`, see
-below), and scales (`set_axis()`/`set_flipped()`/`set_position()`). Six chart
-types are modeled: bar, line, scatter, histogram, box plot, and heat (plus
-combo bar-line for free). Pie, gauge, and radar are not. There is no legend
-surface yet (`WebChart$legend` is modeled but nothing sets it), which grouped
-charts have made worth adding - they are the first thing here that produces
-more than one series, and each series' `name` is what a legend would show.
+below), marker size (`set_size()`), hover text (`set_tooltip()`), and scales
+(`set_axis()`/`set_flipped()`/`set_position()`). Six chart types are modeled:
+bar, line, scatter, histogram, box plot, and heat (plus combo bar-line for
+free). Pie, gauge, and radar are not. On top of that sits a Shiny layer
+(`R/arc-proxy.R`): `arc_proxy()` returns an `ArcChart` subclass, so every
+`set_*()` works on a rendered chart, and `arc_update()` flushes. `set_legend()`
+exists on the proxy only - `WebChart$legend` is still modeled-but-unset on
+the `ArcChart` side, which grouped charts make worth closing. Alongside all of
+that, and sharing its renderer and palette code but almost nothing else, sits
+a second widget: `arc_map() |> add_layer()` draws an `sf` object on
+`<arcgis-map>` as a client side feature layer (`R/arc-map.R`,
+`srcjs/widgets/arcgisMap.js`). It renders; it has no Shiny proxy yet.
 
 Two shapes worth knowing before adding a seventh chart type. `chart_type_map`
-(`R/arc-chart.R`) carries `config_class`, `has_y`, `aggregates`, and
-`tooltip_fields` per type, and `build_webchart()` reads them rather than
-branching on the type name.
+(`R/arc-chart.R`) carries `config_class`, `has_y`, `aggregates`,
+`tooltip_fields`, `splits`, `stacks`, and `sizes` per type, and
+`build_webchart()` reads them rather than branching on the type name.
 Chart types whose spec defines a `WebChart` subtype get it as a real S7
 subclass (`WebBoxPlot`, `WebHeatChart`), which is how they inherit the
 `as_vector()` method that drops unset properties. And **every axis must carry
@@ -123,12 +129,20 @@ makes repeated calls layer rather than reset, the same rule as `set_labs()`.
 package - it's `as_vector(x)` + `yyjsonr::write_json_str(auto_unbox = TRUE)`,
 a generic `S7_object` method in `s7x`.
 
-**`as_vector()` is the single extension point for the wire format.** It
-recurses through the generic (`as_vector_value()`, `s7x/R/as_vector.R:30`),
-so a method on a nested class fires during the parent's walk. `R/arc-data.R`
+**`as_vector()` is the single extension point for the wire format**, and
+`widget_json()` is the single place it is called. Nothing flattens at a call
+site: an `ArcChart`'s `@webchart` and an `IFeatureLayer` travel as their own
+classes right into the payload, and the serializer converts the lot. It
+recurses through the generic (`as_vector_value()`, `s7x/R/as_vector.R`), so a
+method on a nested class fires during the parent's walk. `R/arc-data.R`
 registers these, and `to_json()` inherits all of them for free:
 
 - `WebChart` - drops unset (NA/NULL) properties via `compact_config()`.
+- `IFeatureLayer` - drops unset properties **shallowly**. A deep walk would
+  visit every feature, and everything nested under it comes from arcgisutils
+  already well-formed.
+- `ISimpleRenderer`/`IUniqueValueRenderer` - compact, because on a map a
+  renderer sits in `layerDefinition$drawingInfo` where no parent compacts it.
 - the three `WebChart*Series` classes - emit `query: null` when the query is
   unset, the client-side signal to delete a default.
 - `Color` - the spec's raw `[r,g,b,a]` tuple, undoing this package's
@@ -267,10 +281,27 @@ name makes all series read the same column and draw identical bars, which
 looks like the filter being ignored. Hence `series_aggregation(suffix =)`:
 `_0` unsplit (the SDK's own convention), `_<level>` per split series.
 
-Only **bar, line, combo, and box plot** have split-by subtypes
-(`utils/misc/interfaces.d.ts:7`); scatter reads `series[0]` and ignores the
-rest. `chart_type_map$splits` gates it, so the other types keep colouring per
-item through `chartRenderer`.
+**Splitting and stacking are two different capabilities and two different
+sets of chart types.** Don't conflate them.
+
+*Splitting* (`chart_type_map$splits`) works for **bar, line, combo, and box
+plot** - the only types with split-by subtypes
+(`utils/misc/interfaces.d.ts:7`). Scatter reads `series[0]` and ignores the
+rest, so it and histogram and heat keep colouring per item through
+`chartRenderer`. A grouped box plot is `BoxPlotMonoFieldAndCategoryAndSplitBy`
+(`xn()`, `index2.js:600`).
+
+*Stacking* (`chart_type_map$stacks`) works for **bar and line only**, as the
+spec's own note on `stackedType` says (`web-chart.d.ts:1307`). This is
+verifiable rather than a matter of trust: the entire bundle sets amCharts
+stacking in exactly four places, three inside `Gr()`
+(`customElement.js:13342`) and one inside `G0()` (`:15392`), and `Zr()`
+(`:16839`) - the series-builder dispatcher - routes to `G0` for `BarSeries`
+alone, sending histogram to `rL`, heat to `ev`, and box plot to `bF`. **So
+`position =` for histogram and heat is not a missing feature, it is
+unimplementable client-side**, and a box plot arranges its own groups side by
+side. `set_position()` errors on all three rather than silently no-opping,
+and `chart_position()` sends no `stackedType` at all for them.
 
 A split series carries its colour on **its own symbol** (`fillSymbol` /
 `lineSymbol`, per `chart_type_map$symbol_property`) and the chart sends no
@@ -284,6 +315,11 @@ depend on that match holding.
 `arc_line()` map ggplot2's `dodge`/`stack`/`fill` onto
 `sideBySide`/`stacked`/`stacked100`. A split chart defaults to `dodge`; an
 unsplit one sends no `stackedType` at all.
+
+`set_size()` maps a numeric column onto marker area, the bubble-chart
+variant of a scatterplot. `sizePolicy` is declared on
+`WebChartScatterplotSeries` alone (`web-chart.d.ts:843`), so no other type
+takes it, and `chart_type_map$sizes` gates it.
 
 A colour mapping is otherwise unreadable on hover, so the coloured-by column
 also goes into `series$additionalTooltipFields`. That property exists **only
@@ -310,13 +346,144 @@ columns rather than list ones: every ramp carries **exactly one** of
 `arcgisutils::data_frame()`, which adds a `tbl` class for printing without
 pulling in tibble.
 
+## Tooltips (`set_tooltip()`), and why they take two paths
+
+`set_tooltip(\`Body mass\` = body_mass)` takes named arguments: the name is
+the label, a bare column labels itself.
+
+**Labels ride as field aliases, not as a popupTemplate.** `_e()`
+(`chunks/index3.js:646`) returns a field's `alias` and falls back to its
+name, and `Ce()` (`index2.js:3331`) reads `layerDefinition.fields[].alias`
+unconditionally for a feature layer. So `tooltip_aliased()` just rewrites the
+alias in the layer we already build. `popupTemplate.fieldInfos[].label` +
+`popupTemplateFieldInfosEnabled` also works and *overrides* the alias, but
+needs an element flag for no gain. An alias also titles axes and legend
+entries, which is a feature, not a leak.
+
+**`additionalTooltipFields` is scatter-only** (`web-chart.d.ts:845`) and is
+the only field-naming tooltip property in the whole spec. Everything else
+goes through `tooltipFormatter`, which we can set because we own the bundle.
+Its per-type signatures decide what is possible:
+
+| type | formatter args | key |
+|---|---|---|
+| scatter | `(x, y, size, dataContext)` | native path used instead |
+| bar/line/combo | `{seriesName, statValue, xValue, ...}` | seriesName + x |
+| heat | `(value, xValue, yValue)` | x + y |
+| box plot | `{seriesName, dataContext, xValue}` | seriesName + x |
+| histogram | `(count, binMin, binMax)` | **none** |
+
+Heat honours a formatter (`Qx()`/`Jx()`, `customElement.js:10740`) even though
+`TooltipFormatters` doesn't list a heat variant - don't trust that union.
+Histogram is genuinely impossible: bins are computed in the browser, so there
+is no stable key, hence `tooltip_keys` being absent for it.
+
+Because bar/line get no row, **R precomputes the values and ships a lookup**
+keyed by series and mark (`tooltip_payload()`). Every mark covers a group of
+rows, so a field is only sendable when it is constant within that group -
+`check_tooltip_unique()` errors otherwise rather than picking one. Date-typed
+x is refused outright: R and JS stringify dates differently and the key would
+never match.
+
+A formatter **replaces** the default tooltip entirely
+(`tooltipFormatter: i ?? Ox(t)`, `customElement.js:10012`), so our JS rebuilds
+the x/y lines too. R sends the axis titles for that, since it already
+resolved them. Consequence: `dataTooltipValueFormat` is not honoured on the
+types that use our formatter.
+
+## Shiny (`arc_proxy()`)
+
+**`ArcProxy` subclasses `ArcChart`.** That is the whole design: every
+`set_*()` assigns a property and returns the object, S7 keeps the subclass,
+so all thirteen work on a proxy with zero duplicated code. `arc_update()`
+then flushes, which also means a pipeline of `set_*()` calls costs one
+message and one re-render instead of N.
+
+`createModel()` returns a model whose mapping is **live accessors** -
+`xAxisField`, `numericFields`, `aggregationType`, `splitByField`,
+`stackedType`, `rotated` - so writing one re-derives the query without a
+layer rebuild. Names differ per type (`numericField` on histogram, `category`
+on box plot; box plot's `numericFields` is read-only), which is why routing
+`set_x()` through them needs a `model_fields` entry in `chart_type_map`. Not
+done yet: `arc_update()` currently resends the whole config, which is correct
+but coarser.
+
+Message protocol is one handler, `"arcgisviz-chart"`, with a `method`
+discriminator: `config` (deepMerge over the stored config, rebuild the
+model), `element` (write `<arcgis-chart>` accessors), `model` (write
+`ChartModel` accessors), `call` (invoke a method). The widget keeps `iLayer`
+and the merged config in its factory closure, so **the data never crosses the
+wire twice**.
+
+`set_filter()` uses the element's `runtimeDataFilters`
+(`Pick<WebChartQuery, "where" | "objectIds" | ...>`, `web-chart.d.ts:591`),
+which requeries the layer the chart already holds - no model rebuild at all,
+the cheapest interaction available. The model's `setDataFilters()` is the
+persistent half and is not wired up.
+
+Events become `input$<id>_selection`/`_legend`/`_axes`/`_colors`/
+`_series_order`/`_status`/`_data`, plus one `_error` carrying a `kind`.
+Three traps, all handled in `cleanPayload()`/the factory: payloads carry the
+circular `model` and must be stripped; `selectionIndexes` is a JS `Map` that
+stringifies to `{}`; and OIDs and indexes only exist if
+`returnSelectionOIDs`/`returnSelectionIndexes` are set at render time.
+`arcgisConfigChange` is deliberately not subscribed - it fires on our own
+writes and would loop.
+
+## Maps (`arc_map()`), and why they are not charts
+
+`<arcgis-map>` takes **live `@arcgis/core` instances**, not a JSON config -
+`map: Map`, `basemap: Basemap | string`, `graphics: Collection<Graphic>`. So
+there is no `createModel()`-style merge and no `config` property. R sends
+`basemap`/`center`/`zoom`/`extent` (all four autocast) plus a list of layers,
+and `srcjs/widgets/arcgisMap.js` constructs each layer itself.
+
+**Maps are built from client side feature collections, not a web map
+document.** `WebMap.fromJSON()` is not called and the Web Map Specification is
+not modeled. Every layer, on both widgets, is an **`IFeatureLayer`** built by
+`as_feature_layer()` - one producer, not one per widget. Its
+`featureCollection` comes from `arcgisutils::as_feature_collection()` and its
+`layerDefinition` from `arcgisutils::as_layer_definition()`, including the
+renderer via that function's own `drawing_info` argument. **Use the
+arcgisutils builders and pass their bare lists through; never hand-assemble a
+layer shape.** The JS reads `featureCollection.layers[0]` off it and hands the
+pair to a `FeatureLayer`'s `source`. Two SDK converters do the rest and
+neither should be hand-rolled: `FeatureSet.fromJSON()` (Esri feature JSON ->
+`Graphic`s, and `esriGeometryPoint` -> the `"point"` `geometryType` wants) and
+`renderers/support/jsonUtils.fromJSON()`.
+
+`opacity` and `visibility` are properties of the layer itself, not of the
+`layerDefinition` - `visibility`, not `visible`, is the spec's name
+(`ILayer`, `rest-js-types.d.ts:1324`).
+
+`viewOnReady()` gates everything - `mapEl.map` is not there before it
+resolves, so layers are added after.
+
+**A map renderer resolves per feature against the layer**, so the
+`uniqueValue` branch that charts can only reach while aggregating is always
+available here. `map_renderer()` is therefore simpler than
+`color_renderer()`: numeric -> `continuous_renderer()` (shared verbatim),
+anything else -> `unique_value_renderer()`, no `arcgisviz_color` code column
+and none of the amCharts5 workaround. `geometry_symbol_map` is the map's
+answer to `chart_type_map`'s `symbol_*` entries - the geometry decides the
+symbol, not the chart type.
+
+`add_layer(color =)` takes a bare column; a **fixed** colour is `palette`
+with no `color`, since a map layer has one symbol either way. `as_widget()`
+is an S7 generic with `ArcChart` and `ArcMap` methods.
+
+`@arcgis/core`'s `config.js` defaults `assetsPath` to the Esri CDN when
+empty, so nothing configures it. Offline use would need assets copied into
+`inst/htmlwidgets/` plus `setAssetPath()`; not decided. See
+`dev-docs/map-components-plan.md`.
+
 ## Deliberately deferred (don't "fix" these without asking)
 
-- **Live FeatureLayer / non-featureCollection layer types.** `WebChart$iLayer`
-  is `IFeatureLayer | IImageServiceLayer | ITiledImageServiceLayer | IWCSLayer`
-  in the spec but stays `class_any` here - charts are built from a
-  `type: "featureCollection"` JSON blob via `arcgisutils::as_layer()`, not a
-  live layer reference. Don't model the live-layer types.
+- **The non-feature layer types.** `WebChart$iLayer` is
+  `IFeatureLayer | IImageServiceLayer | ITiledImageServiceLayer | IWCSLayer`
+  in the spec. `IFeatureLayer` is modeled (`R/types-feature-layer.R`); the
+  other three are not, and a layer here always carries a client side
+  `featureCollection` rather than a service `url`.
 - **Geometry types** (`IPoint`/`IPolygon`/etc.) - handled elsewhere, not
   modeled in this package's type registry. `WebChartDataFilters$geometry`
   stays `class_any`.
@@ -346,11 +513,17 @@ S7 class or a spec enum value.
 
 ## Comments
 
-Keep them terse. More than ~5 lines in one block is too much, and most
-comments aren't needed at all. Comment only what the code can't say - a
-non-obvious external contract, a surprising constraint, a spec citation
+**Hard limit: 3 lines per comment block.** Not a guideline, not "about" 3 -
+if a block runs to 4 lines it gets cut, and a block that can't say it in 3
+is a block that shouldn't exist. This is the single most violated rule in
+this file.
+
+Most comments aren't needed at all. Comment only what the code can't say -
+a non-obvious external contract, a surprising constraint, a spec citation
 (`web-chart.d.ts:1274`). Don't restate what the code does, don't justify
-the design, don't narrate the reasoning that led there.
+the design, don't narrate the reasoning that led there. Never write a
+comment that enumerates a data structure's fields; the structure is right
+there.
 
 ## R style: rlang first, cli for all messaging
 
@@ -369,6 +542,16 @@ argument so errors point at the user's frame. Load the `r-lib:cli` skill
 before writing any of it.
 
 ## Conventions worth knowing before editing `R/`
+
+- **Never invent a JSON shape as a bare list.** If a thing has a name in a
+  spec, model it as an S7 class written faithfully from that spec
+  (`IFeatureLayer`, the renderers). If `arcgisutils` already builds it, call
+  that function and pass its bare list through untouched - those lists are a
+  documented interface, and reaching into one to re-assemble its parts
+  couples us to its internals. `as_layer()`, `as_layer_definition()`, and
+  `as_feature_collection()` all take the arguments you would otherwise be
+  tempted to patch in by hand (`drawing_info`, `layer_definition`, `id`,
+  `popup_info`).
 
 - S7 classes: `Foo := new_class(properties = list(...))` - no name string
   as the first arg (breaks `:=`'s inference, silently binds to `parent`

@@ -7,13 +7,13 @@ test_df <- function() {
   data.frame(category = c("a", "b", "c"), value = c(1, 5, 3))
 }
 
-test_that("as_chart_layer() produces the IFeatureLayer shape createModel reads", {
-  lyr <- as_chart_layer(test_df())
+test_that("as_feature_layer() produces the IFeatureLayer shape createModel reads", {
+  lyr <- as_feature_layer(test_df())
 
-  expect_identical(lyr$layerType, "ArcGISFeatureLayer")
+  expect_identical(lyr@layerType, "ArcGISFeatureLayer")
 
   # `gi` (dist/chunks/index2.js) reads exactly these paths off iLayer.
-  fc_layer <- lyr$featureCollection$layers[[1]]
+  fc_layer <- lyr@featureCollection$layers[[1]]
   expect_length(fc_layer$featureSet$features, 3)
   expect_identical(fc_layer$layerDefinition$objectIdField, "object_id")
   expect_true(nrow(fc_layer$layerDefinition$fields) == 3)
@@ -44,7 +44,7 @@ test_that("an unset title sends a null to delete the model's default", {
   # dist/chunks/index.js:289), so an absent key would leave that in place.
   cfg <- s7x::as_vector(arc_scatter(test_df(), category, value)@webchart)
   expect_identical(cfg$title, json_null)
-  expect_identical(widget_json(cfg$title), "null")
+  expect_identical(widget_json(list(title = cfg$title)), "{\"title\":null}")
 
   titled <- WebChart(
     title = WebChartText(
@@ -174,7 +174,7 @@ test_that("categories ride integer codes on a visual variable", {
   expect_identical(sent$arcgisviz_color, c(1L, 2L, 3L))
   expect_true(
     "arcgisviz_color" %in%
-      as_chart_layer(sent)$featureCollection$layers[[
+      as_feature_layer(sent)@featureCollection$layers[[
         1
       ]]$layerDefinition$fields$name
   )
@@ -433,7 +433,10 @@ test_that("stat = 'identity' sends a null query to delete the default", {
   # The default bar series ships a count aggregation; only an explicit null
   # gets rid of it, and BarAndLineNoAggregation needs it gone.
   expect_identical(cfg$series[[1]]$query, json_null)
-  expect_identical(widget_json(cfg$series[[1]]$query), "null")
+  expect_identical(
+    widget_json(list(query = cfg$series[[1]]$query)),
+    "{\"query\":null}"
+  )
   expect_identical(cfg$series[[1]]$y, "value")
 })
 
@@ -475,9 +478,9 @@ test_that("arc_bar() counts rows per x and needs no y", {
   )
 
   # The query engine rejects fields the layer doesn't have.
-  lyr <- as_chart_layer(test_df())
+  lyr <- as_feature_layer(test_df())
   expect_identical(
-    lyr$featureCollection$layers[[1]]$layerDefinition$objectIdField,
+    lyr@featureCollection$layers[[1]]$layerDefinition$objectIdField,
     oid_field
   )
 })
@@ -552,6 +555,107 @@ test_that("a coloured scatterplot names the column in its tooltip", {
     (arc_col(test_df(), category, value) |> set_color(category))@webchart
   )
   expect_null(bars$series[[1]]$additionalTooltipFields)
+})
+
+test_that("set_tooltip() names extra fields and joins the coloured column", {
+  df <- data.frame(
+    category = c("a", "b", "c"),
+    value = c(1, 5, 3),
+    note = c("x", "y", "z")
+  )
+
+  named <- s7x::as_vector(
+    (arc_scatter(df, category, value) |> set_tooltip(note))@webchart
+  )
+  expect_identical(named$series[[1]]$additionalTooltipFields, list("note"))
+
+  # The coloured column comes first, and is not repeated if also named.
+  both <- s7x::as_vector(
+    (arc_scatter(df, category, value) |>
+      set_color(category) |>
+      set_tooltip(note, category))@webchart
+  )
+  expect_identical(
+    both$series[[1]]$additionalTooltipFields,
+    list("category", "note")
+  )
+
+  # No columns clears the list.
+  cleared <- s7x::as_vector(
+    (arc_scatter(df, category, value) |>
+      set_tooltip(note) |>
+      set_tooltip())@webchart
+  )
+  expect_null(cleared$series[[1]]$additionalTooltipFields)
+})
+
+test_that("set_tooltip() refuses histograms and unknown columns", {
+  expect_error(
+    arc_histogram(test_df(), value) |> set_tooltip(category),
+    "does not apply"
+  )
+  expect_error(
+    arc_scatter(test_df(), category, value) |> set_tooltip(missing_col),
+    "must be a column"
+  )
+})
+
+test_that("set_tooltip() labels a field by its argument name", {
+  df <- data.frame(category = c("a", "b"), value = c(1, 5), note = c("x", "y"))
+  chart <- arc_scatter(df, category, value) |>
+    set_tooltip(`The note` = note)
+
+  # The label rides over as the field's alias, which is what the chart
+  # renders a field name with (_e(), chunks/index3.js:646).
+  fields <- tooltip_aliased(
+    as_feature_layer(df),
+    chart@tooltip
+  )@featureCollection$layers[[1]]$layerDefinition$fields
+  expect_identical(fields$alias[fields$name == "note"], "The note")
+  expect_identical(fields$alias[fields$name == "value"], "value")
+})
+
+test_that("a non-scatter chart ships a tooltip lookup keyed by mark", {
+  df <- data.frame(
+    city = c("a", "a", "b"),
+    state = c("s1", "s1", "s2"),
+    pop = c(1, 2, 3)
+  )
+  chart <- arc_bar(df, city) |> set_stat("count") |> set_tooltip(State = state)
+  payload <- tooltip_payload(chart)
+
+  expect_identical(payload$labels, list("State"))
+  # One series, so the lookup falls back to the "*" key.
+  expect_identical(payload$lookup[["*"]][["a"]], list("s1"))
+  expect_identical(payload$lookup[["*"]][["b"]], list("s2"))
+
+  # Scatter names its own fields, so it ships no lookup.
+  expect_null(tooltip_payload(arc_scatter(df, pop, pop) |> set_tooltip(state)))
+})
+
+test_that("a tooltip field must be constant within each mark", {
+  df <- data.frame(
+    species = c("a", "a", "b"),
+    island = c("i1", "i2", "i3"),
+    mass = c(1, 2, 3)
+  )
+  chart <- arc_bar(df, species) |>
+    set_stat("count") |>
+    set_tooltip(Island = island)
+
+  expect_error(tooltip_payload(chart), "not constant within each mark")
+})
+
+test_that("a heat chart keys its tooltip lookup by both axes", {
+  df <- data.frame(
+    row = c("a", "a", "b"),
+    col = c("x", "y", "x"),
+    note = c("n1", "n2", "n3")
+  )
+  payload <- tooltip_payload(arc_heat(df, row, col) |> set_tooltip(note))
+
+  expect_identical(payload$lookup[["*"]][["a\ry"]], list("n2"))
+  expect_identical(payload$lookup[["*"]][["b\rx"]], list("n3"))
 })
 
 test_that("colouring by a column other than x splits into one series each", {
@@ -707,4 +811,100 @@ test_that("each split series names its statistic after its own level", {
   # An unsplit chart keeps the SDK's own `_0` convention.
   plain <- s7x::as_vector(arc_bar(grouped, category)@webchart)
   expect_identical(plain$series[[1]]$y, "COUNT_OBJECT_ID_0")
+})
+
+test_that("set_size() sends a sizePolicy on the scatter series", {
+  sized <- s7x::as_vector(
+    (arc_scatter(test_df(), category, value) |>
+      set_size(value, range = c(4, 20)))@webchart
+  )
+  policy <- sized$series[[1]]$sizePolicy
+  expect_identical(policy$type, "sizeScale")
+  expect_identical(policy$field, "value")
+  expect_identical(policy$scaleType, "linear")
+  expect_identical(policy$minSize, 4)
+  expect_identical(policy$maxSize, 20)
+
+  # An omitted range leaves the SDK's own 5 to 30 in place.
+  bare <- s7x::as_vector(
+    (arc_scatter(test_df(), category, value) |> set_size(value))@webchart
+  )
+  expect_null(bare$series[[1]]$sizePolicy$minSize)
+  expect_null(bare$series[[1]]$sizePolicy$maxSize)
+
+  # "log" is ggplot2's spelling of the spec's "logarithmic".
+  logged <- s7x::as_vector(
+    (arc_scatter(test_df(), category, value) |>
+      set_size(value, scale = "log"))@webchart
+  )
+  expect_identical(logged$series[[1]]$sizePolicy$scaleType, "logarithmic")
+
+  expect_null(
+    s7x::as_vector(arc_scatter(test_df(), category, value)@webchart)$series[[
+      1
+    ]]$sizePolicy
+  )
+})
+
+test_that("set_size() only applies where markers exist", {
+  # sizePolicy is declared on WebChartScatterplotSeries alone
+  # (web-chart.d.ts:843).
+  expect_error(set_size(arc_bar(test_df(), category), value), "does not apply")
+  expect_error(
+    set_size(arc_scatter(test_df(), category, value), category),
+    "must map a numeric column"
+  )
+  expect_error(
+    set_size(arc_scatter(test_df(), category, value), value, range = 5),
+    "must be two numbers"
+  )
+  expect_error(
+    set_size(arc_scatter(test_df(), category, value), value, range = c(9, 2)),
+    "small to large"
+  )
+})
+
+test_that("box plots split into groups but never stack", {
+  grouped <- data.frame(
+    category = c("a", "a", "b", "b"),
+    grp = c("x", "y", "x", "y"),
+    value = c(1, 2, 3, 4)
+  )
+  cfg <- s7x::as_vector(
+    (arc_boxplot(grouped, category, value) |> set_color(grp))@webchart
+  )
+
+  # BoxPlotMonoFieldAndCategoryAndSplitBy: a real where clause alongside a
+  # category x (xn(), index2.js:600).
+  expect_length(cfg$series, 2)
+  expect_identical(
+    vapply(cfg$series, function(s) s$query$where, character(1)),
+    c("grp='x'", "grp='y'")
+  )
+  expect_identical(cfg$series[[1]]$fillSymbol$color, c(31, 120, 180, 255))
+
+  # Only bar and line read stackedType, so a box plot sends none and
+  # refuses a position outright rather than accepting it silently.
+  expect_null(cfg$stackedType)
+  expect_error(
+    set_position(arc_boxplot(grouped, category, value)),
+    "does not apply"
+  )
+})
+
+test_that("position is refused by the chart types that cannot stack", {
+  # Only Gr() and G0() set amCharts stacking, and Zr() dispatches G0 for
+  # BarSeries alone (customElement.js:16839).
+  expect_error(
+    set_position(arc_histogram(test_df(), value)),
+    "does not apply to histogram"
+  )
+  expect_error(
+    set_position(arc_heat(test_df(), category, value)),
+    "does not apply to heat"
+  )
+  expect_error(
+    arc_histogram(test_df(), value) |> set_position("stack"),
+    "Only .* charts stack"
+  )
 })

@@ -1,4 +1,4 @@
-#' @include types-statistics.R
+#' @include types-feature-layer.R
 NULL
 
 # S7 classes for ArcGIS Charts WebChart* spec object types with nested/ref'd

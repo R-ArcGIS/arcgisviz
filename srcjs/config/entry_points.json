@@ -1,3 +1,4 @@
 {
-  "arcgisChart": "./srcjs/widgets/arcgisChart.js"
+  "arcgisChart": "./srcjs/widgets/arcgisChart.js",
+  "arcgisMap": "./srcjs/widgets/arcgisMap.js"
 }

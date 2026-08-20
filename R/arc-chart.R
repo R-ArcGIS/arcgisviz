@@ -38,6 +38,8 @@ ArcChart <- new_class(
     stat = s7x::class_string,
     labs = class_list,
     color = class_list,
+    size = class_list,
+    tooltip = S7::class_character,
     axes = class_list,
     flipped = s7x::class_boolean,
     position = s7x::class_string,
@@ -47,17 +49,9 @@ ArcChart <- new_class(
   )
 )
 
-# friendly kebab/plain type name -> {model_type (ModelTypes value, used to
-# build the client-side defaults), series_type (the series' own `type`
-# discriminator), series_class (which WebChart*Series S7 class to build),
-# config_class (WebChart, or the subtype the spec gives this chart type),
-# aggregates (whether the series honours `stat` at all), has_y (whether the
-# series takes a y field), tooltip_fields (whether the series can name extra
-# fields for its tooltip), splits (whether the client understands one series
-# per group - see chart_split()), symbol_property (where a split series
-# carries its own colour), axis_defaults (axis properties every chart of this
-# type needs), symbol_* (the symbol a chartRenderer carries for this chart
-# type - see color_renderer())}
+# Per chart type capability flags, read by build_webchart() instead of
+# branching on the type name. `tooltip_keys` names what identifies one mark;
+# absent means the type has no tooltip hook (web-chart.d.ts:845).
 chart_type_map <- list(
   bar = list(
     model_type = "barChart",
@@ -67,6 +61,8 @@ chart_type_map <- list(
     aggregates = TRUE,
     has_y = TRUE,
     splits = TRUE,
+    stacks = TRUE,
+    tooltip_keys = c("series", "x"),
     symbol_property = "fillSymbol",
     symbol_class = ISimpleFillSymbol,
     symbol_type = "esriSFS",
@@ -80,6 +76,8 @@ chart_type_map <- list(
     aggregates = FALSE,
     has_y = TRUE,
     tooltip_fields = TRUE,
+    tooltip_keys = character(),
+    sizes = TRUE,
     symbol_class = ISimpleMarkerSymbol,
     symbol_type = "esriSMS",
     symbol_style = SimpleMarkerSymbolStyle("esriSMSCircle")
@@ -92,6 +90,8 @@ chart_type_map <- list(
     aggregates = TRUE,
     has_y = TRUE,
     splits = TRUE,
+    stacks = TRUE,
+    tooltip_keys = c("series", "x"),
     symbol_property = "lineSymbol",
     symbol_class = ISimpleLineSymbol,
     symbol_type = "esriSLS",
@@ -115,6 +115,8 @@ chart_type_map <- list(
     config_class = WebBoxPlot,
     aggregates = FALSE,
     has_y = TRUE,
+    splits = TRUE,
+    symbol_property = "fillSymbol",
     symbol_class = ISimpleFillSymbol,
     symbol_type = "esriSFS",
     symbol_style = SimpleFillSymbolStyle("esriSFSSolid")
@@ -126,6 +128,7 @@ chart_type_map <- list(
     config_class = WebHeatChart,
     aggregates = FALSE,
     has_y = TRUE,
+    tooltip_keys = c("x", "y"),
     # Without a category valueFormat on both axes the client reads the config
     # as a half-built calendar heat chart and renders a placeholder asking
     # for a date field (Io(), dist/chunks/index2.js:4144).
@@ -639,8 +642,33 @@ set_flipped <- function(chart, flipped = TRUE) {
 #'   set_position("stack")
 #' @export
 set_position <- function(chart, position = "dodge") {
+  check_chart_type_set(chart)
+  check_stacks(chart)
   chart@position <- rlang::arg_match0(position, names(position_map))
   chart
+}
+
+# Only bar and line read stackedType. Every other type either has no second
+# dimension left to arrange (histogram, heat) or arranges its groups itself
+# (box plot), so silently accepting a position would be a lie.
+check_stacks <- function(chart, call = rlang::caller_env()) {
+  spec <- chart_type_map[[chart@chart_type]]
+  if (isTRUE(spec$stacks)) {
+    return(invisible(chart))
+  }
+
+  stackable <- names(chart_type_map)[vapply(
+    chart_type_map,
+    function(s) isTRUE(s$stacks),
+    logical(1)
+  )]
+  cli::cli_abort(
+    c(
+      "{.arg position} does not apply to {chart@chart_type} charts.",
+      "i" = "Only {.val {stackable}} charts stack or dodge."
+    ),
+    call = call
+  )
 }
 
 # The `position` argument the arc_*() shortcuts share. NULL leaves the
@@ -649,6 +677,7 @@ chart_positioned <- function(chart, position, call = rlang::caller_env()) {
   if (rlang::is_null(position)) {
     return(chart)
   }
+  check_stacks(chart, call = call)
   chart@position <- rlang::arg_match0(
     position,
     names(position_map),
@@ -656,6 +685,273 @@ chart_positioned <- function(chart, position, call = rlang::caller_env()) {
     error_call = call
   )
   chart
+}
+
+#' Map a column to marker size
+#'
+#' Scales each marker by the value of a numeric column, turning a
+#' scatterplot into a bubble chart. Only scatterplots draw markers, so this
+#' does not apply to the other chart types.
+#'
+#' @param chart Defines which chart to modify.
+#' @param size Defines which numeric column the marker sizes are drawn from.
+#' @param range default `NULL`. Defines the smallest and largest marker size
+#'   as a length-2 numeric vector. `NULL` keeps the SDK's own 5 to 30.
+#' @param scale default `"linear"`. Defines how values map onto that range,
+#'   either `"linear"` or `"log"`.
+#' @return `chart`, with its marker sizes set.
+#' @examples
+#' df <- data.frame(len = c(1, 5, 3), dep = c(2, 4, 6), mass = c(10, 40, 25))
+#'
+#' arc_scatter(df, len, dep) |>
+#'   set_size(mass, range = c(4, 20))
+#' @export
+set_size <- function(chart, size, range = NULL, scale = "linear") {
+  check_chart_type_set(chart)
+  spec <- chart_type_map[[chart@chart_type]]
+  if (!isTRUE(spec$sizes)) {
+    cli::cli_abort(
+      c(
+        "{.fn set_size} does not apply to {chart@chart_type} charts.",
+        "i" = "Only scatterplots draw a marker per row."
+      ),
+      call = rlang::caller_env()
+    )
+  }
+
+  col <- rlang::as_string(rlang::ensym(size))
+  check_column(chart, col, "size")
+
+  values <- chart@data[[col]]
+  if (!rlang::is_null(values) && !is.numeric(values)) {
+    cli::cli_abort(
+      c(
+        "{.arg size} must map a numeric column.",
+        "x" = "{.field {col}} is {.cls {class(values)}}."
+      ),
+      call = rlang::caller_env()
+    )
+  }
+
+  scale <- rlang::arg_match0(scale, c("linear", "log"))
+  range <- check_size_range(range)
+
+  chart@size <- list(field = col, range = range, scale = scale)
+  chart
+}
+
+check_size_range <- function(range, call = rlang::caller_env()) {
+  if (rlang::is_null(range)) {
+    return(NULL)
+  }
+  if (!is.numeric(range) || length(range) != 2 || anyNA(range)) {
+    cli::cli_abort(
+      c(
+        "{.arg range} must be two numbers, the smallest and largest size.",
+        "x" = "You supplied {.obj_type_friendly {range}}."
+      ),
+      call = call
+    )
+  }
+  if (any(range < 1) || range[[1]] > range[[2]]) {
+    cli::cli_abort(
+      c(
+        "{.arg range} must run from small to large, and no smaller than 1.",
+        "x" = "You supplied {.val {range}}."
+      ),
+      call = call
+    )
+  }
+  as.double(range)
+}
+
+# The spec calls a log scale "logarithmic"; ggplot2 users write "log".
+size_scale_map <- c(linear = "linear", log = "logarithmic")
+
+series_size <- function(chart) {
+  size <- chart@size
+  if (rlang::is_empty(size)) {
+    return(NULL)
+  }
+  SizePolicy(
+    type = "sizeScale",
+    field = size$field,
+    scaleType = SizePolicyScaleTypes(size_scale_map[[size$scale]]),
+    minSize = if (!rlang::is_null(size$range)) size$range[[1]] else NA_real_,
+    maxSize = if (!rlang::is_null(size$range)) size$range[[2]] else NA_real_
+  )
+}
+
+#' Add columns to a chart's tooltip
+#'
+#' Names extra columns to show when a mark is hovered, alongside `x` and `y`.
+#' Name an argument to label it, or pass a bare column name to label it with
+#' the column name. A column mapped with [set_color()] is added for you.
+#'
+#' Every mark on a chart covers a group of rows: a bar covers every row with
+#' that `x`, a heat cell every row in that pair of categories. An extra field
+#' can only be shown when it takes a single value across that group, so
+#' `set_tooltip()` checks that and errors rather than pick one arbitrarily.
+#' Histograms are the exception and take no tooltip fields at all, because
+#' their bins are computed in the browser.
+#'
+#' @param chart Defines which chart to modify.
+#' @param ... Defines which columns to show, as bare column names. Name an
+#'   argument to use that name as the label. Passing none clears whatever is
+#'   already set.
+#' @return `chart`, with its tooltip fields set.
+#' @examples
+#' df <- data.frame(len = c(1, 5, 3), dep = c(2, 4, 6), id = c("a", "b", "c"))
+#'
+#' arc_scatter(df, len, dep) |>
+#'   set_tooltip(Identifier = id)
+#' @export
+set_tooltip <- function(chart, ...) {
+  check_chart_type_set(chart)
+  spec <- chart_type_map[[chart@chart_type]]
+  if (rlang::is_null(spec$tooltip_keys)) {
+    cli::cli_abort(
+      c(
+        "{.fn set_tooltip} does not apply to {chart@chart_type} charts.",
+        "i" = "Their bins are computed in the browser, so there is no row
+               to read a field from."
+      ),
+      call = rlang::caller_env()
+    )
+  }
+
+  syms <- rlang::ensyms(...)
+  cols <- vapply(syms, rlang::as_string, character(1))
+  labels <- rlang::names2(syms)
+  labels[labels == ""] <- cols[labels == ""]
+  for (col in cols) {
+    check_column(chart, col, "...")
+  }
+
+  chart@tooltip <- rlang::set_names(unname(cols), labels)
+  chart
+}
+
+# The lookup's outer key when a chart has one series, so the client can fall
+# back to it without knowing whether the chart was split.
+tooltip_any_series <- "*"
+
+# The client is handed a bar's own x value, so both sides have to stringify a
+# key the same way. Dates do not, which is why check_tooltip_keys() blocks
+# them.
+tooltip_key <- function(x) {
+  if (is.numeric(x)) {
+    return(format(x, trim = TRUE, scientific = FALSE))
+  }
+  as.character(x)
+}
+
+tooltip_value <- function(x) {
+  if (is.numeric(x)) {
+    return(format(x, trim = TRUE, scientific = FALSE))
+  }
+  as.character(x)
+}
+
+check_tooltip_keys <- function(chart, spec, call = rlang::caller_env()) {
+  cols <- c(chart@x, if ("y" %in% spec$tooltip_keys) chart@y)
+  for (col in cols) {
+    values <- chart@data[[col]]
+    if (inherits(values, "Date") || inherits(values, "POSIXt")) {
+      cli::cli_abort(
+        c(
+          "{.fn set_tooltip} cannot key off the date column {.field {col}}.",
+          "i" = "R and the browser format dates differently, so the lookup
+                 would never match."
+        ),
+        call = call
+      )
+    }
+  }
+}
+
+# One value per mark or nothing: picking one of several would be a lie about
+# which row the reader is looking at.
+check_tooltip_unique <- function(values, group, col, label, call) {
+  counts <- tapply(values, group, function(v) length(unique(v)))
+  bad <- counts[!is.na(counts) & counts > 1]
+  if (rlang::is_empty(bad)) {
+    return(invisible(NULL))
+  }
+
+  n <- max(bad)
+  cli::cli_abort(
+    c(
+      "{.arg {label}} maps {.field {col}}, which is not constant within
+       each mark.",
+      "x" = "One mark covers {n} different value{?s} of {.field {col}}.",
+      "i" = "Aggregate it first, or map it with {.fn set_color} instead."
+    ),
+    call = call
+  )
+}
+
+# Scatter reads its own additionalTooltipFields, so only the other types need
+# a lookup shipped alongside the config.
+tooltip_payload <- function(chart, call = rlang::caller_env()) {
+  spec <- chart_type_map[[chart@chart_type]]
+  fields <- chart@tooltip
+  if (rlang::is_empty(fields) || isTRUE(spec$tooltip_fields)) {
+    return(NULL)
+  }
+  check_tooltip_keys(chart, spec, call = call)
+
+  data <- chart@data
+  split <- chart_split(chart, spec)
+  outer <- if (rlang::is_null(split)) {
+    rep(tooltip_any_series, nrow(data))
+  } else {
+    tooltip_key(data[[split$field]])
+  }
+  inner <- if ("y" %in% spec$tooltip_keys) {
+    paste(
+      tooltip_key(data[[chart@x]]),
+      tooltip_key(data[[chart@y]]),
+      sep = "\r"
+    )
+  } else {
+    tooltip_key(data[[chart@x]])
+  }
+
+  group <- paste(outer, inner, sep = "\r")
+  for (i in seq_along(fields)) {
+    check_tooltip_unique(
+      data[[fields[[i]]]],
+      group,
+      fields[[i]],
+      names(fields)[[i]],
+      call
+    )
+  }
+
+  keep <- !duplicated(group)
+  lookup <- list()
+  for (row in which(keep)) {
+    values <- lapply(fields, function(col) tooltip_value(data[[col]][[row]]))
+    lookup[[outer[[row]]]][[inner[[row]]]] <- unname(values)
+  }
+
+  list(labels = as.list(names(fields)), lookup = lookup)
+}
+
+# The chart renders a field by its alias (_e(), chunks/index3.js:646), so a
+# label rides over as one rather than needing a popupTemplate.
+tooltip_aliased <- function(layer, fields) {
+  if (rlang::is_empty(fields)) {
+    return(layer)
+  }
+  collection <- layer@featureCollection
+  defn <- collection$layers[[1]]$layerDefinition
+  hit <- match(unname(fields), defn$fields$name)
+  defn$fields$alias[hit[!is.na(hit)]] <- names(fields)[!is.na(hit)]
+  collection$layers[[1]]$layerDefinition <- defn
+  layer@featureCollection <- collection
+  layer
 }
 
 #' Map a column to colour
@@ -733,7 +1029,7 @@ set_color <- function(chart, color, palette = NULL) {
 }
 
 # Mirrors the SDK's own class-break symbols (class-breaks.js:414).
-renderer_symbol <- function(spec, color = NULL) {
+renderer_symbol <- function(spec, color = NULL, size = NULL) {
   args <- list(
     type = spec$symbol_type,
     style = spec$symbol_style,
@@ -745,12 +1041,12 @@ renderer_symbol <- function(spec, color = NULL) {
     )
   )
   if (identical(spec$symbol_type, "esriSMS")) {
-    args$size <- 6
+    args$size <- if (rlang::is_null(size)) 6 else size
   }
   # A line symbol has no outline of its own.
   if (identical(spec$symbol_type, "esriSLS")) {
     args$outline <- NULL
-    args$width <- 2
+    args$width <- if (rlang::is_null(size)) 2 else size
   }
   if (!rlang::is_null(color)) {
     args$color <- color
@@ -760,7 +1056,7 @@ renderer_symbol <- function(spec, color = NULL) {
 
 # The client interpolates between stops (index2.js:1612), so the ramp's own
 # stops go over untouched, spread across the column's range.
-continuous_renderer <- function(field, values, stops, spec, call) {
+continuous_renderer <- function(field, values, stops, spec, call, size = NULL) {
   rng <- range(values, na.rm = TRUE)
   if (!all(is.finite(rng))) {
     cli::cli_abort(
@@ -780,7 +1076,7 @@ continuous_renderer <- function(field, values, stops, spec, call) {
   if (rng[[1]] == rng[[2]]) {
     return(ISimpleRenderer(
       type = "simple",
-      symbol = renderer_symbol(spec, rgba_color(stops[nrow(stops), ]))
+      symbol = renderer_symbol(spec, rgba_color(stops[nrow(stops), ]), size)
     ))
   }
 
@@ -788,7 +1084,7 @@ continuous_renderer <- function(field, values, stops, spec, call) {
   at <- as.double(seq(rng[[1]], rng[[2]], length.out = nrow(stops)))
   ISimpleRenderer(
     type = "simple",
-    symbol = renderer_symbol(spec),
+    symbol = renderer_symbol(spec, size = size),
     visualVariables = list(
       IColorVisualVariable(
         type = "colorInfo",
@@ -834,8 +1130,12 @@ chart_split <- function(chart, spec) {
 }
 
 # Groups sit side by side unless asked otherwise. An unsplit chart has one
-# series and nothing to arrange, so it sends nothing at all.
-chart_position <- function(chart, split) {
+# series and nothing to arrange, so it sends nothing at all, and neither does
+# a chart type the client never stacks.
+chart_position <- function(chart, split, spec) {
+  if (!isTRUE(spec$stacks)) {
+    return(WebChartStackedKinds())
+  }
   position <- if (!is.na(chart@position)) {
     chart@position
   } else if (!rlang::is_null(split)) {
@@ -894,7 +1194,7 @@ split_series <- function(series, split, chart, spec, stat, aggregating) {
 # Under aggregation the query returns only the group-by field and the
 # statistics, so a derived code column never comes back - but the grouped
 # column itself does, and uniqueValue resolves against it (index2.js:1436).
-unique_value_renderer <- function(field, levels, colors, spec) {
+unique_value_renderer <- function(field, levels, colors, spec, size = NULL) {
   IUniqueValueRenderer(
     type = "uniqueValue",
     field1 = field,
@@ -906,7 +1206,7 @@ unique_value_renderer <- function(field, levels, colors, spec) {
         IUniqueValueInfo(
           value = value,
           label = value,
-          symbol = renderer_symbol(spec, color)
+          symbol = renderer_symbol(spec, color, size)
         )
       },
       levels,
@@ -1069,13 +1369,16 @@ build_webchart <- function(chart) {
   if (isTRUE(spec$aggregates)) {
     series$query <- agg$query
   }
-  # A colour mapping is otherwise invisible on hover: the tooltip names x and
-  # y and nothing else. Only the scatterplot series takes extra fields
-  # (web-chart.d.ts:845), and they land in the query's outFields too
-  # (fu(), dist/chunks/index2.js:7857).
-  if (isTRUE(spec$tooltip_fields) && !rlang::is_empty(chart@color)) {
-    series$additionalTooltipFields <- chart@color$field
+  # A colour mapping is otherwise invisible on hover, so the coloured column
+  # joins whatever set_tooltip() named. These land in the query's outFields
+  # too (fu(), dist/chunks/index2.js:7857).
+  if (isTRUE(spec$tooltip_fields)) {
+    fields <- unique(c(chart@color$field, unname(chart@tooltip)))
+    if (!rlang::is_empty(fields)) {
+      series$additionalTooltipFields <- fields
+    }
   }
+  series$sizePolicy <- series_size(chart)
   # Chart-type options, already keyed by spec property name.
   series <- c(series, chart@series_opts)
 
@@ -1094,7 +1397,7 @@ build_webchart <- function(chart) {
     chartRenderer = renderer,
     colorMatch = if (rlang::is_null(renderer)) NA else TRUE,
     rotated = chart@flipped,
-    stackedType = chart_position(chart, split),
+    stackedType = chart_position(chart, split, spec),
     axes = list(
       chart_axis(
         axis_lab(labs$x, chart@x),

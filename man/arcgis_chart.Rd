@@ -8,6 +8,7 @@ arcgis_chart(
   i_layer,
   chart_type,
   config,
+  tooltip = NULL,
   width = NULL,
   height = NULL,
   element_id = NULL
@@ -15,13 +16,16 @@ arcgis_chart(
 }
 \arguments{
 \item{i_layer}{Defines the layer the chart reads, as built by
-\code{\link[=as_chart_layer]{as_chart_layer()}}.}
+\code{\link[=as_feature_layer]{as_feature_layer()}}.}
 
 \item{chart_type}{Defines which default model the config merges over, such
 as \code{"barChart"}. See \link{ModelTypes}.}
 
 \item{config}{Defines the chart configuration in the \code{WebChart} shape. May
 be sparse because the browser merges it over the defaults.}
+
+\item{tooltip}{default \code{NULL}. Defines extra tooltip rows as \code{labels} plus
+a \code{lookup} keyed by series and mark, as built by \code{\link[=set_tooltip]{set_tooltip()}}.}
 
 \item{width, height}{default \code{NULL}. Defines the widget size, passed to
 \code{\link[htmlwidgets:createWidget]{htmlwidgets::createWidget()}}.}
@@ -40,8 +44,8 @@ for you.
 df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
 
 arcgis_chart(
-  i_layer = as_chart_layer(df),
+  i_layer = as_feature_layer(df),
   chart_type = "barChart",
-  config = s7x::as_vector(arc_col(df, species, mass)@webchart)
+  config = arc_col(df, species, mass)@webchart
 )
 }

@@ -41,7 +41,9 @@ arc_bar(penguins, island, group = ) |>
 # Without set_labs() the client would title this "Chart"; we send an explicit
 # null to delete that default.
 arc_bar(penguins, island) |>
-  set_color(sex, palette = "Watermelon Sugar")
+  set_color(sex, palette = "Watermelon Sugar") |>
+  set_labs(title = "Penguins by sex and island", x = NULL, y = NULL) |>
+  set_flipped()
 
 # library(ggplot2)
 

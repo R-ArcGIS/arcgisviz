@@ -1,8 +1,6 @@
 # Scratch gallery for eyeballing charts in the Viewer. Not run by testthat.
 devtools::load_all()
 
-penguins <- datasets::penguins
-
 # --- bar: count rows per category -----------------------------------------
 arc_bar(penguins, species)
 arc_bar(penguins, island)

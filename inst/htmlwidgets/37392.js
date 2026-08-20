@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[37392],{15011(e,s,r){r.r(s),r.d(s,{default:()=>d});var t=r(31635),a=r(69636),l=r(72939),u=r(76084);class c extends u.A{constructor(){super(...arguments),this.layer=null}}let n=class extends((0,l.C)(c)){};n=(0,t.Cg)([(0,a.$K)("esri.views.2d.layers.ParquetLayerView2D")],n);const d=n}}]);

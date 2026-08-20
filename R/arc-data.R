@@ -11,34 +11,55 @@ oid_field <- "object_id"
 
 #' Build a feature layer from a data frame
 #'
-#' Wraps a data frame as a self-contained client side feature collection, the
-#' `iLayer` the browser builds the chart from. No live feature service is
-#' involved.
+#' Wraps a data frame as a self-contained client side feature collection. This
+#' is the `iLayer` a chart reads and the layer a map draws. No live feature
+#' service is involved.
 #'
 #' @param .data Defines which data frame or `sf` object to convert.
-#' @param name default `"chart_data"`. Defines what the layer is named.
+#' @param name default `"layer_data"`. Defines what the layer is named.
 #' @param title default `name`. Defines the human readable layer title.
 #' @param id default `"arcgisviz-layer"`. Defines the unique layer id.
-#' @return A list holding the `IFeatureLayer` JSON shape.
+#' @param drawing_info default `NULL`. Defines how features are symbolized, as
+#'   a list holding a `renderer`.
+#' @param opacity default `NULL`. Defines the layer opacity, from `0` to `1`.
+#' @param visibility default `NULL`. Defines whether the layer starts visible.
+#' @return An [IFeatureLayer].
 #' @examples
 #' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
 #'
-#' as_chart_layer(df)
+#' as_feature_layer(df)
 #' @export
-as_chart_layer <- function(
+as_feature_layer <- function(
   .data,
-  name = "chart_data",
+  name = "layer_data",
   title = name,
-  id = "arcgisviz-layer"
+  id = "arcgisviz-layer",
+  drawing_info = NULL,
+  opacity = NULL,
+  visibility = NULL
 ) {
-  layer <- arcgisutils::as_layer(.data, name = name, title = title)
+  definition <- arcgisutils::as_layer_definition(
+    .data,
+    name = name,
+    object_id_field = oid_field,
+    drawing_info = drawing_info
+  )
 
-  list(
+  IFeatureLayer(
     id = id,
     title = title,
     layerType = "ArcGISFeatureLayer",
+    opacity = if (rlang::is_null(opacity)) NA_real_ else as.double(opacity),
+    visibility = if (rlang::is_null(visibility)) NA else visibility,
     featureCollection = arcgisutils::as_feature_collection(
-      layers = list(layer)
+      layers = list(
+        arcgisutils::as_layer(
+          .data,
+          name = name,
+          title = title,
+          layer_definition = definition
+        )
+      )
     )
   )
 }
@@ -74,6 +95,13 @@ compact_config <- function(x) {
   }
 
   out <- lapply(x, compact_config)
+  out[!vapply(out, is_unset, logical(1))]
+}
+
+# Shallow, not compact_config(): everything nested here comes from arcgisutils
+# already well-formed, and a deep walk would visit every feature.
+S7::method(as_vector, IFeatureLayer) <- function(x, ...) {
+  out <- as_vector(S7::super(x, S7::S7_object), ...)
   out[!vapply(out, is_unset, logical(1))]
 }
 
@@ -123,13 +151,27 @@ S7::method(as_vector, Color) <- function(x, ...) {
   if (anyNA(rgba)) NULL else rgba
 }
 
+# A renderer travels inside layerDefinition$drawingInfo on a map, where no
+# parent compacts it. Registering it here covers that and the chart's
+# chartRenderer with one rule.
+renderer_as_vector <- function(x, ...) {
+  compact_config(as_vector(S7::super(x, S7::S7_object), ...))
+}
+
+S7::method(as_vector, ISimpleRenderer) <- renderer_as_vector
+S7::method(as_vector, IUniqueValueRenderer) <- renderer_as_vector
+
 # Our serializer, installed via htmlwidgets' TOJSON_FUNC hook. Called with
 # the whole payload (x, evals, jsHooks), returns a JSON string. yyjsonr's
 # defaults are the right ones here; jsonlite's `dataframe = "columns"`
 # silently breaks `layerDefinition$fields`.
+#
+# This is the one place S7 becomes JSON. as_vector() recurses, so a config or
+# a layer travels as its class right up to here and every method registered
+# above fires on the way through.
 widget_json <- function(x, ...) {
   yyjsonr::write_json_str(
-    x,
+    as_vector(x),
     opts = yyjsonr::opts_write_json(
       auto_unbox = TRUE,
       json_verbatim = TRUE,
@@ -138,12 +180,12 @@ widget_json <- function(x, ...) {
   )
 }
 
-#' Convert a chart to an htmlwidget
+#' Convert a chart or map to an htmlwidget
 #'
-#' Turns an [arc_chart()] into a renderable widget. Printing an `ArcChart`
-#' calls this for you.
+#' Turns an [arc_chart()] or an [arc_map()] into a renderable widget. Printing
+#' either one calls this for you.
 #'
-#' @param chart Defines which chart to render.
+#' @param x Defines which chart or map to render.
 #' @param width,height default `NULL`. Defines the widget size, passed to
 #'   [htmlwidgets::createWidget()].
 #' @param element_id default `NULL`. Defines the DOM element id to render into.
@@ -153,16 +195,33 @@ widget_json <- function(x, ...) {
 #'
 #' as_widget(arc_col(df, species, mass))
 #' @export
-as_widget <- function(chart, width = NULL, height = NULL, element_id = NULL) {
-  check_chart_type_set(chart)
-  if (rlang::is_null(chart@data)) {
-    cli::cli_abort("{.arg chart} has no data to render.")
+as_widget <- S7::new_generic(
+  "as_widget",
+  "x",
+  function(x, width = NULL, height = NULL, element_id = NULL) {
+    S7::S7_dispatch()
+  }
+)
+
+S7::method(as_widget, ArcChart) <- function(
+  x,
+  width = NULL,
+  height = NULL,
+  element_id = NULL
+) {
+  check_chart_type_set(x)
+  if (rlang::is_null(x@data)) {
+    cli::cli_abort("{.arg x} has no data to render.")
   }
 
   arcgis_chart(
-    i_layer = as_chart_layer(chart_data(chart)),
-    chart_type = chart_type_map[[chart@chart_type]]$model_type,
-    config = as_vector(chart@webchart),
+    i_layer = tooltip_aliased(
+      as_feature_layer(chart_data(x), name = "chart_data"),
+      x@tooltip
+    ),
+    chart_type = chart_type_map[[x@chart_type]]$model_type,
+    config = x@webchart,
+    tooltip = tooltip_payload(x),
     width = width,
     height = height,
     element_id = element_id

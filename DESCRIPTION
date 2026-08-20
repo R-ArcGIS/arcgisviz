@@ -8,6 +8,8 @@ License: Apache License (>= 2)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE, roclets = c("collate", "namespace", "s7x::enum_roclet"))
 Suggests:
+    sf,
+    shiny,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Collate:
@@ -19,6 +21,7 @@ Collate:
     'types-renderer.R'
     'types-format-options.R'
     'types-statistics.R'
+    'types-feature-layer.R'
     'types-webchart.R'
     'types-series-shared.R'
     'types-bar-chart.R'
@@ -30,8 +33,12 @@ Collate:
     'arc-chart.R'
     'arc-data.R'
     'enums-widget.R'
+    'arcgis-map-widget.R'
+    'arc-map.R'
     'arcgis-chart-widget.R'
     'palettes.R'
+    'arc-proxy.R'
+    'arcgisviz-package.R'
     'zzz.R'
 Imports:
     S7,

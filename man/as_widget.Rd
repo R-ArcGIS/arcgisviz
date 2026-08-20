@@ -2,12 +2,12 @@
 % Please edit documentation in R/arc-data.R
 \name{as_widget}
 \alias{as_widget}
-\title{Convert a chart to an htmlwidget}
+\title{Convert a chart or map to an htmlwidget}
 \usage{
-as_widget(chart, width = NULL, height = NULL, element_id = NULL)
+as_widget(x, width = NULL, height = NULL, element_id = NULL)
 }
 \arguments{
-\item{chart}{Defines which chart to render.}
+\item{x}{Defines which chart or map to render.}
 
 \item{width, height}{default \code{NULL}. Defines the widget size, passed to
 \code{\link[htmlwidgets:createWidget]{htmlwidgets::createWidget()}}.}
@@ -18,8 +18,8 @@ as_widget(chart, width = NULL, height = NULL, element_id = NULL)
 An htmlwidget.
 }
 \description{
-Turns an \code{\link[=arc_chart]{arc_chart()}} into a renderable widget. Printing an \code{ArcChart}
-calls this for you.
+Turns an \code{\link[=arc_chart]{arc_chart()}} or an \code{\link[=arc_map]{arc_map()}} into a renderable widget. Printing
+either one calls this for you.
 }
 \examples{
 df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))

@@ -51,3 +51,10 @@ arc_bar(penguins, species) |>
 # Same rule as ggplot2: numeric goes to a gradient.
 arc_scatter(penguins, bill_len, bill_dep) |>
   set_color(body_mass)
+
+# --- grouped box plots -----------------------------------------------------
+# Box plots split the same way bars do. They always sit side by side, so
+# there is no position to set.
+arc_boxplot(penguins, species, body_mass) |>
+  set_color(sex) |>
+  set_labs(title = "Body mass by species and sex", y = "Body mass (g)")

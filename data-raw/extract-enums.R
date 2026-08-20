@@ -76,7 +76,11 @@ walk_node <- function(node, path, out) {
 # 1. Named top-level enums: any registry entry whose own kind is "enum".
 named_enums <- Filter(is_enum_node, registry)
 named_enums <- lapply(named_enums, function(e) {
-  list(values = unlist(e$values), nullable = isTRUE(e$nullable), description = e$description)
+  list(
+    values = unlist(e$values),
+    nullable = isTRUE(e$nullable),
+    description = e$description
+  )
 })
 
 # 2. Inline enum usages: walk every top-level type's *nested* structure.
@@ -87,7 +91,10 @@ all_hits <- list()
 for (type_name in names(registry)) {
   all_hits <- walk_node(registry[[type_name]], type_name, all_hits)
 }
-inline_enum_usages <- Filter(function(h) !(h$path %in% names(named_enums)), all_hits)
+inline_enum_usages <- Filter(
+  function(h) !(h$path %in% names(named_enums)),
+  all_hits
+)
 
 values_match <- function(a, b) {
   identical(sort(as.character(a)), sort(as.character(b)))
@@ -115,5 +122,9 @@ write_json(
 
 cat("Named enums:", length(named_enums), "\n")
 cat("Inline enum usages:", length(inline_enum_usages), "\n")
-matched <- sum(vapply(inline_enum_usages, function(u) !is.null(u$matches_named), logical(1)))
+matched <- sum(vapply(
+  inline_enum_usages,
+  function(u) !is.null(u$matches_named),
+  logical(1)
+))
 cat("Inline usages matching a named enum's value set:", matched, "\n")
