@@ -10,9 +10,10 @@ set_filter(proxy, where = NULL, object_ids = NULL)
 \item{proxy}{Defines which \code{\link[=arc_proxy]{arc_proxy()}} to filter.}
 
 \item{where}{default \code{NULL}. Defines a SQL where clause, such as
-\code{"species = 'Adelie'"}. \code{NULL} leaves it unset and \code{NA} clears it.}
+\code{"species = 'Adelie'"}. \code{NULL}, \code{NA}, or \code{""} clear it.}
 
-\item{object_ids}{default \code{NULL}. Defines which rows to keep, by object id.}
+\item{object_ids}{default \code{NULL}. Defines which rows to keep, by object id.
+\code{NULL} or an empty vector clears them.}
 }
 \value{
 \code{proxy}, invisibly.
@@ -21,6 +22,10 @@ set_filter(proxy, where = NULL, object_ids = NULL)
 Applies a SQL \code{where} clause, or a set of object ids, to a chart that is
 already on screen. The chart requeries the layer it already holds, so no
 data is resent and no model is rebuilt.
+}
+\details{
+Each call defines the complete filter state, because the element replaces
+\code{runtimeDataFilters} wholesale rather than merging into it.
 }
 \examples{
 df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))

@@ -58,6 +58,33 @@ test_that("set_filter() goes to the element, not the model", {
   expect_error(set_filter(f$proxy, where = 1), "single SQL clause")
 })
 
+test_that("a blank filter keeps the key so Shiny sends a JSON null", {
+  # Shiny drops an absent key but serializes a NULL-valued one to null, and
+  # null is what clears a filter client-side.
+  for (blank in list(NULL, NA, NA_character_, "")) {
+    f <- fake_proxy()
+    set_filter(f$proxy, blank)
+
+    filters <- f$session$sent()[[1]]$message$payload$runtimeDataFilters
+    expect_named(filters, c("where", "objectIds"))
+    expect_null(filters$where)
+  }
+})
+
+test_that("object ids clear on an empty vector", {
+  f <- fake_proxy()
+  set_filter(f$proxy, object_ids = c(1, 2))
+  expect_identical(
+    f$session$sent()[[1]]$message$payload$runtimeDataFilters$objectIds,
+    list(1L, 2L)
+  )
+
+  set_filter(f$proxy, object_ids = integer())
+  expect_null(
+    f$session$sent()[[2]]$message$payload$runtimeDataFilters$objectIds
+  )
+})
+
 test_that("set_legend() writes model accessors", {
   f <- fake_proxy()
   set_legend(f$proxy, visible = TRUE, position = "bottom", title = "Key")

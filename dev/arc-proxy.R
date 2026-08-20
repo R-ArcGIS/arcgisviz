@@ -50,7 +50,7 @@ server <- function(input, output, session) {
   # A filter never rebuilds the model - the chart requeries what it holds.
   observeEvent(input$where, {
     arc_proxy("chart", chart()) |>
-      set_filter(if (nzchar(input$where)) input$where else NA)
+      set_filter(input$where)
   })
 
   observeEvent(input$png, {

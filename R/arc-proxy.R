@@ -97,9 +97,13 @@ arc_update <- function(proxy) {
 #'
 #' @param proxy Defines which [arc_proxy()] to filter.
 #' @param where default `NULL`. Defines a SQL where clause, such as
-#'   `"species = 'Adelie'"`. `NULL` leaves it unset and `NA` clears it.
+#'   `"species = 'Adelie'"`. `NULL`, `NA`, or `""` clear it.
 #' @param object_ids default `NULL`. Defines which rows to keep, by object id.
+#'   `NULL` or an empty vector clears them.
 #' @return `proxy`, invisibly.
+#' @details
+#' Each call defines the complete filter state, because the element replaces
+#' `runtimeDataFilters` wholesale rather than merging into it.
 #' @examples
 #' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
 #'
@@ -110,24 +114,36 @@ arc_update <- function(proxy) {
 #' @export
 set_filter <- function(proxy, where = NULL, object_ids = NULL) {
   check_proxy(proxy)
-  if (!rlang::is_null(where) && !rlang::is_scalar_character(where)) {
+  if (!rlang::is_null(where) && !is_where_clause(where)) {
     cli::cli_abort(c(
-      "{.arg where} must be a single SQL clause or {.code NULL}.",
+      "{.arg where} must be a single SQL clause, {.code NA}, or {.code NULL}.",
       "x" = "You supplied {.obj_type_friendly {where}}."
     ))
   }
 
-  # An absent key leaves the client's filter alone; an explicit null clears
-  # it, the same rule deepMerge() follows for the config.
-  filters <- list()
-  if (!rlang::is_null(where)) {
-    filters$where <- if (is.na(where)) NULL else where
-  }
-  if (!rlang::is_null(object_ids)) {
-    filters$objectIds <- as.list(as.integer(object_ids))
-  }
+  # Built in one call so an unset filter stays a NULL-valued key: Shiny
+  # serializes that to a JSON null, which is what clears one client-side.
+  filters <- list(
+    where = if (is_blank_filter(where)) NULL else where,
+    objectIds = if (rlang::is_empty(object_ids)) {
+      NULL
+    } else {
+      as.list(as.integer(object_ids))
+    }
+  )
 
   proxy_send(proxy, "element", list(runtimeDataFilters = filters))
+}
+
+# NA arrives as logical from `if (nzchar(x)) x else NA`, so any scalar NA
+# counts, not just NA_character_.
+is_where_clause <- function(x) {
+  rlang::is_scalar_character(x) ||
+    (rlang::is_scalar_atomic(x) && is.na(x))
+}
+
+is_blank_filter <- function(x) {
+  rlang::is_null(x) || is.na(x) || !nzchar(x)
 }
 
 #' Select marks on a rendered chart

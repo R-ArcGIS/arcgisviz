@@ -27,23 +27,39 @@ builds for charts, and the only spec surface left is the renderer, which
 
 ## What crosses the wire
 
-Each layer is `layerDefinition` + `featureSet`, exactly the pair inside the
-`featureCollection` charts send as `iLayer`. `arcgisutils::as_layer()`
-produces both, so maps and charts share a data-transfer layer:
+Every layer, on both widgets, is an **`IFeatureLayer`**
+(`rest-js-types.d.ts:1953`), modeled as S7 in `R/types-feature-layer.R` and
+built by `as_feature_layer()`. One producer, not one per widget: charts send
+it as `WebChart$iLayer` and maps send a list of them.
+
+Nothing about its interior is hand-assembled. `arcgisutils` builds all of it:
+
+| part | built by |
+|---|---|
+| `featureCollection` | `as_feature_collection(layers = list(as_layer(...)))` |
+| `layerDefinition` | `as_layer_definition(..., drawing_info = )` |
+| `id`, `popupInfo` | `as_layer(id = , popup_info = )` |
+
+Those bare lists are a documented interface. Pass them through; do not reach
+into one to re-assemble its parts.
+
+What the browser reads off it:
 
 | R | browser |
 |---|---|
-| `layerDefinition$objectIdField` | `objectIdField` |
-| `layerDefinition$fields` | `fields`, via `Field.fromJSON` |
-| `layerDefinition$drawingInfo$renderer` | `renderer`, via `renderers/support/jsonUtils.fromJSON` |
-| `featureSet` | `FeatureSet.fromJSON()`, then `.features` -> `source` |
+| `featureCollection.layers[0].layerDefinition$objectIdField` | `objectIdField` |
+| `...$fields` | `fields`, via `Field.fromJSON` |
+| `...$drawingInfo$renderer` | `renderer`, via `renderers/support/jsonUtils.fromJSON` |
+| `...featureSet` | `FeatureSet.fromJSON()`, then `.features` -> `source` |
+| `opacity`, `visibility` | `opacity`, `visible` |
 
 `FeatureSet.fromJSON()` is doing real work: it turns Esri feature JSON into
 `Graphic`s and normalizes `esriGeometryPoint` to the `"point"` that
 `FeatureLayer$geometryType` wants. Don't hand-roll either conversion.
 
-`drawingInfo.renderer` is where a web map feature collection puts its
-renderer, so this stays spec-faithful even though nothing calls
+`opacity` and `visibility` are layer properties, not `layerDefinition` ones,
+and `drawingInfo.renderer` is where a web map feature collection puts its
+renderer - so this stays spec-faithful even though nothing calls
 `WebMap.fromJSON()`.
 
 ## What the element takes
@@ -101,13 +117,15 @@ bindings.
    large (`arcgisViewClick`, `arcgisViewChange`, `arcgisViewLayerviewCreate`,
    the pointer family). The layer stays in the factory closure so data does
    not cross twice, same as charts.
-2. **Popups.** `popupTemplate` is already passed through per layer but
-   nothing builds one. The field aliases `set_tooltip()` writes would carry
-   straight over.
+2. **Popups.** `IFeatureLayer$popupInfo` is modeled and `as_layer()` takes a
+   `popup_info` argument, but nothing builds one and the JS ignores it. The
+   field aliases `set_tooltip()` writes would carry straight over.
 3. **A legend**, which is `arcgis-legend` slotted in, and the first real
    test of the widget-component idiom.
-4. **Layer types beyond feature collections.** Deliberately out of scope so
-   far, and consistent with `WebChart$iLayer` staying `class_any`.
+4. **Layer types beyond feature collections.** `IFeatureLayer` is modeled;
+   the image-service, tiled-image-service, and WCS members of
+   `WebChart$iLayer`'s union are not, and a layer here always carries a
+   client side `featureCollection` rather than a service `url`.
 
 ## What I would not do
 
