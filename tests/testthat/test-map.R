@@ -213,6 +213,40 @@ test_that("new_renderer() refuses arguments that would misbuild it", {
   )
 })
 
+test_that("new_symbol() takes colours and styles the way users write them", {
+  marker <- s7x::as_vector(new_symbol("marker", color = "steelblue", size = 8))
+  expect_identical(marker$type, "esriSMS")
+  expect_identical(marker$color, c(70, 130, 180, 255))
+  expect_identical(marker$size, 8)
+
+  # style defaults per family: a marker has no "solid", its styles are shapes.
+  expect_identical(marker$style, "esriSMSCircle")
+  expect_identical(s7x::as_vector(new_symbol("fill"))$style, "esriSFSSolid")
+  expect_identical(s7x::as_vector(new_symbol("line"))$style, "esriSLSSolid")
+
+  # Friendly kebab-case in, esri-prefixed enum value out.
+  expect_identical(
+    s7x::as_vector(new_symbol("fill", style = "backward-diagonal"))$style,
+    "esriSFSBackwardDiagonal"
+  )
+
+  # Hex with alpha, and a nested symbol, both survive.
+  fill <- s7x::as_vector(new_symbol(
+    "fill",
+    color = "#b8282899",
+    outline = new_symbol("line", color = "white", width = 0.5)
+  ))
+  expect_identical(fill$color, c(184, 40, 40, 153))
+  expect_identical(fill$outline$type, "esriSLS")
+})
+
+test_that("new_symbol() refuses arguments that would misbuild it", {
+  expect_error(new_symbol("blob"), "must be one of")
+  expect_error(new_symbol("marker", style = "solid"), "must be one of")
+  expect_error(new_symbol("marker", width = 2), "not a property")
+  expect_error(new_symbol("marker", color = "nosuchcolour"), "valid colours")
+})
+
 test_that("add_layer() dispatches on a prebuilt IFeatureLayer", {
   layer <- as_feature_layer(test_points()) |>
     add_renderer(ISimpleRenderer(
@@ -287,4 +321,37 @@ test_that("a geometry only layer gets a real message, not an internal one", {
     as_widget(add_layer(arc_map(), bare)),
     "at least one column besides its geometry"
   )
+})
+
+test_that("legendOptions is a typed class, not a bare list", {
+  opts <- new_legend_options(title = "Births, 1974", order = "descending")
+
+  expect_true(S7::S7_inherits(opts, ILegendOptions))
+  expect_identical(s7x::as_vector(opts)$title, "Births, 1974")
+
+  # Friendly name in, the spec's camelCase value out.
+  expect_identical(s7x::as_vector(opts)$order, "descendingValues")
+  expect_error(new_legend_options(order = "sideways"), "must be one of")
+})
+
+test_that("a colour ramp and a unique value renderer can both be titled", {
+  ramp <- new_renderer(
+    "simple",
+    visualVariables = list(IColorVisualVariable(
+      field = "value",
+      legendOptions = new_legend_options(title = "Births")
+    ))
+  )
+  vv <- s7x::as_vector(ramp)$visualVariables[[1]]
+  expect_identical(vv$legendOptions$title, "Births")
+
+  # Nested in a renderer, unset options compact away rather than send null.
+  expect_named(vv$legendOptions, "title")
+
+  grouped <- new_renderer(
+    "unique-value",
+    field1 = "group",
+    legendOptions = new_legend_options(title = "Region")
+  )
+  expect_identical(s7x::as_vector(grouped)$legendOptions$title, "Region")
 })

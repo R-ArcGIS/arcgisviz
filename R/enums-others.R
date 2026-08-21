@@ -90,6 +90,14 @@ IRendererRotationType <- s7x::new_enum(
   c("arithmetic", "geographic")
 )
 
+# legendOptions$order, web map specification objects/legendOptions/. Which end
+# of the ramp the legend puts first.
+#' @export
+ILegendOptionsOrder <- s7x::new_enum(
+  "ILegendOptionsOrder",
+  c("ascendingValues", "descendingValues")
+)
+
 # Renamed from SizePolicyScaleType (singular) - chart-object-literals.d.ts
 # exports the plural SizePolicyScaleTypes.
 #' @export

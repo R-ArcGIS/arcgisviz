@@ -49,21 +49,20 @@ nc |>
   add_renderer(
     new_renderer(
       "simple",
-      symbol = ISimpleFillSymbol(
-        style = SimpleFillSymbolStyle("esriSFSSolid"),
-        color = Color(r = 180, g = 40, b = 40, a = 160),
-        outline = ISimpleLineSymbol(
-          style = SimpleLineSymbolStyle("esriSLSSolid"),
-          color = Color(r = 255, g = 255, b = 255, a = 255),
-          width = 0.5
-        )
+      symbol = new_symbol(
+        "fill",
+        color = "#b82828a0",
+        outline = new_symbol("line", color = "white", width = 0.5)
       )
     )
   ) |>
   (\(layer) add_layer(arc_map("gray-vector"), layer))()
 
-# No `type =` anywhere above: it is fixed by the class and defaults, so the
-# renderer serializes with the discriminator jsonUtils.fromJSON() needs.
+# No S7 class, no esri-prefixed enum, no `type =` anywhere above. Colours are
+# written the way they are everywhere else in this package, and `style`
+# defaults per family - "solid" for a fill, "circle" for a marker.
+new_symbol("marker", color = "steelblue", size = 8)
+new_symbol("fill", style = "backward-diagonal", color = "grey40")
 
 # Hover a feature and `tooltip` decides what it says. A bare column labels
 # itself; name one and the name becomes the label.

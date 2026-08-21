@@ -40,6 +40,7 @@ Collate:
     'arc-proxy.R'
     'arc-map-proxy.R'
     'arcgisviz-package.R'
+    'constructors.R'
     'zzz.R'
 Imports:
     S7,

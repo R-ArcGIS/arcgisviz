@@ -25,6 +25,19 @@ and series-level temporal binning fields restructured into a nested
 imperative-API docs are **stale/archival** - don't regenerate from them, don't
 diff against them.
 
+## Renderers are the exception - they are not in this spec
+
+`IDrawingInfo$renderer` is `any` here, so **the renderer classes
+(`R/types-renderer.R`) come from the web map specification instead**, and
+where that spec and `@arcgis/core` disagree the spec wins. They do disagree:
+`legendOptions` is one shared 7-property object in the spec, but two split
+classes in core. Everything about typing those - `class_any` vs a real
+class, pruning by renderer family, discriminator defaults, and the
+`new_*()` constructor family in `R/constructors.R` - is written up under
+"Typing a property" in `CLAUDE.md`. Read that before touching
+`R/types-renderer.R`, `R/types-simple.R`, or `R/constructors.R`; the
+`arcgis-map-widget` skill has the map-side context.
+
 ## Where the types actually live
 
 All inside `node_modules/@arcgis/charts-components/dist/spec/`:

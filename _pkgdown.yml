@@ -70,6 +70,8 @@ reference:
       - add_layer
       - add_renderer
       - new_renderer
+      - new_symbol
+      - new_legend_options
       - set_basemap
       - set_view
       - ArcMap
@@ -172,6 +174,7 @@ reference:
       - IColorStop
       - IUniqueValueRenderer
       - IUniqueValueInfo
+      - ILegendOptions
 
   - title: Symbols and colour
     desc: How individual marks are drawn.
@@ -212,6 +215,7 @@ reference:
       - IFontStyle
       - IFontWeight
       - IRendererRotationType
+      - ILegendOptionsOrder
       - IStatisticDefinitionStatisticType
       - IStatisticDefinitionStatisticParametersOrderBy
       - SimpleFillSymbolStyle

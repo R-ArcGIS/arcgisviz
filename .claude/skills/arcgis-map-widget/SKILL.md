@@ -1,6 +1,6 @@
 ---
 name: arcgis-map-widget
-description: Use when touching R/arc-map.R, R/arc-map-proxy.R, R/arcgis-map-widget.R, srcjs/widgets/arcgisMap.js, or anything about drawing an sf object on <arcgis-map> - layers, renderers, hover tooltips, the map Shiny proxy, or the S7 classes behind them. Maps have no bundled .d.ts spec, so their types come from the Web Map Specification and arcgisutils' builders, not from @arcgis/charts-components. Load this before adding a map feature or a map S7 class.
+description: Use when touching R/arc-map.R, R/arc-map-proxy.R, R/arcgis-map-widget.R, srcjs/widgets/arcgisMap.js, or anything about drawing an sf object on <arcgis-map> - layers, renderers, hover tooltips, the map Shiny proxy, or the S7 classes behind them. Maps have no bundled .d.ts spec, so their types come from the Web Map Specification - arcgisutils is an S3 reference to check behavior against, not an authority to route through. Load this before adding a map feature or a map S7 class.
 ---
 
 # ArcGIS maps -> S7 -> `<arcgis-map>`
@@ -26,8 +26,8 @@ is no JSON schema anywhere. So when you need a map type:
 | what | where it comes from |
 |---|---|
 | the layer (`IFeatureLayer`) | `rest-js-types.d.ts:1953`, already modeled in `R/types-feature-layer.R` |
-| renderers | the **web map** specification - not the charts spec (`IDrawingInfo$renderer` is `any`), not the web *scene* spec (its renderers are `Symbol3D`, SceneView only) |
-| `layerDefinition`, `featureCollection`, `popupInfo` | built by `arcgisutils`, passed through as bare lists |
+| renderers | the **web map** specification - not the charts spec (`IDrawingInfo$renderer` is `any`), not the web *scene* spec (its renderers are `Symbol3D`, SceneView only), and **not `@arcgis/core`** where the two disagree |
+| `layerDefinition`, `featureCollection`, `popupInfo` | the web map spec - currently bare lists from `arcgisutils`, not yet modeled |
 | element accessors | `node_modules/@arcgis/map-components/dist/components/arcgis-map/customElement.d.ts` |
 
 `WebMap.fromJSON()` is **not** called and the Web Map Specification is not
@@ -35,25 +35,32 @@ modeled as a document. The persistence format is the feature collection
 layer, so there is no document spec to write. "S7 all the way down" models
 the *layer*, not the document.
 
-## The S7 classes are here on purpose, but verify against arcgisutils
+## arcgisutils is a reference, not an authority
 
-The S7 type analogues live in this package **for now and migrate to
-arcgisutils later**. That is the plan - keep writing them here. What is not
-optional is verifying their behavior against arcgisutils first; the repo is
-cloned at `../arcgisutils`, so read the implementation, not just the docs.
-Index: <https://r.esri.com/arcgisutils/llms.txt>.
+It is the **S3 implementation of the same problem** this package solves with
+S7, and the S7 machinery here is the direction of travel - these types
+migrate *into* arcgisutils later. So don't reflexively route everything
+through it, and don't treat a bare list it returns as the final shape for
+anything. `class_any` on `featureCollection`/`layerDefinition` records that
+they are not modeled *yet*, not that they belong to someone else.
 
-arcgisutils owns the R-to-Esri type mapping and you must not re-derive it:
-`as_fields()` (`infer_esri_type()` is deprecated as of 0.4.0) decides the
-`esriFieldType*` for a column, `ptype_tbl()`/`fields_as_ptype_df()` go the
-other way, and `is_date()`/`date_to_ms()`/`from_esri_date()` own dates.
+Where it earns its keep:
 
-**Never hand-assemble a layer shape.** `as_layer()`,
-`as_layer_definition()` and `as_feature_collection()` take the arguments you
-would otherwise patch in by hand (`drawing_info`, `layer_definition`, `id`,
-`popup_info`). Their return values are a documented interface; reaching into
-one to re-assemble its parts couples us to its internals. `as_feature_layer()`
-(`R/arc-data.R`) is the **single producer** of a layer for both widgets.
+- **Checking behavior.** An S7 analogue has to agree with it. `as_fields()`
+  (`infer_esri_type()` is deprecated as of 0.4.0) decides the
+  `esriFieldType*` for a column, `ptype_tbl()`/`fields_as_ptype_df()` go the
+  other way, and `is_date()`/`date_to_ms()`/`from_esri_date()` own dates.
+  The repo is cloned at `../arcgisutils` - read the implementation, not just
+  the docs. Index: <https://r.esri.com/arcgisutils/llms.txt>.
+- **Not re-deriving what already works.** `as_layer()`,
+  `as_layer_definition()` and `as_feature_collection()` take the arguments
+  you would otherwise patch in by hand (`drawing_info`, `layer_definition`,
+  `id`, `popup_info`), so use those rather than reaching into a returned
+  list to re-assemble its parts. `as_feature_layer()` (`R/arc-data.R`) is
+  the single producer of a layer for both widgets.
+
+Calling one of those is a convenience while the S7 equivalent doesn't exist.
+Writing that equivalent is not off-limits - it is the plan.
 
 Two gotchas that are arcgisutils behavior, not ours: `as_layer()` invents an
 `object_id` column (`1:nrow(x)`) when one is absent, which is what map object
@@ -80,6 +87,14 @@ Two SDK converters do the real work and neither should be hand-rolled:
 `opacity` and `visibility` are properties of the layer itself, not of the
 `layerDefinition` - and `visibility`, not `visible`, is the spec's name
 (`ILayer`, `rest-js-types.d.ts:1324`).
+
+**The web map spec and `@arcgis/core` genuinely diverge**, so check the spec
+before trusting a `.d.ts`. Worked example: `legendOptions` is *one* shared
+object with seven properties in the spec, referenced by ten parents, but
+core splits it into `VisualVariableLegendOptions` + `SizeVariableLegendOptions`.
+`ILegendOptions` follows the spec. The full typing rules - when `class_any`
+becomes a class, pruning by renderer family, discriminator defaults, and the
+`new_*()` constructors - are under "Typing a property" in `CLAUDE.md`.
 
 ## Renderers: simpler than charts
 
