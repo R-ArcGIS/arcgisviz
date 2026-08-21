@@ -5,7 +5,7 @@
 \title{ISimpleFillSymbol}
 \usage{
 ISimpleFillSymbol(
-  type = NA_character_,
+  type = "esriSFS",
   style = SimpleFillSymbolStyle(),
   color = NULL,
   outline = NULL

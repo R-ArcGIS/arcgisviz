@@ -4,20 +4,16 @@
 \alias{add_layer}
 \title{Add a layer to a map}
 \usage{
-add_layer(
-  map,
-  .data,
-  color = NULL,
-  palette = NULL,
-  size = NULL,
-  opacity = NULL,
-  name = NULL
-)
+add_layer(map, .data, ...)
 }
 \arguments{
 \item{map}{Defines which map to modify.}
 
 \item{.data}{Defines which \code{sf} object supplies the features.}
+
+\item{...}{Passed between methods. Must be empty when \code{.data} is an
+\link{IFeatureLayer}, whose own properties already answer \code{color}, \code{palette},
+\code{size} and \code{tooltip}.}
 
 \item{color}{default \code{NULL}. Defines which column drives the symbol colour.
 A numeric column becomes a gradient, anything else one colour per value.}
@@ -29,7 +25,16 @@ name from \code{\link[=esri_palettes]{esri_palettes()}} or a vector of R colours
 
 \item{opacity}{default \code{NULL}. Defines the layer opacity, from \code{0} to \code{1}.}
 
-\item{name}{default \code{NULL}. Defines the layer name shown in a legend.}
+\item{name}{default \code{NULL}. Defines the layer name, which is also the handle
+\code{\link[=remove_layer]{remove_layer()}} and \code{\link[=set_layer]{set_layer()}} take. On an \code{\link[=arc_map_proxy]{arc_map_proxy()}} it is
+required, because that is what tells the browser which layer is meant.}
+
+\item{tooltip}{default \code{NULL}. Defines which columns are shown when a
+feature is hovered, as bare column names wrapped in \code{c()}. Name one to
+label it, as in \code{c(County = NAME)}.}
+
+\item{visible}{default \code{NULL}. Defines whether the layer starts drawn.
+Only when \code{.data} is an \link{IFeatureLayer}.}
 }
 \value{
 \code{map}, with the layer appended.
@@ -37,6 +42,18 @@ name from \code{\link[=esri_palettes]{esri_palettes()}} or a vector of R colours
 \description{
 Draws a data frame or \code{sf} object as a client side feature layer. Colour
 takes a bare column name, the same as \code{\link[=set_color]{set_color()}} does on a chart.
+}
+\details{
+\code{.data} is either a data frame to build a layer from, or an
+\link{IFeatureLayer} you built yourself. The second form is the escape hatch:
+anything this function does not expose is done by constructing the layer
+and modifying it, usually with \code{\link[=add_renderer]{add_renderer()}}.
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{nc |>
+  as_feature_layer() |>
+  add_renderer(ISimpleRenderer(symbol = my_symbol)) |>
+  (\\(lyr) add_layer(arc_map(), lyr))()
+}\if{html}{\out{</div>}}
 }
 \examples{
 set_basemap(arc_map(), "gray-vector")

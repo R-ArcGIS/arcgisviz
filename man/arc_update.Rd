@@ -4,17 +4,20 @@
 \alias{arc_update}
 \title{Send a proxy's changes to the browser}
 \usage{
-arc_update(proxy)
+arc_update(proxy, ...)
 }
 \arguments{
-\item{proxy}{Defines which \code{\link[=arc_proxy]{arc_proxy()}} to flush.}
+\item{proxy}{Defines which \code{\link[=arc_proxy]{arc_proxy()}} or \code{\link[=arc_map_proxy]{arc_map_proxy()}} to flush.}
+
+\item{...}{Reserved for methods.}
 }
 \value{
 \code{proxy}, invisibly.
 }
 \description{
-Flushes everything the \verb{set_*()} functions have changed on an
-\code{\link[=arc_proxy]{arc_proxy()}} as one message, so a pipeline of them costs one re-render.
+Flushes everything the \verb{set_*()} and \code{\link[=add_layer]{add_layer()}} calls have changed on an
+\code{\link[=arc_proxy]{arc_proxy()}} or \code{\link[=arc_map_proxy]{arc_map_proxy()}} as one message, so a pipeline of them
+costs one re-render.
 }
 \examples{
 df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))

@@ -5,7 +5,7 @@
 \title{ISimpleMarkerSymbol}
 \usage{
 ISimpleMarkerSymbol(
-  type = NA_character_,
+  type = "esriSMS",
   style = SimpleMarkerSymbolStyle(),
   color = NULL,
   size = NA_real_,

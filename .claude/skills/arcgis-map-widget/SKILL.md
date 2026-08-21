@@ -1,0 +1,188 @@
+---
+name: arcgis-map-widget
+description: Use when touching R/arc-map.R, R/arc-map-proxy.R, R/arcgis-map-widget.R, srcjs/widgets/arcgisMap.js, or anything about drawing an sf object on <arcgis-map> - layers, renderers, hover tooltips, the map Shiny proxy, or the S7 classes behind them. Maps have no bundled .d.ts spec, so their types come from the Web Map Specification and arcgisutils' builders, not from @arcgis/charts-components. Load this before adding a map feature or a map S7 class.
+---
+
+# ArcGIS maps -> S7 -> `<arcgis-map>`
+
+Maps share this package's renderer and palette code with charts and almost
+nothing else. **Do not reason about maps by analogy to charts** - the two
+halves that look the same (a layer, a renderer) are the same, and everything
+else differs. Full writeup: `dev-docs/map-components-plan.md`.
+
+`inst/htmlwidgets/arcgisMap.js` and `arcgisMap.css` are **generated output**.
+The source is `srcjs/widgets/arcgisMap.js`. Build with `just bundle` (or
+`bundle-dev`); `load_all()` does not rebuild JS. See the `arcgis-js-widget`
+skill for the build system, which both widgets share.
+
+## There is no bundled spec for maps
+
+`@arcgis/charts-components` ships `dist/spec/*.d.ts`, and the
+`arcgis-spec-types` skill is built on hand-writing S7 classes from it.
+**`@arcgis/map-components` ships nothing equivalent** - `dist/types/` is
+framework glue, `dist/support/` is `resources.d.ts`/`slots.d.ts`, and there
+is no JSON schema anywhere. So when you need a map type:
+
+| what | where it comes from |
+|---|---|
+| the layer (`IFeatureLayer`) | `rest-js-types.d.ts:1953`, already modeled in `R/types-feature-layer.R` |
+| renderers | the **web map** specification - not the charts spec (`IDrawingInfo$renderer` is `any`), not the web *scene* spec (its renderers are `Symbol3D`, SceneView only) |
+| `layerDefinition`, `featureCollection`, `popupInfo` | built by `arcgisutils`, passed through as bare lists |
+| element accessors | `node_modules/@arcgis/map-components/dist/components/arcgis-map/customElement.d.ts` |
+
+`WebMap.fromJSON()` is **not** called and the Web Map Specification is not
+modeled as a document. The persistence format is the feature collection
+layer, so there is no document spec to write. "S7 all the way down" models
+the *layer*, not the document.
+
+## The S7 classes are here on purpose, but verify against arcgisutils
+
+The S7 type analogues live in this package **for now and migrate to
+arcgisutils later**. That is the plan - keep writing them here. What is not
+optional is verifying their behavior against arcgisutils first; the repo is
+cloned at `../arcgisutils`, so read the implementation, not just the docs.
+Index: <https://r.esri.com/arcgisutils/llms.txt>.
+
+arcgisutils owns the R-to-Esri type mapping and you must not re-derive it:
+`as_fields()` (`infer_esri_type()` is deprecated as of 0.4.0) decides the
+`esriFieldType*` for a column, `ptype_tbl()`/`fields_as_ptype_df()` go the
+other way, and `is_date()`/`date_to_ms()`/`from_esri_date()` own dates.
+
+**Never hand-assemble a layer shape.** `as_layer()`,
+`as_layer_definition()` and `as_feature_collection()` take the arguments you
+would otherwise patch in by hand (`drawing_info`, `layer_definition`, `id`,
+`popup_info`). Their return values are a documented interface; reaching into
+one to re-assemble its parts couples us to its internals. `as_feature_layer()`
+(`R/arc-data.R`) is the **single producer** of a layer for both widgets.
+
+Two gotchas that are arcgisutils behavior, not ours: `as_layer()` invents an
+`object_id` column (`1:nrow(x)`) when one is absent, which is what map object
+ids mean; and a `logical` column has no `vec_mapping` entry, so `as_fields()`
+errors on one.
+
+## The element takes live objects, not a config
+
+`<arcgis-map>`'s accessors are live `@arcgis/core` instances - `map: Map`,
+`basemap: Basemap | string`, `graphics: Collection<Graphic>`. **There is no
+`config` property and no `createModel()` equivalent**, so none of the chart's
+`deepMerge`-over-defaults machinery applies. R sends `basemap`/`center`/
+`zoom`/`extent` (all four autocast) plus a list of layers, and the JS builds
+each `FeatureLayer` itself.
+
+`viewOnReady()` gates everything - `mapEl.map` is not there before it
+resolves, so layers are added after.
+
+Two SDK converters do the real work and neither should be hand-rolled:
+`FeatureSet.fromJSON()` (Esri feature JSON -> `Graphic`s, and
+`esriGeometryPoint` -> the `"point"` `geometryType` wants) and
+`renderers/support/jsonUtils.fromJSON()`.
+
+`opacity` and `visibility` are properties of the layer itself, not of the
+`layerDefinition` - and `visibility`, not `visible`, is the spec's name
+(`ILayer`, `rest-js-types.d.ts:1324`).
+
+## Renderers: simpler than charts
+
+**A map renderer resolves per feature against the layer**, so the
+`uniqueValue` branch charts can only reach while aggregating is always
+available. `map_renderer()` is therefore simpler than `color_renderer()`:
+numeric -> `continuous_renderer()` (shared verbatim), anything else ->
+`unique_value_renderer()`. No `arcgisviz_color` code column, none of the
+amCharts5 workaround.
+
+`geometry_symbol_map` is the map's answer to `chart_type_map`'s `symbol_*`
+entries - **the geometry decides the symbol**, not the chart type.
+`add_layer(color =)` takes a bare column; a *fixed* colour is `palette` with
+no `color`, since a map layer has one symbol either way.
+
+## Hover tooltips are `popupInfo`
+
+`add_layer(tooltip = c(County = NAME, Births = BIR74))` - bare column names
+in `c()`, a name becomes the label, a bare column labels itself.
+
+The fields ride as **`popupInfo`**, the web map spec's own name for a
+labelled field list, written through `as_layer(popup_info =)` where it lands
+beside `featureSet` and `layerDefinition`. Nothing here invents a shape. The
+client builds a real `PopupTemplate` from it for its `fieldInfos`, then sets
+`popupEnabled = false`: the template exists to be read, not to open a popup
+repeating what the hover already says.
+
+Hovering is `arcgisViewPointerMove` -> `hitTest({ include: })`, wrapped in
+`promiseUtils.debounce()` because the pointer outruns the hit test.
+Superseded calls reject with `AbortError` and **must be swallowed**.
+
+**Format a tooltip value by its field type, not its JS type.**
+`esriFieldTypeDate` is milliseconds from the epoch
+(`arcgisutils::date_to_ms()`), with `-1` for NA (`from_esri_date()`), so a
+date read off `graphic.attributes` is a 13-digit number. The JS reads
+`layer.fields[].type` - `Field.fromJSON` maps `esriFieldTypeDate` -> `"date"`
+(`@arcgis/core/layers/support/fieldType.js`) - and branches on that.
+
+## The Shiny proxy
+
+**`ArcMapProxy` subclasses `ArcMap`**, the same trick as `ArcProxy`:
+`set_basemap()`, `set_view()` and `add_layer()` assign a property and return
+the object, so all three work on a proxy with zero duplicated code, and
+`arc_update()` flushes them as one message.
+
+`arc_update()`, `set_filter()` and `set_selection()` are **S7 generics shared
+with the chart proxy**. A method on `S7::class_any` gives the friendly "must
+be an ArcProxy or ArcMapProxy" error instead of S7's own "can't find method".
+Map-only: `set_layer()`, `remove_layer()`, `arc_goto()`, `arc_screenshot()`.
+
+**A proxy layer must be named**, because the name *is* the layer id
+(`map_layer_id()`). An unnamed layer is only positionally unique and would
+collide with the rendered map's own `arcgisviz-layer-<i>`. Re-adding a name
+already on the map replaces it, which is what makes `add_layer()` idempotent
+across flushes and gives `set_layer()`/`remove_layer()` a handle.
+
+**Serialize proxy payloads yourself.** `map_send()` runs `widget_json()` and
+sends the result as a *string* the client `JSON.parse`s. Shiny would use
+jsonlite, which sends `layerDefinition$fields` columnar and breaks
+`Field.fromJSON` - the same trap `TOJSON_FUNC` avoids on the render path.
+
+Protocol mirrors the chart's: one handler, `"arcgisviz-map"`, with a `method`
+discriminator - `update`, `remove`, `layer`, `filter`, `highlight`, `goto`,
+`screenshot`. The layer stays in the factory closure, so **the data never
+crosses the wire twice**.
+
+`set_filter()` is the layer's `definitionExpression`; `set_selection()` is
+`layerView.highlight()`, whose handle must be kept per layer and removed
+before the next one. Events become `input$<id>_click`/`_hover`/`_view`/
+`_screenshot`, plus `_error`. `_hover` fires only when the feature under the
+pointer *changes* - every pointer move would otherwise be a websocket
+message.
+
+## Verifying a change (no browser available here)
+
+Same ceiling as the chart widget - there is no browser automation, so this
+confirms the R -> JSON -> htmlwidget pipeline and that webpack produced
+loadable JS, **not** that the map draws correctly.
+
+```r
+devtools::load_all(quiet = TRUE)
+nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
+w <- as_widget(add_layer(arc_map(), nc, color = BIR74, tooltip = NAME))
+htmlwidgets::saveWidget(w, tempfile(fileext = ".html"), selfcontained = FALSE)
+```
+
+`tests/testthat/test-map.R` asserts the serialized layer shape and
+`test-map-proxy.R` the message payloads; both read what the browser reads,
+not the R objects. For a proxy, pass a fake session capturing
+`sendCustomMessage()` and parse the payload string with
+`yyjsonr::opts_read_json(arr_of_objs_to_df = FALSE)` - simplifying arrays to
+a data frame hides the shape the client actually receives.
+
+## Deferred (don't "fix" without asking)
+
+- **Click popups**, one flag away but redundant with the hover text until
+  they show something it does not.
+- **A legend** (`arcgis-legend` slotted in) and the ~176 other widget
+  components - the `{calcite}` problem, see the plan doc.
+- **Non-feature layer types** - a layer here always carries a client side
+  `featureCollection`, never a service `url`.
+- **Offline assets.** `@arcgis/core`'s `config.js` defaults `assetsPath` to
+  the Esri CDN, so nothing configures it. Offline would need assets in
+  `inst/htmlwidgets/` plus `setAssetPath()`. Not decided.
+- **Modeling `Graphic`/`Collection`-typed accessors as S7.** They are live
+  objects with no JSON persistence form.

@@ -38,6 +38,7 @@ Collate:
     'arcgis-chart-widget.R'
     'palettes.R'
     'arc-proxy.R'
+    'arc-map-proxy.R'
     'arcgisviz-package.R'
     'zzz.R'
 Imports:

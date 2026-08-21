@@ -132,6 +132,126 @@ test_that("the view is only sent when it is set", {
   expect_identical(placed$x$zoom, 7)
 })
 
+test_that("tooltip fields ride as popupInfo, the spec's own shape", {
+  layer <- sent_layer(add_layer(
+    arc_map(),
+    test_points(),
+    tooltip = c(Group = group, value),
+    name = "Points"
+  ))
+
+  info <- layer$featureCollection$layers[[1]]$popupInfo
+  expect_identical(info$title, "Points")
+  expect_identical(
+    vapply(info$fieldInfos, function(f) f$fieldName, character(1)),
+    c("group", "value")
+  )
+
+  # A bare column labels itself; a named one takes the name.
+  expect_identical(
+    vapply(info$fieldInfos, function(f) f$label, character(1)),
+    c("Group", "value")
+  )
+
+  # A named layer is identified by its name so a proxy can refer to it.
+  expect_identical(layer$id, "Points")
+})
+
+test_that("a layer without a tooltip carries no popupInfo", {
+  layer <- sent_layer(add_layer(arc_map(), test_points()))
+  expect_null(layer$featureCollection$layers[[1]]$popupInfo)
+})
+
+test_that("a date tooltip column stays an Esri date field", {
+  skip_if_not_installed("sf")
+  # Added after the geometry column on purpose: that ordering used to be
+  # mis-indexed by arcgisutils::as_featureset().
+  dated <- test_points()
+  dated$when <- as.Date(c("2020-01-01", "2021-06-05", "2022-03-09"))
+
+  layer <- sent_layer(add_layer(arc_map(), dated, tooltip = when))
+  fields <- layer$featureCollection$layers[[1]]$layerDefinition$fields
+  expect_identical(fields$type[fields$name == "when"], "esriFieldTypeDate")
+
+  # Milliseconds from the epoch, which is what the browser has to reformat.
+  attrs <- layer$featureCollection$layers[[1]]$featureSet$features[[1]]$attributes
+  expect_identical(attrs$when, arcgisutils::date_to_ms(dated$when[[1]]))
+})
+
+test_that("a REST discriminator defaults rather than being restated", {
+  # A renderer built by hand and handed to add_layer() would otherwise
+  # serialize without the `type` jsonUtils.fromJSON() dispatches on.
+  expect_identical(s7x::as_vector(ISimpleRenderer())$type, "simple")
+  expect_identical(s7x::as_vector(IUniqueValueRenderer())$type, "uniqueValue")
+  expect_identical(s7x::as_vector(IColorVisualVariable())$type, "colorInfo")
+  expect_identical(s7x::as_vector(ISimpleMarkerSymbol())$type, "esriSMS")
+  expect_identical(s7x::as_vector(ISimpleFillSymbol())$type, "esriSFS")
+  expect_identical(s7x::as_vector(ISimpleLineSymbol())$type, "esriSLS")
+})
+
+test_that("new_renderer() takes a friendly type and emits the spec one", {
+  simple <- s7x::as_vector(new_renderer("simple", label = "All"))
+  expect_identical(simple$type, "simple")
+  expect_identical(simple$label, "All")
+
+  grouped <- s7x::as_vector(new_renderer("unique-value", field1 = "group"))
+  expect_identical(grouped$type, "uniqueValue")
+  expect_identical(grouped$field1, "group")
+
+  # The default is the common case, so `type` can be left off entirely.
+  expect_identical(s7x::as_vector(new_renderer())$type, "simple")
+})
+
+test_that("new_renderer() refuses arguments that would misbuild it", {
+  expect_error(new_renderer("fancy"), "must be one of")
+  expect_error(new_renderer("simple", field1 = "x"), "not a property")
+
+  # Unnamed, a value would land on `type` and replace the discriminator.
+  expect_error(
+    new_renderer("simple", ISimpleMarkerSymbol()),
+    "must be named"
+  )
+})
+
+test_that("add_layer() dispatches on a prebuilt IFeatureLayer", {
+  layer <- as_feature_layer(test_points()) |>
+    add_renderer(ISimpleRenderer(
+      symbol = ISimpleMarkerSymbol(size = 11),
+      visualVariables = list(IColorVisualVariable(field = "value"))
+    ))
+
+  map <- add_layer(arc_map(), layer, name = "Points", opacity = 0.5)
+  sent <- sent_layer(map)
+
+  expect_identical(sent$id, "Points")
+  expect_identical(sent$opacity, 0.5)
+
+  renderer <- sent$featureCollection$layers[[1]]$layerDefinition$drawingInfo$renderer
+  expect_identical(renderer$type, "simple")
+  expect_identical(renderer$symbol$size, 11)
+  expect_identical(renderer$visualVariables[[1]]$field, "value")
+})
+
+test_that("a prebuilt layer keeps an id its builder chose", {
+  layer <- as_feature_layer(test_points(), id = "mine")
+  expect_identical(sent_layer(add_layer(arc_map(), layer))$id, "mine")
+
+  # An untouched default is positional instead, so two cannot collide.
+  plain <- as_feature_layer(test_points())
+  expect_identical(
+    sent_layer(add_layer(arc_map(), plain))$id,
+    "arcgisviz-layer-1"
+  )
+})
+
+test_that("a prebuilt layer already answers the aesthetic arguments", {
+  layer <- as_feature_layer(test_points())
+
+  expect_error(add_layer(arc_map(), layer, color = value), "must be empty")
+  expect_error(add_renderer(test_points(), ISimpleRenderer()), "IFeatureLayer")
+  expect_error(add_renderer(layer, "nope"), "ISimpleRenderer")
+})
+
 test_that("a map refuses what it cannot draw", {
   expect_error(as_widget(arc_map()), "no layers")
   expect_error(arc_map("moon"), "must be one of")
@@ -139,6 +259,14 @@ test_that("a map refuses what it cannot draw", {
   expect_error(set_view(arc_map(), center = 1), "two numbers")
   expect_error(add_layer(arc_map(), test_points(), missing), "not found")
   expect_error(set_basemap("not a map", "osm"), "must be an")
+  expect_error(
+    add_layer(arc_map(), test_points(), tooltip = c(group, nope)),
+    "not found"
+  )
+  expect_error(
+    add_layer(arc_map(), test_points(), tooltip = c(group + 1)),
+    "bare column names"
+  )
 
   # A plain data frame has no geometry to place.
   expect_error(

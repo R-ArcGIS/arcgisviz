@@ -2,26 +2,32 @@
 % Please edit documentation in R/arc-proxy.R
 \name{set_filter}
 \alias{set_filter}
-\title{Filter a rendered chart in the browser}
+\title{Filter a rendered chart or map in the browser}
 \usage{
-set_filter(proxy, where = NULL, object_ids = NULL)
+set_filter(proxy, ...)
 }
 \arguments{
-\item{proxy}{Defines which \code{\link[=arc_proxy]{arc_proxy()}} to filter.}
+\item{proxy}{Defines which \code{\link[=arc_proxy]{arc_proxy()}} or \code{\link[=arc_map_proxy]{arc_map_proxy()}} to filter.}
+
+\item{...}{Reserved for methods.}
 
 \item{where}{default \code{NULL}. Defines a SQL where clause, such as
 \code{"species = 'Adelie'"}. \code{NULL}, \code{NA}, or \code{""} clear it.}
 
 \item{object_ids}{default \code{NULL}. Defines which rows to keep, by object id.
-\code{NULL} or an empty vector clears them.}
+\code{NULL} or an empty vector clears them. Charts only.}
+
+\item{layer}{default \code{NULL}. Defines which map layer to filter, by name.
+\code{NULL} filters every layer. Maps only.}
 }
 \value{
 \code{proxy}, invisibly.
 }
 \description{
-Applies a SQL \code{where} clause, or a set of object ids, to a chart that is
-already on screen. The chart requeries the layer it already holds, so no
-data is resent and no model is rebuilt.
+Applies a SQL \code{where} clause, or a set of object ids, to a chart or map that
+is already on screen. Nothing is resent and no model is rebuilt: the chart
+requeries the layer it already holds, and a map layer re-evaluates its own
+definition expression.
 }
 \details{
 Each call defines the complete filter state, because the element replaces

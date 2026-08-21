@@ -44,6 +44,8 @@ check_attribute_columns <- function(.data, call = rlang::caller_env()) {
 #'   a list holding a `renderer`.
 #' @param opacity default `NULL`. Defines the layer opacity, from `0` to `1`.
 #' @param visibility default `NULL`. Defines whether the layer starts visible.
+#' @param popup_info default `NULL`. Defines which fields are shown when a
+#'   feature is hovered or clicked, as a list holding `title` and `fieldInfos`.
 #' @return An [IFeatureLayer].
 #' @examples
 #' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
@@ -57,7 +59,8 @@ as_feature_layer <- function(
   id = "arcgisviz-layer",
   drawing_info = NULL,
   opacity = NULL,
-  visibility = NULL
+  visibility = NULL,
+  popup_info = NULL
 ) {
   check_attribute_columns(.data)
 
@@ -80,7 +83,8 @@ as_feature_layer <- function(
           .data,
           name = name,
           title = title,
-          layer_definition = definition
+          layer_definition = definition,
+          popup_info = popup_info
         )
       )
     )

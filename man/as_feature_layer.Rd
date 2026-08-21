@@ -11,7 +11,8 @@ as_feature_layer(
   id = "arcgisviz-layer",
   drawing_info = NULL,
   opacity = NULL,
-  visibility = NULL
+  visibility = NULL,
+  popup_info = NULL
 )
 }
 \arguments{
@@ -29,6 +30,9 @@ a list holding a \code{renderer}.}
 \item{opacity}{default \code{NULL}. Defines the layer opacity, from \code{0} to \code{1}.}
 
 \item{visibility}{default \code{NULL}. Defines whether the layer starts visible.}
+
+\item{popup_info}{default \code{NULL}. Defines which fields are shown when a
+feature is hovered or clicked, as a list holding \code{title} and \code{fieldInfos}.}
 }
 \value{
 An \link{IFeatureLayer}.

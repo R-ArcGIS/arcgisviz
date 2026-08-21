@@ -68,6 +68,8 @@ reference:
     contents:
       - arc_map
       - add_layer
+      - add_renderer
+      - new_renderer
       - set_basemap
       - set_view
       - ArcMap
@@ -94,14 +96,17 @@ reference:
 
   - title: Shiny
     desc: >
-      Update a chart that is already on screen without resending its data,
-      and read back what the reader did to it.
+      Update a chart or map that is already on screen without resending its
+      data, and read back what the reader did to it.
     contents:
       - ArcProxy
+      - ArcMapProxy
       - arc_update
       - set_filter
       - set_selection
       - set_legend
+      - set_layer
+      - arc_goto
       - arc_refresh
 
   - title: Chart configuration

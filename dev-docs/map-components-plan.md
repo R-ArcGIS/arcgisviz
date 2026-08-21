@@ -110,22 +110,29 @@ would fight the grain. They slot in as children of the container, so
 element is the cheap version, and only the ones with real inputs need
 bindings.
 
+## Done since
+
+1. **Shiny.** `arc_map_proxy()` mirrors `arc_proxy()` (`R/arc-map-proxy.R`).
+   The layer stays in the factory closure so data does not cross twice, same
+   as charts. `goTo()`, `takeScreenshot()` and the `hitTest()`-backed click
+   and hover events are wired; `arcgisViewLayerviewCreate` is not.
+2. **Hover tooltips.** `add_layer(tooltip =)` builds a `popupInfo` through
+   `as_layer(popup_info =)` and the client reads its `fieldInfos`. Click
+   popups stay off (`popupEnabled = false`) - see CLAUDE.md's map section.
+
 ## Still to do
 
-1. **Shiny.** `arc_map_proxy()` mirroring `arc_proxy()`: the element already
-   has `goTo()`, `hitTest()`, `takeScreenshot()`, and the event surface is
-   large (`arcgisViewClick`, `arcgisViewChange`, `arcgisViewLayerviewCreate`,
-   the pointer family). The layer stays in the factory closure so data does
-   not cross twice, same as charts.
-2. **Popups.** `IFeatureLayer$popupInfo` is modeled and `as_layer()` takes a
-   `popup_info` argument, but nothing builds one and the JS ignores it. The
-   field aliases `set_tooltip()` writes would carry straight over.
-3. **A legend**, which is `arcgis-legend` slotted in, and the first real
+1. **Click popups**, which are now one flag away but would duplicate the
+   hover text until they can show something the tooltip does not.
+2. **A legend**, which is `arcgis-legend` slotted in, and the first real
    test of the widget-component idiom.
-4. **Layer types beyond feature collections.** `IFeatureLayer` is modeled;
+3. **Layer types beyond feature collections.** `IFeatureLayer` is modeled;
    the image-service, tiled-image-service, and WCS members of
    `WebChart$iLayer`'s union are not, and a layer here always carries a
    client side `featureCollection` rather than a service `url`.
+4. **`setDataFilters()`-style persistence.** `set_filter()` writes
+   `definitionExpression`, which the layer keeps, but nothing persists a
+   filter across a re-render the way the chart's stored config does.
 
 ## What I would not do
 

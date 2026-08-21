@@ -36,7 +36,7 @@ WebChartAxisScrollBar <- new_class(
 ISimpleLineSymbol <- new_class(
   "ISimpleLineSymbol",
   properties = list(
-    type = s7x::class_string,
+    type = s7x::property_scalar(class_character, default = "esriSLS"),
     style = SimpleLineSymbolStyle,
     color = s7x::property_union(Color, NULL, default = NULL),
     width = s7x::class_double
@@ -49,7 +49,7 @@ ISimpleLineSymbol <- new_class(
 ISimpleFillSymbol <- new_class(
   "ISimpleFillSymbol",
   properties = list(
-    type = s7x::class_string,
+    type = s7x::property_scalar(class_character, default = "esriSFS"),
     style = SimpleFillSymbolStyle,
     color = s7x::property_union(Color, NULL, default = NULL),
     outline = s7x::property_union(ISimpleLineSymbol, NULL, default = NULL)
@@ -62,7 +62,7 @@ ISimpleFillSymbol <- new_class(
 ISimpleMarkerSymbol <- new_class(
   "ISimpleMarkerSymbol",
   properties = list(
-    type = s7x::class_string,
+    type = s7x::property_scalar(class_character, default = "esriSMS"),
     style = SimpleMarkerSymbolStyle,
     color = s7x::property_union(Color, NULL, default = NULL),
     size = s7x::class_double,

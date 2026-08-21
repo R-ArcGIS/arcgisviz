@@ -40,3 +40,50 @@ arc_map("streets-navigation-vector") |>
 arc_map() |>
   add_layer(nc, color = AREA) |>
   set_basemap("oceans")
+
+# Everything above builds the layer for you. When you want symbology this
+# package does not expose, build the layer yourself and hand it over -
+# add_layer() dispatches on what it is given.
+nc |>
+  as_feature_layer(name = "Counties") |>
+  add_renderer(
+    new_renderer(
+      "simple",
+      symbol = ISimpleFillSymbol(
+        style = SimpleFillSymbolStyle("esriSFSSolid"),
+        color = Color(r = 180, g = 40, b = 40, a = 160),
+        outline = ISimpleLineSymbol(
+          style = SimpleLineSymbolStyle("esriSLSSolid"),
+          color = Color(r = 255, g = 255, b = 255, a = 255),
+          width = 0.5
+        )
+      )
+    )
+  ) |>
+  (\(layer) add_layer(arc_map("gray-vector"), layer))()
+
+# No `type =` anywhere above: it is fixed by the class and defaults, so the
+# renderer serializes with the discriminator jsonUtils.fromJSON() needs.
+
+# Hover a feature and `tooltip` decides what it says. A bare column labels
+# itself; name one and the name becomes the label.
+arc_map("gray-vector") |>
+  add_layer(nc, color = BIR74, tooltip = c(County = NAME, Births = BIR74))
+
+# The labels ride as popupInfo, the web map spec's own name for a labelled
+# field list, so nothing here invents a JSON shape.
+arc_map() |>
+  add_layer(
+    st_centroid(nc),
+    color = SID74,
+    size = 9,
+    tooltip = c(County = NAME, `Deaths, 1974` = SID74, `Births, 1974` = BIR74)
+  )
+
+# Date columns arrive in the browser as milliseconds from the epoch
+# (arcgisutils::date_to_ms()); the tooltip reads the field type and formats
+# them back into dates rather than printing the number.
+nc$surveyed <- as.Date("2024-01-01") + seq_len(nrow(nc))
+
+arc_map("topo-vector") |>
+  add_layer(nc, color = AREA, tooltip = c(County = NAME, Surveyed = surveyed))

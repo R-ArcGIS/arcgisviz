@@ -2,21 +2,28 @@
 % Please edit documentation in R/arc-proxy.R
 \name{set_selection}
 \alias{set_selection}
-\title{Select marks on a rendered chart}
+\title{Select features on a rendered chart or map}
 \usage{
-set_selection(proxy, object_ids)
+set_selection(proxy, object_ids, ...)
 }
 \arguments{
-\item{proxy}{Defines which \code{\link[=arc_proxy]{arc_proxy()}} to select on.}
+\item{proxy}{Defines which \code{\link[=arc_proxy]{arc_proxy()}} or \code{\link[=arc_map_proxy]{arc_map_proxy()}} to select on.}
 
 \item{object_ids}{Defines which rows to select, by object id. An empty
 vector clears the selection.}
+
+\item{...}{Reserved for methods.}
+
+\item{layer}{default \code{NULL}. Defines which map layer to highlight in, by
+name. \code{NULL} highlights in every layer. Maps only.}
 }
 \value{
 \code{proxy}, invisibly.
 }
 \description{
-Select marks on a rendered chart
+Marks rows as selected by object id. A chart draws them as its own
+selection; a map highlights them in the view's highlight colour, which is
+what makes a chart and a map on the same data link up.
 }
 \examples{
 df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))

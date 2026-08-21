@@ -63,7 +63,7 @@ Every user-facing feature gets a `dev/` example (one file per feature,
 `dev/set-labs.R`), rendered in the Viewer and using `datasets::penguins`.
 These become user-facing tutorials later, so write them to be read.
 
-## Two skills, load them for the relevant work
+## Three skills, load them for the relevant work
 
 - **`arcgis-spec-types`** - hand-writing `s7x`-based S7 classes in `R/`
   directly from `@arcgis/charts-components`'s bundled `.d.ts` spec (see
@@ -73,9 +73,15 @@ These become user-facing tutorials later, so write them to be read.
 - **`arcgis-js-widget`** - the htmlwidget: `srcjs/`, webpack config,
   `R/arcgis-chart-widget.R`, the `createModel`/`<arcgis-chart>` contract.
   Load this before touching anything JS-side or the R widget wrapper.
+- **`arcgis-map-widget`** - the *other* widget: `R/arc-map.R`,
+  `R/arc-map-proxy.R`, `srcjs/widgets/arcgisMap.js`, and the S7 classes
+  behind them. Maps have **no bundled spec**, so their types come from the
+  Web Map Specification and arcgisutils' builders rather than a `.d.ts` -
+  which is why this is its own skill and not a section of the other two.
+  Load it before adding a map feature or a map S7 class.
 
-Both skills point to more detail: `dev-docs/js-widget-architecture.md` for the
-full JS/data-flow writeup.
+The skills point to more detail: `dev-docs/js-widget-architecture.md` for the
+full JS/data-flow writeup, `dev-docs/map-components-plan.md` for the map one.
 
 ## Current state, in one paragraph
 
@@ -102,7 +108,8 @@ the `ArcChart` side, which grouped charts make worth closing. Alongside all of
 that, and sharing its renderer and palette code but almost nothing else, sits
 a second widget: `arc_map() |> add_layer()` draws an `sf` object on
 `<arcgis-map>` as a client side feature layer (`R/arc-map.R`,
-`srcjs/widgets/arcgisMap.js`). It renders; it has no Shiny proxy yet.
+`srcjs/widgets/arcgisMap.js`), with hover tooltips (`add_layer(tooltip =)`)
+and its own Shiny proxy (`R/arc-map-proxy.R`).
 
 Two shapes worth knowing before adding a seventh chart type. `chart_type_map`
 (`R/arc-chart.R`) carries `config_class`, `has_y`, `aggregates`,
@@ -477,6 +484,53 @@ empty, so nothing configures it. Offline use would need assets copied into
 `inst/htmlwidgets/` plus `setAssetPath()`; not decided. See
 `dev-docs/map-components-plan.md`.
 
+**Hover tooltips are `popupInfo`, not an invented shape.** `add_layer(tooltip
+= c(County = NAME))` writes the web map spec's own labelled field list
+through `as_layer(popup_info =)`, where it lands beside `featureSet` and
+`layerDefinition` on the feature collection layer. The client turns it into a
+real `PopupTemplate` for its `fieldInfos` and then sets `popupEnabled =
+false`: the template is there to be read, not to open a popup that would
+repeat what the hover already says. Hovering is `arcgisViewPointerMove` ->
+`hitTest({ include: })`, wrapped in `promiseUtils.debounce()` because the
+pointer outruns the hit test - superseded calls reject with `AbortError` and
+must be swallowed.
+
+**A tooltip value is formatted by its field type, not by its JS type.**
+`esriFieldTypeDate` is milliseconds from the epoch
+(`arcgisutils::date_to_ms()`), with `-1` for NA (`from_esri_date()`), so a
+date read off `graphic.attributes` is a 13-digit number and formatting it as
+one is wrong. The JS reads `layer.fields[].type` (`Field.fromJSON` maps
+`esriFieldTypeDate` -> `"date"`, `fieldType.js`) and branches on that.
+
+**`ArcMapProxy` subclasses `ArcMap`**, the same trick as `ArcProxy`:
+`set_basemap()`, `set_view()` and `add_layer()` all work on a proxy unchanged,
+and `arc_update()` flushes. `arc_update()`, `set_filter()` and
+`set_selection()` are S7 generics shared with the chart proxy - dispatch on
+`S7::class_any` gives the friendly "must be an ArcProxy or ArcMapProxy"
+error instead of S7's own "can't find method". Map-only: `set_layer()`,
+`remove_layer()`, `arc_goto()`, `arc_screenshot()`.
+
+**A proxy layer must be named**, because the name *is* the layer id
+(`map_layer_id()`); an unnamed one is only positionally unique and would
+collide with the rendered map's own `arcgisviz-layer-<i>`. Re-adding a name
+already on the map replaces it, which is what makes `add_layer()` idempotent
+across flushes.
+
+**Map proxy payloads are serialized by us, not by Shiny.** `map_send()` runs
+`widget_json()` and sends the result as a *string* the client `JSON.parse`s.
+Shiny would use jsonlite, which sends `layerDefinition$fields` columnar and
+breaks `Field.fromJSON` - the same trap `TOJSON_FUNC` avoids on the render
+path. Message protocol mirrors the chart's: one handler, `"arcgisviz-map"`,
+with a `method` discriminator (`update`, `remove`, `layer`, `filter`,
+`highlight`, `goto`, `screenshot`).
+
+`set_filter()` on a map is the layer's `definitionExpression`;
+`set_selection()` is `layerView.highlight()`, whose handle has to be kept per
+layer and removed before the next one. Events become
+`input$<id>_click`/`_hover`/`_view`/`_screenshot`, plus `_error`. `_hover`
+only fires when the feature under the pointer *changes* - every pointer move
+would otherwise be a websocket message.
+
 ## Deliberately deferred (don't "fix" these without asking)
 
 - **The non-feature layer types.** `WebChart$iLayer` is
@@ -552,6 +606,16 @@ before writing any of it.
   `as_feature_collection()` all take the arguments you would otherwise be
   tempted to patch in by hand (`drawing_info`, `layer_definition`, `id`,
   `popup_info`).
+
+  **The S7 type analogues live here for now and migrate to arcgisutils
+  later** - that is the plan, not an accident, so keep writing them here.
+  What is not optional is **verifying their behavior against arcgisutils
+  first**: `as_fields()` (`infer_esri_type()` is deprecated as of 0.4.0)
+  decides the `esriFieldType*` for an R column, `ptype_tbl()`/
+  `fields_as_ptype_df()` go the other way, and `is_date()`/`date_to_ms()`/
+  `from_esri_date()` own date handling. Read the implementation, not just
+  the docs - the repo is cloned at `../arcgisutils`. Index:
+  <https://r.esri.com/arcgisutils/llms.txt>.
 
 - S7 classes: `Foo := new_class(properties = list(...))` - no name string
   as the first arg (breaks `:=`'s inference, silently binds to `parent`

@@ -46,7 +46,8 @@ MapLayer := new_class(
     color = S7::class_list,
     size = s7x::class_double,
     opacity = s7x::class_double,
-    visible = s7x::class_boolean
+    visible = s7x::class_boolean,
+    tooltip = S7::class_character
   )
 )
 
@@ -151,29 +152,60 @@ set_view <- function(map, center = NULL, zoom = NULL, extent = NULL) {
 #'   name from [esri_palettes()] or a vector of R colours.
 #' @param size default `NULL`. Defines the marker size or line width in points.
 #' @param opacity default `NULL`. Defines the layer opacity, from `0` to `1`.
-#' @param name default `NULL`. Defines the layer name shown in a legend.
+#' @param name default `NULL`. Defines the layer name, which is also the handle
+#'   [remove_layer()] and [set_layer()] take. On an [arc_map_proxy()] it is
+#'   required, because that is what tells the browser which layer is meant.
+#' @param tooltip default `NULL`. Defines which columns are shown when a
+#'   feature is hovered, as bare column names wrapped in `c()`. Name one to
+#'   label it, as in `c(County = NAME)`.
+#' @param visible default `NULL`. Defines whether the layer starts drawn.
+#'   Only when `.data` is an [IFeatureLayer].
+#' @param ... Passed between methods. Must be empty when `.data` is an
+#'   [IFeatureLayer], whose own properties already answer `color`, `palette`,
+#'   `size` and `tooltip`.
 #' @return `map`, with the layer appended.
+#' @details
+#' `.data` is either a data frame to build a layer from, or an
+#' [IFeatureLayer] you built yourself. The second form is the escape hatch:
+#' anything this function does not expose is done by constructing the layer
+#' and modifying it, usually with [add_renderer()].
+#'
+#' ```r
+#' nc |>
+#'   as_feature_layer() |>
+#'   add_renderer(ISimpleRenderer(symbol = my_symbol)) |>
+#'   (\(lyr) add_layer(arc_map(), lyr))()
+#' ```
 #' @examples
 #' set_basemap(arc_map(), "gray-vector")
 #' @export
-add_layer <- function(
+add_layer <- S7::new_generic(
+  "add_layer",
+  c("map", ".data"),
+  function(map, .data, ...) S7::S7_dispatch()
+)
+
+S7::method(add_layer, list(ArcMap, S7::class_any)) <- function(
   map,
   .data,
   color = NULL,
   palette = NULL,
   size = NULL,
   opacity = NULL,
-  name = NULL
+  name = NULL,
+  tooltip = NULL,
+  ...
 ) {
-  check_map(map)
   call <- rlang::caller_env()
+  check_proxy_layer_name(map, name, call)
 
   layer <- MapLayer(
     data = .data,
     name = if (rlang::is_null(name)) NA_character_ else name,
     size = if (rlang::is_null(size)) NA_real_ else as.double(size),
     opacity = if (rlang::is_null(opacity)) NA_real_ else as.double(opacity),
-    visible = TRUE
+    visible = TRUE,
+    tooltip = tooltip_columns(rlang::enquo(tooltip), .data, call)
   )
 
   # Resolved here, not at render, so a bad palette blames this call.
@@ -201,6 +233,216 @@ add_layer <- function(
 
   map@layers <- c(map@layers, list(layer))
   map
+}
+
+# A layer the caller built already carries its own renderer, fields and
+# popupInfo, so only the map-level properties are still open.
+S7::method(add_layer, list(ArcMap, IFeatureLayer)) <- function(
+  map,
+  .data,
+  ...,
+  name = NULL,
+  opacity = NULL,
+  visible = NULL
+) {
+  call <- rlang::caller_env()
+  rlang::check_dots_empty(call = call)
+  check_proxy_layer_name(map, name, call)
+
+  layer <- MapLayer(
+    data = .data,
+    name = if (rlang::is_null(name)) NA_character_ else name,
+    size = NA_real_,
+    opacity = if (rlang::is_null(opacity)) NA_real_ else as.double(opacity),
+    visible = if (rlang::is_null(visible)) TRUE else visible,
+    color = list(),
+    tooltip = character()
+  )
+
+  map@layers <- c(map@layers, list(layer))
+  map
+}
+
+S7::method(add_layer, list(S7::class_any, S7::class_any)) <- function(
+  map,
+  .data,
+  ...
+) {
+  check_map(map)
+}
+
+# `c(County = NAME, Births = BIR74)`, matching how set_tooltip() reads a
+# chart's: a bare column labels itself, a named one takes the name.
+tooltip_columns <- function(quo, .data, call) {
+  expr <- rlang::quo_get_expr(quo)
+  if (rlang::is_null(expr)) {
+    return(character())
+  }
+
+  wrapped <- rlang::is_call(expr, "c")
+  args <- if (wrapped) rlang::call_args(expr) else list(expr)
+  labels <- if (wrapped) rlang::call_args_names(expr) else ""
+
+  cols <- vapply(
+    args,
+    function(arg) {
+      if (!rlang::is_symbol(arg) && !rlang::is_string(arg)) {
+        cli::cli_abort(
+          c(
+            "{.arg tooltip} must be bare column names.",
+            "i" = "Wrap several in {.code c()}, as in
+                   {.code tooltip = c(name, value)}."
+          ),
+          call = call
+        )
+      }
+      rlang::as_string(arg)
+    },
+    character(1)
+  )
+
+  missing <- setdiff(cols, names(.data))
+  if (!rlang::is_empty(missing)) {
+    cli::cli_abort(
+      c(
+        "{.arg tooltip} must name columns in {.arg .data}.",
+        "x" = "Column{?s} {.field {missing}} not found."
+      ),
+      call = call
+    )
+  }
+
+  labels[labels == ""] <- cols[labels == ""]
+  rlang::set_names(cols, labels)
+}
+
+# The web map spec already names "these fields, with these labels": popupInfo
+# on the feature collection layer. The browser reads it for hover and popups.
+map_popup_info <- function(fields, title) {
+  if (rlang::is_empty(fields)) {
+    return(NULL)
+  }
+
+  list(
+    title = title,
+    fieldInfos = lapply(seq_along(fields), function(i) {
+      list(
+        fieldName = unname(fields[[i]]),
+        label = names(fields)[[i]],
+        visible = TRUE
+      )
+    })
+  )
+}
+
+# A named layer is identified by its name so that a proxy can replace, remove,
+# or filter it later; an unnamed one only ever needs to be positionally unique.
+map_layer_id <- function(layer, i) {
+  if (is.na(layer@name)) paste0("arcgisviz-layer-", i) else layer@name
+}
+
+#' Set a layer's renderer
+#'
+#' Attaches a renderer to a layer built by [as_feature_layer()], so that a
+#' symbology this package does not expose can still be handed to [add_layer()].
+#'
+#' @param layer Defines which [IFeatureLayer] to modify.
+#' @param renderer Defines the renderer, an [ISimpleRenderer] or an
+#'   [IUniqueValueRenderer].
+#' @return `layer`, with the renderer set on its `layerDefinition`.
+#' @examples
+#' df <- data.frame(species = c("a", "b"), mass = c(1, 5))
+#'
+#' as_feature_layer(df) |>
+#'   add_renderer(ISimpleRenderer(symbol = ISimpleMarkerSymbol(size = 8)))
+#' @export
+add_renderer <- function(layer, renderer) {
+  call <- rlang::caller_env()
+  if (!S7::S7_inherits(layer, IFeatureLayer)) {
+    cli::cli_abort(
+      c(
+        "{.arg layer} must be an {.cls IFeatureLayer}.",
+        "i" = "Build one with {.fn as_feature_layer}."
+      ),
+      call = call
+    )
+  }
+  if (!is_renderer(renderer)) {
+    cli::cli_abort(
+      c(
+        "{.arg renderer} must be an {.cls ISimpleRenderer} or an
+         {.cls IUniqueValueRenderer}.",
+        "x" = "You supplied {.obj_type_friendly {renderer}}."
+      ),
+      call = call
+    )
+  }
+
+  # Narrow rewrite of a layer arcgisutils built, the same move
+  # tooltip_aliased() makes - not a hand-assembled layer shape.
+  collection <- layer@featureCollection
+  collection$layers[[1]]$layerDefinition$drawingInfo$renderer <- renderer
+  layer@featureCollection <- collection
+  layer
+}
+
+is_renderer <- function(x) {
+  S7::S7_inherits(x, ISimpleRenderer) ||
+    S7::S7_inherits(x, IUniqueValueRenderer)
+}
+
+# The caller's own id survives; only an unset or still-default one is filled
+# in, since two prebuilt layers would otherwise share as_feature_layer()'s.
+prebuilt_layer <- function(layer, i) {
+  built <- layer@data
+  if (!is.na(layer@name)) {
+    built@id <- layer@name
+    built@title <- layer@name
+  } else if (is.na(built@id) || identical(built@id, "arcgisviz-layer")) {
+    built@id <- paste0("arcgisviz-layer-", i)
+  }
+  if (!is.na(layer@opacity)) {
+    built@opacity <- layer@opacity
+  }
+  if (!isTRUE(layer@visible)) {
+    built@visibility <- layer@visible
+  }
+  built
+}
+
+map_feature_layer <- function(layer, i, call) {
+  if (S7::S7_inherits(layer@data, IFeatureLayer)) {
+    return(prebuilt_layer(layer, i))
+  }
+  geometry <- sf_geometry_type(layer@data, call)
+  name <- if (is.na(layer@name)) paste0("layer_", i) else layer@name
+
+  as_feature_layer(
+    layer@data,
+    name = name,
+    id = map_layer_id(layer, i),
+    drawing_info = list(
+      renderer = map_renderer(layer, geometry_symbol_map[[geometry]], call)
+    ),
+    opacity = if (is.na(layer@opacity)) NULL else layer@opacity,
+    visibility = layer@visible,
+    popup_info = map_popup_info(layer@tooltip, name)
+  )
+}
+
+# On a proxy the name is the layer's only handle: the browser has to be told
+# which layer to replace, and set_layer()/remove_layer() take the same name.
+check_proxy_layer_name <- function(map, name, call) {
+  if (!S7::S7_inherits(map, ArcMapProxy) || !rlang::is_null(name)) {
+    return(invisible(NULL))
+  }
+  cli::cli_abort(
+    c(
+      "{.arg name} is required when adding a layer to an {.cls ArcMapProxy}.",
+      "i" = "It is what {.fn set_layer} and {.fn remove_layer} refer to."
+    ),
+    call = call
+  )
 }
 
 check_map <- function(map, call = rlang::caller_env()) {
@@ -270,20 +512,7 @@ S7::method(as_widget, ArcMap) <- function(
 
   call <- rlang::caller_env()
   layers <- lapply(seq_along(x@layers), function(i) {
-    layer <- x@layers[[i]]
-    geometry <- sf_geometry_type(layer@data, call)
-    name <- if (is.na(layer@name)) paste0("layer_", i) else layer@name
-
-    as_feature_layer(
-      layer@data,
-      name = name,
-      id = paste0("arcgisviz-layer-", i),
-      drawing_info = list(
-        renderer = map_renderer(layer, geometry_symbol_map[[geometry]], call)
-      ),
-      opacity = if (is.na(layer@opacity)) NULL else layer@opacity,
-      visibility = layer@visible
-    )
+    map_feature_layer(x@layers[[i]], i, call)
   })
 
   arcgis_map(
