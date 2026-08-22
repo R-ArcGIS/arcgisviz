@@ -18,7 +18,7 @@ NULL
 #
 # Optional properties (not in the schema's `required` array): scalar/enum
 # ones need no special handling - NA already satisfies class_string,
-# class_double, class_boolean, and Enum's allow_na. Object-typed optional
+# class_float, class_boolean, and Enum's allow_na. Object-typed optional
 # properties get property_union(Type, NULL, default = NULL) since there's
 # no NA equivalent for a class instance. Required object-typed properties
 # stay strictly typed (WebChartText$content, WebChartGuide$style/start,
@@ -37,18 +37,18 @@ WebChartTextSymbol <- new_class(
     text = s7x::class_string,
     color = s7x::property_union(Color, NULL, default = NULL),
     backgroundColor = s7x::property_union(Color, NULL, default = NULL),
-    borderLineSize = s7x::class_double,
+    borderLineSize = s7x::class_float,
     borderLineColor = s7x::property_union(Color, NULL, default = NULL),
-    haloSize = s7x::class_double,
+    haloSize = s7x::class_float,
     haloColor = s7x::property_union(Color, NULL, default = NULL),
     verticalAlignment = WebChartTextSymbolVerticalAlignment,
     horizontalAlignment = WebChartTextSymbolHorizontalAlignment,
     rightToLeft = s7x::class_boolean,
     kerning = s7x::class_boolean,
     font = s7x::property_union(IFont, NULL, default = NULL),
-    angle = s7x::class_double,
-    xoffset = s7x::property_union(s7x::class_string, s7x::class_double),
-    yoffset = s7x::property_union(s7x::class_string, s7x::class_double)
+    angle = s7x::class_float,
+    xoffset = s7x::property_union(s7x::class_string, s7x::class_float),
+    yoffset = s7x::property_union(s7x::class_string, s7x::class_float)
   )
 )
 
@@ -88,7 +88,7 @@ WebChartLegend <- new_class(
     title = s7x::property_union(WebChartText, NULL, default = NULL),
     body = s7x::property_union(WebChartTextSymbol, NULL, default = NULL),
     position = WebChartLegendPositions,
-    maxHeight = s7x::class_double,
+    maxHeight = s7x::class_float,
     roundMarkers = s7x::class_boolean
   )
 )
@@ -100,8 +100,8 @@ WebChartGuide <- new_class(
   "WebChartGuide",
   properties = list(
     type = s7x::class_string,
-    start = s7x::property_union(s7x::class_string, s7x::class_double),
-    end = s7x::property_union(s7x::class_string, s7x::class_double),
+    start = s7x::property_union(s7x::class_string, s7x::class_float),
+    end = s7x::property_union(s7x::class_string, s7x::class_float),
     style = s7x::property_union(ISimpleLineSymbol, ISimpleFillSymbol),
     name = s7x::class_string,
     label = s7x::property_union(WebChartTextSymbol, NULL, default = NULL),
@@ -126,8 +126,8 @@ WebChartAxis <- new_class(
       DateTimeFormatOptions,
       CategoryFormatOptions
     ),
-    minimum = s7x::class_double,
-    maximum = s7x::class_double,
+    minimum = s7x::class_float,
+    maximum = s7x::class_float,
     grid = s7x::property_union(ISimpleLineSymbol, NULL, default = NULL),
     guides = class_list,
     lineSymbol = s7x::property_union(ISimpleLineSymbol, NULL, default = NULL),
@@ -141,7 +141,7 @@ WebChartAxis <- new_class(
     integerOnlyValues = s7x::class_boolean,
     displayCursorTooltip = s7x::class_boolean,
     buffer = s7x::class_boolean,
-    tickSpacing = s7x::class_double,
+    tickSpacing = s7x::class_float,
     dateBaseInterval = s7x::property_union(
       TimeIntervalInfo,
       NULL,
@@ -190,7 +190,7 @@ WebChartMultiAxesDataOrder <- new_class(
 WebChartDataFilters <- new_class(
   "WebChartDataFilters",
   properties = list(
-    distance = s7x::class_double,
+    distance = s7x::class_float,
     gdbVersion = s7x::class_string,
     geometry = class_any,
     objectIds = class_list,

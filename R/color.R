@@ -12,10 +12,10 @@ library(S7)
 Color <- new_class(
   "Color",
   properties = list(
-    r = s7x::class_double,
-    g = s7x::class_double,
-    b = s7x::class_double,
-    a = s7x::class_double
+    r = s7x::class_float,
+    g = s7x::class_float,
+    b = s7x::class_float,
+    a = s7x::class_float
   )
 )
 

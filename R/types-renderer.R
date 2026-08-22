@@ -53,7 +53,7 @@ ILegendOptions := new_class(
 #' @export
 IColorStop := new_class(
   properties = list(
-    value = s7x::class_double,
+    value = s7x::class_float,
     color = Color,
     label = s7x::class_string
   )

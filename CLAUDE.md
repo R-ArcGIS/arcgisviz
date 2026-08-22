@@ -699,7 +699,7 @@ before writing any of it.
   as the first arg (breaks `:=`'s inference, silently binds to `parent`
   instead and errors). `s7x::` is always fully-qualified in package code.
 - Optional properties: `NA` already satisfies `s7x::class_string`/
-  `class_double`/`class_boolean`/`Enum` (has `allow_na = TRUE`) - no
+  `class_float`/`class_boolean`/`Enum` (has `allow_na = TRUE`) - no
   wrapping needed, **including when the property is simply omitted from a
   constructor call** (verified by `tests/testthat/test-type-defaults.R`;
   this used to be false and broke on omission until a round of `s7x` fixes
@@ -709,7 +709,7 @@ before writing any of it.
   `NULL` really is respected on omission now (`property_union()` used to
   conflate "no `default` arg supplied" with "`default = NULL` supplied
   explicitly" and would deep-default into `Type` instead; fixed).
-- `Color` (`R/color.R`) is `r`/`g`/`b`/`a` (four `class_double`), not the
+- `Color` (`R/color.R`) is `r`/`g`/`b`/`a` (four `class_float`), not the
   raw `[r,g,b,a]` tuple the spec uses - a deliberate exception, keep it.
 - `DESCRIPTION`'s `Collate:` field is load-bearing - `R/` files have real
   cross-file dependencies. Add new files to it in dependency order or

@@ -16,8 +16,8 @@ library(S7)
 WebChartCalendarDatePartsBinning := new_class(
   properties = list(
     trimIncompleteTimeInterval = s7x::class_boolean,
-    start = s7x::class_double,
-    end = s7x::class_double,
+    start = s7x::class_float,
+    end = s7x::class_float,
     offset = s7x::property_union(
       WebChartTemporalBinningOffset,
       NULL,
@@ -34,8 +34,8 @@ WebChartCalendarDatePartsBinning := new_class(
 WebChartHeatChartGradient := new_class(
   properties = list(
     colorList = class_list,
-    minValue = s7x::class_double,
-    maxValue = s7x::class_double,
+    minValue = s7x::class_float,
+    maxValue = s7x::class_float,
     outsideRangeLowerColor = s7x::property_union(Color, NULL, default = NULL),
     outsideRangeUpperColor = s7x::property_union(Color, NULL, default = NULL)
   )
@@ -56,7 +56,7 @@ WebChartHeatChartHeatClassBreaksColorRampInfo := new_class(
 #' @export
 WebChartHeatChartHeatClassBreaks := new_class(
   properties = list(
-    breaksCount = s7x::class_double,
+    breaksCount = s7x::class_float,
     classificationMethod = WebChartClassBreakTypes,
     colorRampInfo = s7x::property_union(
       WebChartHeatChartHeatClassBreaksColorRampInfo,
@@ -101,7 +101,7 @@ WebChartHeatChartSeries := new_class(
       NULL,
       default = NULL
     ),
-    dataTooltipFontSize = s7x::class_double,
+    dataTooltipFontSize = s7x::class_float,
     name = s7x::class_string,
     query = s7x::property_union(WebChartSeriesQuery, NULL, default = NULL),
     x = s7x::class_string,

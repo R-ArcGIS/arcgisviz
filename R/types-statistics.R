@@ -18,7 +18,7 @@ library(S7)
 IStatisticDefinitionStatisticParameters <- new_class(
   "IStatisticDefinitionStatisticParameters",
   properties = list(
-    value = s7x::class_double,
+    value = s7x::class_float,
     orderBy = IStatisticDefinitionStatisticParametersOrderBy
   )
 )

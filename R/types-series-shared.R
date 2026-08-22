@@ -30,7 +30,7 @@ WebChartTemporalBinningOffset <- new_class(
   "WebChartTemporalBinningOffset",
   properties = list(
     unit = WebChartTemporalBinningUnits,
-    size = s7x::class_double
+    size = s7x::class_float
   )
 )
 
@@ -44,18 +44,18 @@ WebChartTemporalBinning <- new_class(
   "WebChartTemporalBinning",
   properties = list(
     unit = WebChartTemporalBinningUnits,
-    size = s7x::class_double,
+    size = s7x::class_float,
     timeAggregationType = WebChartTimeAggregationTypes,
     trimIncompleteTimeInterval = s7x::class_boolean,
-    start = s7x::class_double,
-    end = s7x::class_double,
+    start = s7x::class_float,
+    end = s7x::class_float,
     offset = s7x::property_union(
       WebChartTemporalBinningOffset,
       NULL,
       default = NULL
     ),
     outTimeZone = s7x::class_string,
-    firstDayOfWeek = s7x::class_double,
+    firstDayOfWeek = s7x::class_float,
     nullPolicy = WebChartNullPolicyTypes
   )
 )

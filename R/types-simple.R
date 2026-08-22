@@ -10,7 +10,7 @@ NULL
 #
 # Optional properties (not in the schema's `required` array): scalar/enum
 # ones need no special handling - NA already satisfies class_string,
-# class_double, class_boolean, and Enum's allow_na. Object-typed optional
+# class_float, class_boolean, and Enum's allow_na. Object-typed optional
 # properties (Color, another class) get property_union(Type, NULL,
 # default = NULL) since there's no NA equivalent for a class instance.
 
@@ -23,10 +23,10 @@ WebChartAxisScrollBar <- new_class(
   "WebChartAxisScrollBar",
   properties = list(
     visible = s7x::class_boolean,
-    width = s7x::class_double,
+    width = s7x::class_float,
     color = s7x::property_union(Color, NULL, default = NULL),
-    gripSize = s7x::class_double,
-    margin = s7x::class_double
+    gripSize = s7x::class_float,
+    margin = s7x::class_float
   )
 )
 
@@ -39,7 +39,7 @@ ISimpleLineSymbol <- new_class(
     type = s7x::property_scalar(class_character, default = "esriSLS"),
     style = SimpleLineSymbolStyle,
     color = s7x::property_union(Color, NULL, default = NULL),
-    width = s7x::class_double
+    width = s7x::class_float
   )
 )
 
@@ -65,11 +65,11 @@ ISimpleMarkerSymbol <- new_class(
     type = s7x::property_scalar(class_character, default = "esriSMS"),
     style = SimpleMarkerSymbolStyle,
     color = s7x::property_union(Color, NULL, default = NULL),
-    size = s7x::class_double,
+    size = s7x::class_float,
     outline = s7x::property_union(ISimpleLineSymbol, NULL, default = NULL),
-    angle = s7x::class_double,
-    xoffset = s7x::class_double,
-    yoffset = s7x::class_double
+    angle = s7x::class_float,
+    xoffset = s7x::class_float,
+    yoffset = s7x::class_float
   )
 )
 
@@ -80,7 +80,7 @@ CategoryFormatOptions <- new_class(
   "CategoryFormatOptions",
   properties = list(
     type = s7x::class_string,
-    characterLimit = s7x::class_double
+    characterLimit = s7x::class_float
   )
 )
 
@@ -114,7 +114,7 @@ TimeIntervalInfo <- new_class(
   "TimeIntervalInfo",
   properties = list(
     unit = WebChartTemporalBinningUnits,
-    size = s7x::class_double
+    size = s7x::class_float
   )
 )
 
@@ -125,7 +125,7 @@ IFont <- new_class(
   "IFont",
   properties = list(
     family = s7x::class_string,
-    size = s7x::class_double,
+    size = s7x::class_float,
     style = IFontStyle,
     weight = IFontWeight,
     decoration = IFontDecoration
@@ -172,11 +172,11 @@ IntlNumberFormatOptions <- new_class(
     currency = s7x::class_string,
     currencyDisplay = IntlNumberFormatOptionsCurrencyDisplay,
     useGrouping = s7x::class_boolean,
-    minimumIntegerDigits = s7x::class_double,
-    minimumFractionDigits = s7x::class_double,
-    maximumFractionDigits = s7x::class_double,
-    minimumSignificantDigits = s7x::class_double,
-    maximumSignificantDigits = s7x::class_double,
+    minimumIntegerDigits = s7x::class_float,
+    minimumFractionDigits = s7x::class_float,
+    maximumFractionDigits = s7x::class_float,
+    minimumSignificantDigits = s7x::class_float,
+    maximumSignificantDigits = s7x::class_float,
     numberingSystem = s7x::class_string,
     compactDisplay = IntlNumberFormatOptionsCompactDisplay,
     notation = IntlNumberFormatOptionsNotation,

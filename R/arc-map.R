@@ -44,8 +44,8 @@ MapLayer := new_class(
     data = S7::class_any,
     name = s7x::class_string,
     color = S7::class_list,
-    size = s7x::class_double,
-    opacity = s7x::class_double,
+    size = s7x::class_float,
+    opacity = s7x::class_float,
     visible = s7x::class_boolean,
     tooltip = S7::class_character
   )
@@ -63,7 +63,7 @@ ArcMap := new_class(
     layers = S7::class_list,
     basemap = s7x::class_string,
     center = S7::class_numeric,
-    zoom = s7x::class_double,
+    zoom = s7x::class_float,
     extent = S7::class_list
   )
 )

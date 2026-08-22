@@ -56,13 +56,13 @@ WebChartHistogramSeries := new_class(
       NULL,
       default = NULL
     ),
-    dataTooltipFontSize = s7x::class_double,
+    dataTooltipFontSize = s7x::class_float,
     name = s7x::class_string,
     query = s7x::property_union(WebChartSeriesQuery, NULL, default = NULL),
     x = s7x::class_string,
     dataLabels = s7x::property_union(WebChartText, NULL, default = NULL),
     assignToSecondValueAxis = s7x::class_boolean,
-    binCount = s7x::class_double,
+    binCount = s7x::class_float,
     overlays = s7x::property_union(HistogramOverlays, NULL, default = NULL),
     dataTransformationType = WebChartDataTransformations,
     fillSymbol = s7x::property_union(ISimpleFillSymbol, NULL, default = NULL)

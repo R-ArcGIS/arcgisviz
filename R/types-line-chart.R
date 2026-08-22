@@ -65,7 +65,7 @@ WebChartLineChartSeries <- new_class(
       NULL,
       default = NULL
     ),
-    dataTooltipFontSize = s7x::class_double,
+    dataTooltipFontSize = s7x::class_float,
     name = s7x::class_string,
     query = s7x::property_union(WebChartSeriesQuery, NULL, default = NULL),
     x = s7x::class_string,

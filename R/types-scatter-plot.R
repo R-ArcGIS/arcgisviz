@@ -13,7 +13,7 @@ NULL
 #
 # Optional properties (not in the interface's `?`-marked properties): scalar/
 # enum ones need no special handling - NA already satisfies class_string,
-# class_double, class_boolean, and Enum's allow_na. Object-typed optional
+# class_float, class_boolean, and Enum's allow_na. Object-typed optional
 # properties get property_union(Type, NULL, default = NULL) since there's
 # no NA equivalent for a class instance.
 
@@ -52,8 +52,8 @@ SizePolicy <- new_class(
     type = s7x::class_string,
     scaleType = SizePolicyScaleTypes,
     field = s7x::class_string,
-    minSize = s7x::class_double,
-    maxSize = s7x::class_double
+    minSize = s7x::class_float,
+    maxSize = s7x::class_float
   )
 )
 
@@ -92,7 +92,7 @@ WebChartScatterplotSeries <- new_class(
       NULL,
       default = NULL
     ),
-    dataTooltipFontSize = s7x::class_double,
+    dataTooltipFontSize = s7x::class_float,
     name = s7x::class_string,
     query = s7x::property_union(WebChartSeriesQuery, NULL, default = NULL),
     x = s7x::class_string,

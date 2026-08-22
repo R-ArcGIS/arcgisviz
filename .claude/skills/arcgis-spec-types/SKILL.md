@@ -93,8 +93,10 @@ before (e.g. `WebChartTemporalBinningOffset`,
 
 ## Property-type mapping (TS interface -> S7 property)
 
-- `string`/`number`/`boolean` -> `s7x::class_string`/`class_double`/
-  `class_boolean`.
+- `string`/`number`/`boolean` -> `s7x::class_string`/`class_float`/
+  `class_boolean`. These are **scalar** presets; a spec type written `T[]`
+  wants `s7x::property_list_of(T)` for a list of S7 objects, or
+  `S7::class_double`/`S7::class_character` for a plain atomic array.
 - A named or inline literal-union type (`"a" | "b" | "c"`, or a const object
   exported from `chart-object-literals.d.ts`/`rest-js-types.d.ts`) -> the
   matching `s7x::new_enum()`-built class.
@@ -116,7 +118,7 @@ before (e.g. `WebChartTemporalBinningOffset`,
 - **Optionality** (TS `?`): a property NOT marked `?` stays strictly typed
   with no union. A `?`-marked scalar/enum property needs **no wrapping** -
   `NA` (`NA_character_`/`NA_real_`/`NA`) already satisfies `class_string`/
-  `class_double`/`class_boolean`/`Enum`, including when the property is
+  `class_float`/`class_boolean`/`Enum`, including when the property is
   simply *omitted* from a constructor call (verified in
   `tests/testthat/test-type-defaults.R`; this used to silently break on
   omission until a round of `s7x` default-value fixes - see CLAUDE.md). A
@@ -125,7 +127,7 @@ before (e.g. `WebChartTemporalBinningOffset`,
   correctly respected on omission now too.
 
 `Color` (`R/color.R`) is a deliberate one-off exception: the spec's raw
-`[r,g,b,a]` tuple becomes an `r`/`g`/`b`/`a` (`class_double` each) S7 class,
+`[r,g,b,a]` tuple becomes an `r`/`g`/`b`/`a` (`class_float` each) S7 class,
 not a length-4 vector, per explicit instruction - don't "fix" this to match
 the raw tuple shape.
 
