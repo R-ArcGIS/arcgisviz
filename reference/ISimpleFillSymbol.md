@@ -6,7 +6,7 @@ ISimpleFillSymbol
 
 ``` r
 ISimpleFillSymbol(
-  type = NA_character_,
+  type = "esriSFS",
   style = SimpleFillSymbolStyle(),
   color = NULL,
   outline = NULL

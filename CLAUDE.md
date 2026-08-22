@@ -66,7 +66,7 @@ Every user-facing feature gets a `dev/` example (one file per feature,
 [`datasets::penguins`](https://rdrr.io/r/datasets/penguins.html). These
 become user-facing tutorials later, so write them to be read.
 
-## Two skills, load them for the relevant work
+## Three skills, load them for the relevant work
 
 - **`arcgis-spec-types`** - hand-writing `s7x`-based S7 classes in `R/`
   directly from `@arcgis/charts-components`’s bundled `.d.ts` spec (see
@@ -77,9 +77,16 @@ become user-facing tutorials later, so write them to be read.
   `R/arcgis-chart-widget.R`, the `createModel`/`<arcgis-chart>`
   contract. Load this before touching anything JS-side or the R widget
   wrapper.
+- **`arcgis-map-widget`** - the *other* widget: `R/arc-map.R`,
+  `R/arc-map-proxy.R`, `srcjs/widgets/arcgisMap.js`, and the S7 classes
+  behind them. Maps have **no bundled spec**, so their types come from
+  the Web Map Specification and arcgisutils’ builders rather than a
+  `.d.ts` - which is why this is its own skill and not a section of the
+  other two. Load it before adding a map feature or a map S7 class.
 
-Both skills point to more detail: `dev-docs/js-widget-architecture.md`
-for the full JS/data-flow writeup.
+The skills point to more detail: `dev-docs/js-widget-architecture.md`
+for the full JS/data-flow writeup, `dev-docs/map-components-plan.md` for
+the map one.
 
 ## Current state, in one paragraph
 
@@ -120,8 +127,8 @@ on the `ArcChart` side, which grouped charts make worth closing.
 Alongside all of that, and sharing its renderer and palette code but
 almost nothing else, sits a second widget: `arc_map() |> add_layer()`
 draws an `sf` object on `<arcgis-map>` as a client side feature layer
-(`R/arc-map.R`, `srcjs/widgets/arcgisMap.js`). It renders; it has no
-Shiny proxy yet.
+(`R/arc-map.R`, `srcjs/widgets/arcgisMap.js`), with hover tooltips
+(`add_layer(tooltip =)`) and its own Shiny proxy (`R/arc-map-proxy.R`).
 
 Two shapes worth knowing before adding a seventh chart type.
 `chart_type_map` (`R/arc-chart.R`) carries `config_class`, `has_y`,
@@ -547,6 +554,70 @@ empty, so nothing configures it. Offline use would need assets copied
 into `inst/htmlwidgets/` plus `setAssetPath()`; not decided. See
 `dev-docs/map-components-plan.md`.
 
+**Hover tooltips are `popupInfo`, not an invented shape.**
+`add_layer(tooltip = c(County = NAME))` writes the web map spec’s own
+labelled field list through `as_layer(popup_info =)`, where it lands
+beside `featureSet` and `layerDefinition` on the feature collection
+layer. The client turns it into a real `PopupTemplate` for its
+`fieldInfos` and then sets `popupEnabled = false`: the template is there
+to be read, not to open a popup that would repeat what the hover already
+says. Hovering is `arcgisViewPointerMove` -\> `hitTest({ include: })`,
+wrapped in `promiseUtils.debounce()` because the pointer outruns the hit
+test - superseded calls reject with `AbortError` and must be swallowed.
+
+**A tooltip value is formatted by its field type, not by its JS type.**
+`esriFieldTypeDate` is milliseconds from the epoch
+([`arcgisutils::date_to_ms()`](https://rdrr.io/pkg/arcgisutils/man/dates.html)),
+with `-1` for NA (`from_esri_date()`), so a date read off
+`graphic.attributes` is a 13-digit number and formatting it as one is
+wrong. The JS reads `layer.fields[].type` (`Field.fromJSON` maps
+`esriFieldTypeDate` -\> `"date"`, `fieldType.js`) and branches on that.
+
+**`ArcMapProxy` subclasses `ArcMap`**, the same trick as `ArcProxy`:
+[`set_basemap()`](http://r.esri.com/arcgisviz/reference/set_basemap.md),
+[`set_view()`](http://r.esri.com/arcgisviz/reference/set_view.md) and
+[`add_layer()`](http://r.esri.com/arcgisviz/reference/add_layer.md) all
+work on a proxy unchanged, and
+[`arc_update()`](http://r.esri.com/arcgisviz/reference/arc_update.md)
+flushes.
+[`arc_update()`](http://r.esri.com/arcgisviz/reference/arc_update.md),
+[`set_filter()`](http://r.esri.com/arcgisviz/reference/set_filter.md)
+and
+[`set_selection()`](http://r.esri.com/arcgisviz/reference/set_selection.md)
+are S7 generics shared with the chart proxy - dispatch on
+[`S7::class_any`](https://rconsortium.github.io/S7/reference/class_any.html)
+gives the friendly “must be an ArcProxy or ArcMapProxy” error instead of
+S7’s own “can’t find method”. Map-only:
+[`set_layer()`](http://r.esri.com/arcgisviz/reference/set_layer.md),
+[`remove_layer()`](http://r.esri.com/arcgisviz/reference/set_layer.md),
+[`arc_goto()`](http://r.esri.com/arcgisviz/reference/arc_goto.md),
+[`arc_screenshot()`](http://r.esri.com/arcgisviz/reference/arc_goto.md).
+
+**A proxy layer must be named**, because the name *is* the layer id
+(`map_layer_id()`); an unnamed one is only positionally unique and would
+collide with the rendered map’s own `arcgisviz-layer-<i>`. Re-adding a
+name already on the map replaces it, which is what makes
+[`add_layer()`](http://r.esri.com/arcgisviz/reference/add_layer.md)
+idempotent across flushes.
+
+**Map proxy payloads are serialized by us, not by Shiny.** `map_send()`
+runs `widget_json()` and sends the result as a *string* the client
+`JSON.parse`s. Shiny would use jsonlite, which sends
+`layerDefinition$fields` columnar and breaks `Field.fromJSON` - the same
+trap `TOJSON_FUNC` avoids on the render path. Message protocol mirrors
+the chart’s: one handler, `"arcgisviz-map"`, with a `method`
+discriminator (`update`, `remove`, `layer`, `filter`, `highlight`,
+`goto`, `screenshot`).
+
+[`set_filter()`](http://r.esri.com/arcgisviz/reference/set_filter.md) on
+a map is the layer’s `definitionExpression`;
+[`set_selection()`](http://r.esri.com/arcgisviz/reference/set_selection.md)
+is `layerView.highlight()`, whose handle has to be kept per layer and
+removed before the next one. Events become
+`input$<id>_click`/`_hover`/`_view`/`_screenshot`, plus `_error`.
+`_hover` only fires when the feature under the pointer *changes* - every
+pointer move would otherwise be a websocket message.
+
 ## Deliberately deferred (don’t “fix” these without asking)
 
 - **The non-feature layer types.** `WebChart$iLayer` is
@@ -567,6 +638,82 @@ into `inst/htmlwidgets/` plus `setAssetPath()`; not decided. See
   takes the client’s calendar branch instead of the matrix one (`Te()`,
   `dist/chunks/index4.js:10833`), which is also why a matrix heat chart
   has to send a category `valueFormat` on both axes.
+
+## Typing a property, and the `new_*()` constructors
+
+Six rules, all learned from real divergences rather than assumed.
+
+**`class_any` is a staging area, not a destination.** A property is
+`class_any` because it has not been modeled *yet* - `featureCollection`
+and `layerDefinition` currently hold bare lists from `arcgisutils`,
+`WebChartDataFilters$geometry` is handled elsewhere. None of that is a
+reason it should stay untyped. The moment a *user* is expected to write
+a value there it needs a class, which is what `legendOptions` did the
+moment titling a colour ramp became a user task.
+
+**For renderer-side types the web map specification wins over
+`@arcgis/core`,** and the two genuinely diverge - this is not a
+formality. `legendOptions` is the worked example: `@arcgis/core` splits
+it into `VisualVariableLegendOptions` (`showLegend`, `title`) plus a
+separate `SizeVariableLegendOptions`, while the web map spec has **one
+shared object** with seven properties referenced by ten different
+parents. Model the spec. Charts-side types still come from
+`@arcgis/charts-components`’ bundled `.d.ts` - see `arcgis-spec-types`.
+
+**Prune properties belonging to families this package doesn’t model, and
+say why in a comment.** The precedent is `authoringInfo`, omitted
+throughout as authoring metadata nothing reads. `ILegendOptions`
+likewise drops `dotLabel` and `unit` (dotDensity renderers) and
+`minLabel`/`maxLabel` (heatmap renderers). Prune by *family*, never
+because a property looks unused.
+
+**A shared spec object stays one class; per-parent constraints are
+documented, not modeled.** `showLegend` is unavailable under
+`uniqueValueRenderer`, so that is a line in `ILegendOptions`’ docs
+rather than a second near-duplicate class.
+
+**A `type` discriminator is fixed by its class, so it defaults** - it is
+never restated at a call site.
+`s7x::property_scalar(class_character, default = "simple")`. Hardcoded,
+not an enum: there is exactly one valid value, so an enum would validate
+nothing. Only the six classes a user constructs carry this (3 renderers,
+3 symbols); the ~21 chart-internal ones are still threaded from
+`chart_type_map` by `build_webchart()`. This is also what would make a
+future `from_json()` possible - the discriminator is the “which class do
+I construct into” knowledge CLAUDE.md files as missing.
+
+**Any class a user authors gets a `new_*()` helper** when building it
+would otherwise mean naming an S7 class or typing a spec-cased value.
+They live in `R/constructors.R` and share one shape: a friendly
+kebab-case `type` first, then `...` of that type’s own properties.
+
+- `...` is **named-only**. Unnamed, a value lands on the first
+  property - which is `type` - and silently replaces the discriminator.
+- Unknown property names error with the valid list; S7’s own message is
+  a bare `unused argument (nope = 1)`.
+- Friendly values in, spec values out: `"unique-value"` -\>
+  `"uniqueValue"`, `"backward-diagonal"` -\>
+  `"esriSFSBackwardDiagonal"`, `"descending"` -\> `"descendingValues"`.
+  Style names are **derived from the enum’s own variants**, not tabled,
+  so a style added to the spec needs no change here.
+- Colours are written as names or hex (`"steelblue"`, `"#b8282899"`) and
+  coerced by `parse_color()`. `Color` itself stays r/g/b/a - that
+  exception is deliberate, so the coercion belongs in the helper, not
+  the class.
+- **Unset arguments are omitted, never passed as `NA`.** An omitted
+  property already defaults to NA and drops out of the wire format, and
+  an enum cannot be constructed from a logical `NA` at all.
+- Defaults that vary by family belong in the map, not the code path: a
+  marker has no `"solid"` style, so `symbol_styles` carries `"circle"`
+  for markers and `"solid"` for fills and lines.
+
+**Still open: `class_list` properties cannot be resolved.**
+`visualVariables`, `stops`, and `uniqueValueInfos` declare no element
+class, so a user still writes
+`IColorVisualVariable(...)`/`IColorStop(...)` by hand - the one place
+the `new_*()` family does not yet reach. Fixing it needs either more
+helpers or a `property_list_of()` in `s7x`. `s7x` is this package’s own
+dependency and is fair game to work in (cloned at `../s7x`).
 
 ## Naming
 
@@ -629,13 +776,30 @@ frame. Load the `r-lib:cli` skill before writing any of it.
 
 - **Never invent a JSON shape as a bare list.** If a thing has a name in
   a spec, model it as an S7 class written faithfully from that spec
-  (`IFeatureLayer`, the renderers). If `arcgisutils` already builds it,
-  call that function and pass its bare list through untouched - those
-  lists are a documented interface, and reaching into one to re-assemble
-  its parts couples us to its internals. `as_layer()`,
-  `as_layer_definition()`, and `as_feature_collection()` all take the
-  arguments you would otherwise be tempted to patch in by hand
-  (`drawing_info`, `layer_definition`, `id`, `popup_info`).
+  (`IFeatureLayer`, the renderers).
+
+  **`arcgisutils` is a reference, not an authority.** It is the **S3
+  implementation of the same problem** this package is solving with S7,
+  and the S7 machinery here is the direction of travel - these types
+  migrate *into* arcgisutils later. So do not reflexively route
+  everything through it, and do not treat a bare list it returns as the
+  final shape for something. What it is genuinely good for:
+
+  - **Checking behavior.** `as_fields()` (`infer_esri_type()` is
+    deprecated as of 0.4.0) decides the `esriFieldType*` for an R
+    column, `ptype_tbl()`/`fields_as_ptype_df()` go the other way, and
+    `is_date()`/`date_to_ms()`/`from_esri_date()` own date handling. An
+    S7 analogue must agree with these. Read the implementation, not just
+    the docs - the repo is cloned at `../arcgisutils`. Index:
+    <https://r.esri.com/arcgisutils/llms.txt>.
+  - **Not re-deriving what already works.** `as_layer()`,
+    `as_layer_definition()` and `as_feature_collection()` take the
+    arguments you would otherwise patch in by hand (`drawing_info`,
+    `layer_definition`, `id`, `popup_info`), so use those arguments
+    rather than reaching into a returned list to re-assemble its parts.
+
+  Calling one of those is a convenience while the S7 equivalent does not
+  exist, not a rule about where the shape belongs.
 
 - S7 classes: `Foo := new_class(properties = list(...))` - no name
   string as the first arg (breaks `:=`’s inference, silently binds to
@@ -644,7 +808,7 @@ frame. Load the `r-lib:cli` skill before writing any of it.
 
 - Optional properties: `NA` already satisfies
   [`s7x::class_string`](https://s7x.josiah.rs/reference/property_scalar.html)/
-  `class_double`/`class_boolean`/`Enum` (has `allow_na = TRUE`) - no
+  `class_float`/`class_boolean`/`Enum` (has `allow_na = TRUE`) - no
   wrapping needed, **including when the property is simply omitted from
   a constructor call** (verified by
   `tests/testthat/test-type-defaults.R`; this used to be false and broke
@@ -656,9 +820,8 @@ frame. Load the `r-lib:cli` skill before writing any of it.
   conflate “no `default` arg supplied” with “`default = NULL` supplied
   explicitly” and would deep-default into `Type` instead; fixed).
 
-- `Color` (`R/color.R`) is `r`/`g`/`b`/`a` (four `class_double`), not
-  the raw `[r,g,b,a]` tuple the spec uses - a deliberate exception, keep
-  it.
+- `Color` (`R/color.R`) is `r`/`g`/`b`/`a` (four `class_float`), not the
+  raw `[r,g,b,a]` tuple the spec uses - a deliberate exception, keep it.
 
 - `DESCRIPTION`’s `Collate:` field is load-bearing - `R/` files have
   real cross-file dependencies. Add new files to it in dependency order

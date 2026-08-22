@@ -1,13 +1,14 @@
-# Filter a rendered chart in the browser
+# Filter a rendered chart or map in the browser
 
-Applies a SQL `where` clause, or a set of object ids, to a chart that is
-already on screen. The chart requeries the layer it already holds, so no
-data is resent and no model is rebuilt.
+Applies a SQL `where` clause, or a set of object ids, to a chart or map
+that is already on screen. Nothing is resent and no model is rebuilt:
+the chart requeries the layer it already holds, and a map layer
+re-evaluates its own definition expression.
 
 ## Usage
 
 ``` r
-set_filter(proxy, where = NULL, object_ids = NULL)
+set_filter(proxy, ...)
 ```
 
 ## Arguments
@@ -15,8 +16,13 @@ set_filter(proxy, where = NULL, object_ids = NULL)
 - proxy:
 
   Defines which
-  [`arc_proxy()`](http://r.esri.com/arcgisviz/reference/ArcProxy.md) to
-  filter.
+  [`arc_proxy()`](http://r.esri.com/arcgisviz/reference/ArcProxy.md) or
+  [`arc_map_proxy()`](http://r.esri.com/arcgisviz/reference/ArcMapProxy.md)
+  to filter.
+
+- ...:
+
+  Reserved for methods.
 
 - where:
 
@@ -26,7 +32,12 @@ set_filter(proxy, where = NULL, object_ids = NULL)
 - object_ids:
 
   default `NULL`. Defines which rows to keep, by object id. `NULL` or an
-  empty vector clears them.
+  empty vector clears them. Charts only.
+
+- layer:
+
+  default `NULL`. Defines which map layer to filter, by name. `NULL`
+  filters every layer. Maps only.
 
 ## Value
 

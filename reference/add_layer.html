@@ -47,15 +47,7 @@ takes a bare column name, the same as <code><a href="set_color.html">set_color()
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">add_layer</span><span class="op">(</span></span>
-<span>  <span class="va">map</span>,</span>
-<span>  <span class="va">.data</span>,</span>
-<span>  color <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  palette <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  size <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  opacity <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  name <span class="op">=</span> <span class="cn">NULL</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">add_layer</span><span class="op">(</span><span class="va">map</span>, <span class="va">.data</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -68,6 +60,12 @@ takes a bare column name, the same as <code><a href="set_color.html">set_color()
 
 <dt id="arg--data">.data<a class="anchor" aria-label="anchor" href="#arg--data"></a></dt>
 <dd><p>Defines which <code>sf</code> object supplies the features.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Passed between methods. Must be empty when <code>.data</code> is an
+<a href="IFeatureLayer.html">IFeatureLayer</a>, whose own properties already answer <code>color</code>, <code>palette</code>,
+<code>size</code> and <code>tooltip</code>.</p></dd>
 
 
 <dt id="arg-color">color<a class="anchor" aria-label="anchor" href="#arg-color"></a></dt>
@@ -89,12 +87,36 @@ name from <code><a href="esri_palettes.html">esri_palettes()</a></code> or a vec
 
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
-<dd><p>default <code>NULL</code>. Defines the layer name shown in a legend.</p></dd>
+<dd><p>default <code>NULL</code>. Defines the layer name, which is also the handle
+<code><a href="set_layer.html">remove_layer()</a></code> and <code><a href="set_layer.html">set_layer()</a></code> take. On an <code><a href="ArcMapProxy.html">arc_map_proxy()</a></code> it is
+required, because that is what tells the browser which layer is meant.</p></dd>
+
+
+<dt id="arg-tooltip">tooltip<a class="anchor" aria-label="anchor" href="#arg-tooltip"></a></dt>
+<dd><p>default <code>NULL</code>. Defines which columns are shown when a
+feature is hovered, as bare column names wrapped in <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code>. Name one to
+label it, as in <code>c(County = NAME)</code>.</p></dd>
+
+
+<dt id="arg-visible">visible<a class="anchor" aria-label="anchor" href="#arg-visible"></a></dt>
+<dd><p>default <code>NULL</code>. Defines whether the layer starts drawn.
+Only when <code>.data</code> is an <a href="IFeatureLayer.html">IFeatureLayer</a>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p><code>map</code>, with the layer appended.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p><code>.data</code> is either a data frame to build a layer from, or an
+<a href="IFeatureLayer.html">IFeatureLayer</a> you built yourself. The second form is the escape hatch:
+anything this function does not expose is done by constructing the layer
+and modifying it, usually with <code><a href="add_renderer.html">add_renderer()</a></code>.</p>
+<p></p><div class="sourceCode r"><pre><code><span><span class="va">nc</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/as_feature_layer.html">as_feature_layer</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/add_renderer.html">add_renderer</a></span><span class="op">(</span><span class="fu"><a href="../reference/ISimpleRenderer.html">ISimpleRenderer</a></span><span class="op">(</span>symbol <span class="op">=</span> <span class="va">my_symbol</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="op">(</span>\<span class="op">(</span><span class="va">lyr</span><span class="op">)</span> <span class="fu"><a href="../reference/add_layer.html">add_layer</a></span><span class="op">(</span><span class="fu"><a href="../reference/arc_map.html">arc_map</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">lyr</span><span class="op">)</span><span class="op">)</span><span class="op">(</span><span class="op">)</span></span></code></pre><p></p></div>
     </div>
 
     <div class="section level2">

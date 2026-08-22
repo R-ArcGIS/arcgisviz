@@ -1,71 +1,42 @@
-# Build a feature layer from a data frame
+# Set a layer's renderer
 
-Wraps a data frame as a self-contained client side feature collection.
-This is the `iLayer` a chart reads and the layer a map draws. No live
-feature service is involved.
+Attaches a renderer to a layer built by
+[`as_feature_layer()`](http://r.esri.com/arcgisviz/reference/as_feature_layer.md),
+so that a symbology this package does not expose can still be handed to
+[`add_layer()`](http://r.esri.com/arcgisviz/reference/add_layer.md).
 
 ## Usage
 
 ``` r
-as_feature_layer(
-  .data,
-  name = "layer_data",
-  title = name,
-  id = "arcgisviz-layer",
-  drawing_info = NULL,
-  opacity = NULL,
-  visibility = NULL,
-  popup_info = NULL
-)
+add_renderer(layer, renderer)
 ```
 
 ## Arguments
 
-- .data:
+- layer:
 
-  Defines which data frame or `sf` object to convert.
+  Defines which
+  [IFeatureLayer](http://r.esri.com/arcgisviz/reference/IFeatureLayer.md)
+  to modify.
 
-- name:
+- renderer:
 
-  default `"layer_data"`. Defines what the layer is named.
-
-- title:
-
-  default `name`. Defines the human readable layer title.
-
-- id:
-
-  default `"arcgisviz-layer"`. Defines the unique layer id.
-
-- drawing_info:
-
-  default `NULL`. Defines how features are symbolized, as a list holding
-  a `renderer`.
-
-- opacity:
-
-  default `NULL`. Defines the layer opacity, from `0` to `1`.
-
-- visibility:
-
-  default `NULL`. Defines whether the layer starts visible.
-
-- popup_info:
-
-  default `NULL`. Defines which fields are shown when a feature is
-  hovered or clicked, as a list holding `title` and `fieldInfos`.
+  Defines the renderer, an
+  [ISimpleRenderer](http://r.esri.com/arcgisviz/reference/ISimpleRenderer.md)
+  or an
+  [IUniqueValueRenderer](http://r.esri.com/arcgisviz/reference/IUniqueValueRenderer.md).
 
 ## Value
 
-An
-[IFeatureLayer](http://r.esri.com/arcgisviz/reference/IFeatureLayer.md).
+`layer`, with the renderer set on its `layerDefinition`.
 
 ## Examples
 
 ``` r
-df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+df <- data.frame(species = c("a", "b"), mass = c(1, 5))
 
-as_feature_layer(df)
+as_feature_layer(df) |>
+  add_renderer(ISimpleRenderer(symbol = ISimpleMarkerSymbol(size = 8)))
 #> <arcgisviz::IFeatureLayer>
 #>  @ id                   : chr "arcgisviz-layer"
 #>  @ name                 : chr NA
@@ -86,7 +57,7 @@ as_feature_layer(df)
 #>  ..  ..$ :List of 4
 #>  ..  .. ..$ featureSet     :List of 2
 #>  ..  .. .. ..$ spatialReference: Named list()
-#>  ..  .. .. ..$ features        :List of 3
+#>  ..  .. .. ..$ features        :List of 2
 #>  ..  .. .. .. ..$ :List of 1
 #>  ..  .. .. .. .. ..$ attributes:List of 3
 #>  ..  .. .. .. .. .. ..$ mass     : num 1
@@ -97,12 +68,7 @@ as_feature_layer(df)
 #>  ..  .. .. .. .. .. ..$ mass     : num 5
 #>  ..  .. .. .. .. .. ..$ object_id: num 2
 #>  ..  .. .. .. .. .. ..$ species  : chr "b"
-#>  ..  .. .. .. ..$ :List of 1
-#>  ..  .. .. .. .. ..$ attributes:List of 3
-#>  ..  .. .. .. .. .. ..$ mass     : num 3
-#>  ..  .. .. .. .. .. ..$ object_id: num 3
-#>  ..  .. .. .. .. .. ..$ species  : chr "c"
-#>  ..  .. ..$ layerDefinition:List of 7
+#>  ..  .. ..$ layerDefinition:List of 8
 #>  ..  .. .. ..$ name          : chr "layer_data"
 #>  ..  .. .. ..$ objectIdField : chr "object_id"
 #>  ..  .. .. ..$ fields        :'data.frame':  3 obs. of  6 variables:
@@ -116,6 +82,29 @@ as_feature_layer(df)
 #>  ..  .. .. ..$ maxScale      : num 0
 #>  ..  .. .. ..$ minScale      : num 0
 #>  ..  .. .. ..$ type          : chr "Table"
+#>  ..  .. .. ..$ drawingInfo   :List of 1
+#>  ..  .. .. .. ..$ renderer: <arcgisviz::ISimpleRenderer>
+#>  ..  .. .. .. .. ..@ type              : chr "simple"
+#>  ..  .. .. .. .. ..@ symbol            : <arcgisviz::ISimpleMarkerSymbol>
+#>  .. .. .. .. .. .. .. @ type   : chr "esriSMS"
+#>  .. .. .. .. .. .. .. @ style  : <arcgisviz::SimpleMarkerSymbolStyle>
+#>  .. .. .. .. .. .. .. .. @ value   : chr NA
+#>  .. .. .. .. .. .. .. .. @ variants: chr [1:6] "esriSMSCircle" "esriSMSCross" "esriSMSDiamond" "esriSMSSquare" ...
+#>  .. .. .. .. .. .. .. .. @ allow_na: logi TRUE
+#>  .. .. .. .. .. .. .. @ color  : NULL
+#>  .. .. .. .. .. .. .. @ size   : num 8
+#>  .. .. .. .. .. .. .. @ outline: NULL
+#>  .. .. .. .. .. .. .. @ angle  : num NA
+#>  .. .. .. .. .. .. .. @ xoffset: num NA
+#>  .. .. .. .. .. .. .. @ yoffset: num NA
+#>  ..  .. .. .. .. ..@ visualVariables   : list()
+#>  ..  .. .. .. .. ..@ label             : chr NA
+#>  ..  .. .. .. .. ..@ description       : chr NA
+#>  ..  .. .. .. .. ..@ rotationExpression: chr NA
+#>  ..  .. .. .. .. ..@ rotationType      : <arcgisviz::IRendererRotationType>
+#>  .. .. .. .. .. .. .. @ value   : chr NA
+#>  .. .. .. .. .. .. .. @ variants: chr [1:2] "arithmetic" "geographic"
+#>  .. .. .. .. .. .. .. @ allow_na: logi TRUE
 #>  ..  .. ..$ name           : chr "layer_data"
 #>  ..  .. ..$ title          : chr "layer_data"
 #>  .. $ showLegend: logi TRUE

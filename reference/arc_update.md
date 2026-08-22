@@ -1,13 +1,16 @@
 # Send a proxy's changes to the browser
 
-Flushes everything the `set_*()` functions have changed on an
-[`arc_proxy()`](http://r.esri.com/arcgisviz/reference/ArcProxy.md) as
-one message, so a pipeline of them costs one re-render.
+Flushes everything the `set_*()` and
+[`add_layer()`](http://r.esri.com/arcgisviz/reference/add_layer.md)
+calls have changed on an
+[`arc_proxy()`](http://r.esri.com/arcgisviz/reference/ArcProxy.md) or
+[`arc_map_proxy()`](http://r.esri.com/arcgisviz/reference/ArcMapProxy.md)
+as one message, so a pipeline of them costs one re-render.
 
 ## Usage
 
 ``` r
-arc_update(proxy)
+arc_update(proxy, ...)
 ```
 
 ## Arguments
@@ -15,8 +18,13 @@ arc_update(proxy)
 - proxy:
 
   Defines which
-  [`arc_proxy()`](http://r.esri.com/arcgisviz/reference/ArcProxy.md) to
-  flush.
+  [`arc_proxy()`](http://r.esri.com/arcgisviz/reference/ArcProxy.md) or
+  [`arc_map_proxy()`](http://r.esri.com/arcgisviz/reference/ArcMapProxy.md)
+  to flush.
+
+- ...:
+
+  Reserved for methods.
 
 ## Value
 

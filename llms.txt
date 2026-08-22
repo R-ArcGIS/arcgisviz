@@ -152,6 +152,14 @@ a feature collection, so no feature service is involved.
   Start a map
 - [`add_layer()`](http://r.esri.com/arcgisviz/reference/add_layer.md) :
   Add a layer to a map
+- [`add_renderer()`](http://r.esri.com/arcgisviz/reference/add_renderer.md)
+  : Set a layer's renderer
+- [`new_renderer()`](http://r.esri.com/arcgisviz/reference/new_renderer.md)
+  : Create a renderer
+- [`new_symbol()`](http://r.esri.com/arcgisviz/reference/new_symbol.md)
+  : Create a symbol
+- [`new_legend_options()`](http://r.esri.com/arcgisviz/reference/new_legend_options.md)
+  : Describe a renderer in the legend
 - [`set_basemap()`](http://r.esri.com/arcgisviz/reference/set_basemap.md)
   : Set the basemap
 - [`set_view()`](http://r.esri.com/arcgisviz/reference/set_view.md) :
@@ -195,20 +203,29 @@ Turn a chart into an htmlwidget, in a document or in Shiny.
 
 ## Shiny
 
-Update a chart that is already on screen without resending its data, and
-read back what the reader did to it.
+Update a chart or map that is already on screen without resending its
+data, and read back what the reader did to it.
 
 - [`ArcProxy()`](http://r.esri.com/arcgisviz/reference/ArcProxy.md)
   [`arc_proxy()`](http://r.esri.com/arcgisviz/reference/ArcProxy.md) :
   Update a rendered chart from the Shiny server
+- [`ArcMapProxy()`](http://r.esri.com/arcgisviz/reference/ArcMapProxy.md)
+  [`arc_map_proxy()`](http://r.esri.com/arcgisviz/reference/ArcMapProxy.md)
+  : Update a rendered map from the Shiny server
 - [`arc_update()`](http://r.esri.com/arcgisviz/reference/arc_update.md)
   : Send a proxy's changes to the browser
 - [`set_filter()`](http://r.esri.com/arcgisviz/reference/set_filter.md)
-  : Filter a rendered chart in the browser
+  : Filter a rendered chart or map in the browser
 - [`set_selection()`](http://r.esri.com/arcgisviz/reference/set_selection.md)
-  : Select marks on a rendered chart
+  : Select features on a rendered chart or map
 - [`set_legend()`](http://r.esri.com/arcgisviz/reference/set_legend.md)
   : Control a rendered chart's legend
+- [`set_layer()`](http://r.esri.com/arcgisviz/reference/set_layer.md)
+  [`remove_layer()`](http://r.esri.com/arcgisviz/reference/set_layer.md)
+  : Show, hide, or fade a layer that is already drawn
+- [`arc_goto()`](http://r.esri.com/arcgisviz/reference/arc_goto.md)
+  [`arc_screenshot()`](http://r.esri.com/arcgisviz/reference/arc_goto.md)
+  : Move a rendered map's view
 - [`arc_refresh()`](http://r.esri.com/arcgisviz/reference/arc_refresh.md)
   [`arc_reset_zoom()`](http://r.esri.com/arcgisviz/reference/arc_refresh.md)
   [`arc_clear_selection()`](http://r.esri.com/arcgisviz/reference/arc_refresh.md)
@@ -323,6 +340,8 @@ continuous colour and a unique value renderer covers categories.
   : IUniqueValueRenderer
 - [`IUniqueValueInfo`](http://r.esri.com/arcgisviz/reference/IUniqueValueInfo.md)
   : IUniqueValueInfo
+- [`ILegendOptions`](http://r.esri.com/arcgisviz/reference/ILegendOptions.md)
+  : ILegendOptions
 
 ## Symbols and colour
 
@@ -387,6 +406,8 @@ single property of the classes above.
   : IFontWeight
 - [`IRendererRotationType()`](http://r.esri.com/arcgisviz/reference/IRendererRotationType.md)
   : IRendererRotationType
+- [`ILegendOptionsOrder()`](http://r.esri.com/arcgisviz/reference/ILegendOptionsOrder.md)
+  : ILegendOptionsOrder
 - [`IStatisticDefinitionStatisticType()`](http://r.esri.com/arcgisviz/reference/IStatisticDefinitionStatisticType.md)
   : IStatisticDefinitionStatisticType
 - [`IStatisticDefinitionStatisticParametersOrderBy()`](http://r.esri.com/arcgisviz/reference/IStatisticDefinitionStatisticParametersOrderBy.md)

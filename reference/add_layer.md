@@ -8,15 +8,7 @@ on a chart.
 ## Usage
 
 ``` r
-add_layer(
-  map,
-  .data,
-  color = NULL,
-  palette = NULL,
-  size = NULL,
-  opacity = NULL,
-  name = NULL
-)
+add_layer(map, .data, ...)
 ```
 
 ## Arguments
@@ -28,6 +20,13 @@ add_layer(
 - .data:
 
   Defines which `sf` object supplies the features.
+
+- ...:
+
+  Passed between methods. Must be empty when `.data` is an
+  [IFeatureLayer](http://r.esri.com/arcgisviz/reference/IFeatureLayer.md),
+  whose own properties already answer `color`, `palette`, `size` and
+  `tooltip`.
 
 - color:
 
@@ -50,11 +49,45 @@ add_layer(
 
 - name:
 
-  default `NULL`. Defines the layer name shown in a legend.
+  default `NULL`. Defines the layer name, which is also the handle
+  [`remove_layer()`](http://r.esri.com/arcgisviz/reference/set_layer.md)
+  and
+  [`set_layer()`](http://r.esri.com/arcgisviz/reference/set_layer.md)
+  take. On an
+  [`arc_map_proxy()`](http://r.esri.com/arcgisviz/reference/ArcMapProxy.md)
+  it is required, because that is what tells the browser which layer is
+  meant.
+
+- tooltip:
+
+  default `NULL`. Defines which columns are shown when a feature is
+  hovered, as bare column names wrapped in
+  [`c()`](https://rdrr.io/r/base/c.html). Name one to label it, as in
+  `c(County = NAME)`.
+
+- visible:
+
+  default `NULL`. Defines whether the layer starts drawn. Only when
+  `.data` is an
+  [IFeatureLayer](http://r.esri.com/arcgisviz/reference/IFeatureLayer.md).
 
 ## Value
 
 `map`, with the layer appended.
+
+## Details
+
+`.data` is either a data frame to build a layer from, or an
+[IFeatureLayer](http://r.esri.com/arcgisviz/reference/IFeatureLayer.md)
+you built yourself. The second form is the escape hatch: anything this
+function does not expose is done by constructing the layer and modifying
+it, usually with
+[`add_renderer()`](http://r.esri.com/arcgisviz/reference/add_renderer.md).
+
+    nc |>
+      as_feature_layer() |>
+      add_renderer(ISimpleRenderer(symbol = my_symbol)) |>
+      (\(lyr) add_layer(arc_map(), lyr))()
 
 ## Examples
 
