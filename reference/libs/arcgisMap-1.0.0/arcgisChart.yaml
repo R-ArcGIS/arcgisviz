@@ -1,6 +1,8 @@
+# arcgisChart.js is already attached as the `arcgisChart-binding` dependency
+# by htmlwidgets' inst/htmlwidgets/<name>.js convention. Listing it here too
+# loads the bundle a second time under a different dependency name.
 dependencies:
   - name: arcgisChart
     version: 1.0.0
     src: htmlwidgets
-    script: arcgisChart.js
     stylesheet: arcgisChart.css
