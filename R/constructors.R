@@ -91,7 +91,10 @@ coerce_style <- function(args, type, call) {
   args
 }
 
-legend_orders <- c(ascending = "ascendingValues", descending = "descendingValues")
+legend_orders <- c(
+  ascending = "ascendingValues",
+  descending = "descendingValues"
+)
 
 #' Describe a renderer in the legend
 #'

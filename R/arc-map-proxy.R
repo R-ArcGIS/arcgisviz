@@ -181,7 +181,9 @@ arc_goto <- function(
   duration = NULL
 ) {
   check_map_proxy(proxy)
-  if (rlang::is_null(center) && rlang::is_null(zoom) && rlang::is_null(extent)) {
+  if (
+    rlang::is_null(center) && rlang::is_null(zoom) && rlang::is_null(extent)
+  ) {
     cli::cli_abort(c(
       "{.fn arc_goto} needs somewhere to go.",
       "i" = "Set {.arg center}, {.arg zoom}, or {.arg extent}."

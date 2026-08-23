@@ -174,7 +174,9 @@ test_that("a date tooltip column stays an Esri date field", {
   expect_identical(fields$type[fields$name == "when"], "esriFieldTypeDate")
 
   # Milliseconds from the epoch, which is what the browser has to reformat.
-  attrs <- layer$featureCollection$layers[[1]]$featureSet$features[[1]]$attributes
+  attrs <- layer$featureCollection$layers[[1]]$featureSet$features[[
+    1
+  ]]$attributes
   expect_identical(attrs$when, arcgisutils::date_to_ms(dated$when[[1]]))
 })
 
@@ -260,7 +262,9 @@ test_that("add_layer() dispatches on a prebuilt IFeatureLayer", {
   expect_identical(sent$id, "Points")
   expect_identical(sent$opacity, 0.5)
 
-  renderer <- sent$featureCollection$layers[[1]]$layerDefinition$drawingInfo$renderer
+  renderer <- sent$featureCollection$layers[[
+    1
+  ]]$layerDefinition$drawingInfo$renderer
   expect_identical(renderer$type, "simple")
   expect_identical(renderer$symbol$size, 11)
   expect_identical(renderer$visualVariables[[1]]$field, "value")

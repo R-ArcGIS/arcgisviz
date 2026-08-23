@@ -64,7 +64,8 @@ test_that("arc_update() sends only what was set", {
 
 test_that("a layer added through a proxy travels as an IFeatureLayer", {
   f <- fake_map_proxy()
-  f$proxy |> add_layer(map_points(), color = value, name = "Points") |>
+  f$proxy |>
+    add_layer(map_points(), color = value, name = "Points") |>
     arc_update()
 
   layer <- sent_payload(f$session)$layers[[1]]
