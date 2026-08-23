@@ -1,6 +1,8 @@
+# arcgisMap.js is already attached as the `arcgisMap-binding` dependency by
+# htmlwidgets' inst/htmlwidgets/<name>.js convention. Listing it here too
+# loads the bundle a second time under a different dependency name.
 dependencies:
   - name: arcgisMap
     version: 1.0.0
     src: htmlwidgets
-    script: arcgisMap.js
     stylesheet: arcgisMap.css
