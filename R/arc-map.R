@@ -225,7 +225,7 @@ selectable_ids <- function(layers) {
 #'   feature is hovered, as bare column names wrapped in `c()`. Name one to
 #'   label it, as in `c(County = NAME)`.
 #' @param selectable default `NULL`. Defines whether clicking a feature adds it
-#'   to the selection, which arrives in Shiny as `input$<id>_selection`. See
+#'   to the selection, which arrives in Shiny as `input$<output_id>$selection`. See
 #'   [set_selection()].
 #' @param visible default `NULL`. Defines whether the layer starts drawn.
 #'   Only when `.data` is an [IFeatureLayer].

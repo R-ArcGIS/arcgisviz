@@ -7,15 +7,15 @@
 arc_sf(x)
 }
 \arguments{
-\item{x}{Defines which event to read, from \verb{input$<output_id>_sketch} or
-\verb{input$<output_id>_edits}.}
+\item{x}{Defines which event to read, from \verb{input$<output_id>$sketch} or
+\verb{input$<output_id>$edits}.}
 }
 \value{
 An \code{sf} object, or \code{NULL} when the event carried no features - a
 cleared sketch, or an edit that only deleted.
 }
 \description{
-Turns an \verb{input$<output_id>_sketch} or \verb{input$<output_id>_edits} event into
+Turns an \verb{input$<output_id>$sketch} or \verb{input$<output_id>$edits} event into
 an \code{sf} object. Both carry their features as Esri feature JSON, which is
 what \code{\link[arcgisutils:parse_esri_json]{arcgisutils::parse_esri_json()}} reads.
 }
@@ -28,8 +28,8 @@ the data frame was sent in.
 \examples{
 # Inside a Shiny server:
 if (interactive()) {
-  observeEvent(input$map_sketch, {
-    drawn <- arc_sf(input$map_sketch)
+  observeEvent(input$map$sketch, {
+    drawn <- arc_sf(input$map$sketch)
     print(sf::st_area(drawn))
   })
 }

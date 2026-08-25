@@ -45,7 +45,7 @@ or \code{"horizontal"}.}
 }
 \description{
 Hands the reader tools to draw with. What they draw arrives in Shiny as
-\verb{input$<output_id>_sketch}, which \code{\link[=arc_sf]{arc_sf()}} turns into an \code{sf} object.
+\verb{input$<output_id>$sketch}, which \code{\link[=arc_sf]{arc_sf()}} turns into an \code{sf} object.
 }
 \examples{
 arc_map() |> add_sketch(tools = c("polygon", "rectangle"))

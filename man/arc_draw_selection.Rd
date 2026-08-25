@@ -23,7 +23,7 @@ name. \code{NULL} means every layer on the map.}
 }
 \description{
 Hands the reader a drawing tool. Whatever the shape they draw covers becomes
-the selection, which arrives back as \verb{input$<output_id>_selection} the same
+the selection, which arrives back as \verb{input$<output_id>$selection} the same
 way \code{\link[=set_selection]{set_selection()}}'s does. The tool is live from the moment this is
 called and is put away once the shape is finished.
 }

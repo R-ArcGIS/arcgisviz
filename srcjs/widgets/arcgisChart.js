@@ -141,26 +141,32 @@ var ERROR_EVENTS = [
   "arcgisBadDataWarningRaise",
 ];
 
+// Every event lands on one input named by the output id, so a chart rendered
+// as arcgisChartOutput("my_chart") reports input$my_chart$selection. el.id is
+// already namespaced, so this is what a module reads too.
+//
+// The object accumulates: a status update does not wipe out the selection
+// beside it. "event" priority means an identical event still fires.
 function subscribeEvents(chartEl, el) {
   if (!HTMLWidgets.shinyMode || !el.id) return;
+  var events = {};
+
+  var report = function (name, value) {
+    events[name] = value;
+    Shiny.setInputValue(el.id, Object.assign({}, events), {
+      priority: "event",
+    });
+  };
 
   Object.keys(CHART_EVENTS).forEach(function (name) {
     chartEl.addEventListener(name, function (event) {
-      Shiny.setInputValue(
-        el.id + "_" + CHART_EVENTS[name],
-        cleanPayload(event.detail),
-        { priority: "event" },
-      );
+      report(CHART_EVENTS[name], cleanPayload(event.detail));
     });
   });
 
   ERROR_EVENTS.forEach(function (name) {
     chartEl.addEventListener(name, function (event) {
-      Shiny.setInputValue(
-        el.id + "_error",
-        { kind: name, detail: cleanPayload(event.detail) },
-        { priority: "event" },
-      );
+      report("error", { kind: name, detail: cleanPayload(event.detail) });
     });
   });
 }

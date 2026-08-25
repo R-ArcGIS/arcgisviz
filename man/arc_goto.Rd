@@ -31,7 +31,7 @@ milliseconds.}
 \description{
 \code{arc_goto()} animates the view, unlike \code{\link[=set_view]{set_view()}} on a proxy, which jumps
 to the new position. \code{arc_screenshot()} captures the view as a PNG data URL
-and sends it back as \verb{input$<output_id>_screenshot}.
+and sends it back as \verb{input$<output_id>$screenshot}.
 }
 \examples{
 if (interactive()) {

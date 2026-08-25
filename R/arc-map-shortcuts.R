@@ -392,7 +392,7 @@ add_track <- function(
 #' Add a drawing tool
 #'
 #' Hands the reader tools to draw with. What they draw arrives in Shiny as
-#' `input$<output_id>_sketch`, which [arc_sf()] turns into an `sf` object.
+#' `input$<output_id>$sketch`, which [arc_sf()] turns into an `sf` object.
 #'
 #' @inheritParams add_widget
 #' @param tools default `NULL`. Defines which tools are offered, any of
@@ -436,7 +436,7 @@ add_sketch <- function(
 #'
 #' Lets the reader change the features on the map - move them, retype their
 #' attributes, add and delete. Edits happen in the browser and arrive in Shiny
-#' as `input$<output_id>_edits`; nothing is written back to the data frame the
+#' as `input$<output_id>$edits`; nothing is written back to the data frame the
 #' layer came from unless R does it.
 #'
 #' @inheritParams add_widget
@@ -473,7 +473,7 @@ add_editor <- function(
 #' Add a measurement tool
 #'
 #' Measures distance along a drawn line, or the area and perimeter of a drawn
-#' shape. The result arrives in Shiny as `input$<output_id>_measurement`, a
+#' shape. The result arrives in Shiny as `input$<output_id>$measurement`, a
 #' value and its unit.
 #'
 #' @inheritParams add_widget

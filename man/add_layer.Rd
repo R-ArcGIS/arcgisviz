@@ -34,7 +34,7 @@ feature is hovered, as bare column names wrapped in \code{c()}. Name one to
 label it, as in \code{c(County = NAME)}.}
 
 \item{selectable}{default \code{NULL}. Defines whether clicking a feature adds it
-to the selection, which arrives in Shiny as \verb{input$<id>_selection}. See
+to the selection, which arrives in Shiny as \verb{input$<output_id>$selection}. See
 \code{\link[=set_selection]{set_selection()}}.}
 
 \item{visible}{default \code{NULL}. Defines whether the layer starts drawn.

@@ -145,7 +145,7 @@ select_tool_map <- list(
 #' Select features by drawing on the map
 #'
 #' Hands the reader a drawing tool. Whatever the shape they draw covers becomes
-#' the selection, which arrives back as `input$<output_id>_selection` the same
+#' the selection, which arrives back as `input$<output_id>$selection` the same
 #' way [set_selection()]'s does. The tool is live from the moment this is
 #' called and is put away once the shape is finished.
 #'
@@ -189,7 +189,7 @@ arc_draw_selection <- function(
 
 #' Read what was drawn or edited on a map
 #'
-#' Turns an `input$<output_id>_sketch` or `input$<output_id>_edits` event into
+#' Turns an `input$<output_id>$sketch` or `input$<output_id>$edits` event into
 #' an `sf` object. Both carry their features as Esri feature JSON, which is
 #' what [arcgisutils::parse_esri_json()] reads.
 #'
@@ -198,15 +198,15 @@ arc_draw_selection <- function(
 #' features come back in the layer's own coordinate reference system, the one
 #' the data frame was sent in.
 #'
-#' @param x Defines which event to read, from `input$<output_id>_sketch` or
-#'   `input$<output_id>_edits`.
+#' @param x Defines which event to read, from `input$<output_id>$sketch` or
+#'   `input$<output_id>$edits`.
 #' @return An `sf` object, or `NULL` when the event carried no features - a
 #'   cleared sketch, or an edit that only deleted.
 #' @examples
 #' # Inside a Shiny server:
 #' if (interactive()) {
-#'   observeEvent(input$map_sketch, {
-#'     drawn <- arc_sf(input$map_sketch)
+#'   observeEvent(input$map$sketch, {
+#'     drawn <- arc_sf(input$map$sketch)
 #'     print(sf::st_area(drawn))
 #'   })
 #' }
@@ -222,7 +222,7 @@ arc_sf <- function(x) {
 
 #' Read a map selection
 #'
-#' Pulls the object ids out of an `input$<output_id>_selection` event. A
+#' Pulls the object ids out of an `input$<output_id>$selection` event. A
 #' selection can span several layers, so `layer` narrows it to one.
 #'
 #' @param x Defines which selection event to read.
@@ -295,7 +295,7 @@ remove_layer <- function(proxy, layer = NULL) {
 #'
 #' `arc_goto()` animates the view, unlike [set_view()] on a proxy, which jumps
 #' to the new position. `arc_screenshot()` captures the view as a PNG data URL
-#' and sends it back as `input$<output_id>_screenshot`.
+#' and sends it back as `input$<output_id>$screenshot`.
 #'
 #' @param proxy Defines which [arc_map_proxy()] to act on.
 #' @param center default `NULL`. Defines the target centre as `c(lon, lat)`.

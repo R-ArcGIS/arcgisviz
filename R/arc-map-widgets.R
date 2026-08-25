@@ -149,7 +149,7 @@ map_widget_map <- list(
   sketch = list(
     component = "arcgis-sketch",
     position = "top-right",
-    # What is drawn comes back as input$<id>_sketch, an Esri feature set that
+    # What is drawn comes back as input$sketch, an Esri feature set that
     # arc_sf() turns into an sf object.
     props = c(
       "availableCreateTools",
@@ -182,7 +182,7 @@ map_widget_map <- list(
   editor = list(
     component = "arcgis-editor",
     position = "top-right",
-    # Edits are applied in the browser and reported as input$<id>_edits;
+    # Edits are applied in the browser and reported as input$edits;
     # nothing is written back to the data frame the layer came from.
     props = c(
       "hideCreateFeaturesSection",
