@@ -5,7 +5,7 @@
 \alias{remove_widget}
 \title{Add a widget to a map}
 \usage{
-add_widget(map, widget, position = NULL, ...)
+add_widget(map, widget, position = NULL, expand = FALSE, ...)
 
 remove_widget(map, widget = NULL)
 }
@@ -19,6 +19,11 @@ it was added with. \code{NULL} removes every widget.}
 \code{"top-left"}, \code{"top-right"}, \code{"bottom-left"}, \code{"bottom-right"}, or the
 direction-aware \code{"top-start"}, \code{"top-end"}, \code{"bottom-start"},
 \code{"bottom-end"}. Each widget has its own default.}
+
+\item{expand}{default \code{FALSE}. Defines whether the widget is collapsed
+behind a button rather than drawn open. Worth it for the panels - the
+legend, layer list, basemap gallery - which otherwise cover the map.
+Collapsed widgets sharing a corner close each other when opened.}
 
 \item{...}{Named properties of the component itself, written either
 \code{snake_case} or \code{camelCase}. \code{\link[=map_widgets]{map_widgets()}} lists what each one takes.}

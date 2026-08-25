@@ -43,7 +43,13 @@ test_that("a widget refuses what its component cannot take", {
     "no property"
   )
   expect_error(
-    add_widget(arc_map(), "legend", position = "top-left", TRUE),
+    add_widget(
+      arc_map(),
+      "legend",
+      position = "top-left",
+      expand = FALSE,
+      TRUE
+    ),
     "must be named"
   )
 
@@ -84,4 +90,40 @@ test_that("map_widgets() lists every widget with what it takes", {
   expect_true(all(widgets$position %in% map_positions))
   expect_true("legend" %in% widgets$widget)
   expect_true("legendStyle" %in% widgets$properties[[1]])
+})
+
+test_that("expand wraps a widget and is only sent when asked for", {
+  plain <- as_widget_specs(add_widget(arc_map(), "basemap-gallery"))[[1]]
+  expect_false("expand" %in% names(plain))
+
+  collapsed <- as_widget_specs(
+    add_widget(arc_map(), "basemap-gallery", expand = TRUE)
+  )[[1]]
+  expect_true(collapsed$expand)
+
+  expect_error(
+    add_widget(arc_map(), "legend", expand = "yes"),
+    "must be .*TRUE"
+  )
+})
+
+test_that("a collapsed widget survives the proxy path too", {
+  skip_if_not_installed("shiny")
+  sent <- list()
+  session <- list(
+    sendCustomMessage = function(type, message) {
+      sent[[length(sent) + 1]] <<- message
+      invisible(NULL)
+    }
+  )
+
+  arc_map_proxy("map", session = session) |>
+    add_widget("basemap-gallery", expand = TRUE) |>
+    arc_update()
+
+  payload <- yyjsonr::read_json_str(
+    sent[[1]]$payload,
+    opts = yyjsonr::opts_read_json(arr_of_objs_to_df = FALSE)
+  )
+  expect_true(payload$widgets[[1]]$expand)
 })

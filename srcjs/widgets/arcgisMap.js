@@ -193,6 +193,9 @@ var COMPONENTS = {
   "arcgis-compass": function () {
     return import("@arcgis/map-components/components/arcgis-compass");
   },
+  "arcgis-expand": function () {
+    return import("@arcgis/map-components/components/arcgis-expand");
+  },
   "arcgis-coordinate-conversion": function () {
     return import(
       "@arcgis/map-components/components/arcgis-coordinate-conversion"
@@ -416,11 +419,26 @@ HTMLWidgets.widget({
 
         removeWidgets([spec.component]);
         var node = document.createElement(spec.component);
-        node.slot = spec.position;
         assign(node, spec.props || {});
-        mapEl.appendChild(node);
-        state.widgets[spec.component] = node;
+
+        var mounted = spec.expand ? await expandWrapper(spec, node) : node;
+        mounted.slot = spec.position;
+        mapEl.appendChild(mounted);
+
+        // The wrapper is what a later remove has to take off the map.
+        state.widgets[spec.component] = mounted;
       }
+    }
+
+    // A collapsed widget is arcgis-expand with the component in its default
+    // slot. Expands sharing a corner share a group, so opening one closes the
+    // other - Esri's own pattern (arcgis-expand/customElement.d.ts:126).
+    async function expandWrapper(spec, node) {
+      await COMPONENTS["arcgis-expand"]();
+      var wrapper = document.createElement("arcgis-expand");
+      wrapper.group = spec.position;
+      wrapper.appendChild(node);
+      return wrapper;
     }
 
     function removeWidgets(components) {

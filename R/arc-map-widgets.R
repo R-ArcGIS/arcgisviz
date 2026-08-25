@@ -195,6 +195,7 @@ MapWidget := new_class(
   properties = list(
     widget = s7x::class_string,
     position = s7x::class_string,
+    expand = s7x::class_boolean,
     props = S7::class_list
   )
 )
@@ -216,6 +217,10 @@ MapWidget := new_class(
 #'   `"top-left"`, `"top-right"`, `"bottom-left"`, `"bottom-right"`, or the
 #'   direction-aware `"top-start"`, `"top-end"`, `"bottom-start"`,
 #'   `"bottom-end"`. Each widget has its own default.
+#' @param expand default `FALSE`. Defines whether the widget is collapsed
+#'   behind a button rather than drawn open. Worth it for the panels - the
+#'   legend, layer list, basemap gallery - which otherwise cover the map.
+#'   Collapsed widgets sharing a corner close each other when opened.
 #' @param ... Named properties of the component itself, written either
 #'   `snake_case` or `camelCase`. [map_widgets()] lists what each one takes.
 #' @return `map`, with the widget added.
@@ -224,9 +229,19 @@ MapWidget := new_class(
 #'   add_widget("legend") |>
 #'   add_widget("layer-list", position = "top-right", show_filter = TRUE)
 #' @export
-add_widget <- function(map, widget, position = NULL, ...) {
+add_widget <- function(map, widget, position = NULL, expand = FALSE, ...) {
   check_map(map)
   call <- rlang::caller_env()
+
+  if (!rlang::is_bool(expand)) {
+    cli::cli_abort(
+      c(
+        "{.arg expand} must be {.code TRUE} or {.code FALSE}.",
+        "x" = "You supplied {.obj_type_friendly {expand}}."
+      ),
+      call = call
+    )
+  }
 
   widget <- rlang::arg_match0(widget, names(map_widget_map), arg_nm = "widget")
   spec <- map_widget_map[[widget]]
@@ -242,6 +257,7 @@ add_widget <- function(map, widget, position = NULL, ...) {
     list(MapWidget(
       widget = widget,
       position = position,
+      expand = expand,
       props = widget_props(rlang::list2(...), spec, widget, call)
     ))
   )
@@ -341,10 +357,14 @@ widget_props <- function(props, spec, widget, call) {
 # The client keys widgets by element name, so that is what crosses the wire.
 map_widget_specs <- function(widgets) {
   lapply(widgets, function(widget) {
-    list(
+    spec <- list(
       component = map_widget_map[[widget@widget]]$component,
       position = widget@position,
       props = widget@props
     )
+    if (isTRUE(widget@expand)) {
+      spec$expand <- TRUE
+    }
+    spec
   })
 }
