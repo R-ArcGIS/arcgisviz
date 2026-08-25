@@ -146,6 +146,88 @@ map_widget_map <- list(
       "icon"
     )
   ),
+  sketch = list(
+    component = "arcgis-sketch",
+    position = "top-right",
+    # What is drawn comes back as input$<id>_sketch, an Esri feature set that
+    # arc_sf() turns into an sf object.
+    props = c(
+      "availableCreateTools",
+      "creationMode",
+      "layout",
+      "toolbarKind",
+      "scale",
+      "visualScale",
+      "updateOnGraphicClickDisabled",
+      "showCreateToolsFreehandPolygon",
+      "showCreateToolsFreehandPolyline",
+      "showCreateToolsText",
+      "hideCreateToolsCircle",
+      "hideCreateToolsMultipoint",
+      "hideCreateToolsPoint",
+      "hideCreateToolsPolygon",
+      "hideCreateToolsPolyline",
+      "hideCreateToolsRectangle",
+      "hideDeleteButton",
+      "hideDuplicateButton",
+      "hideSelectionToolsLassoSelection",
+      "hideSelectionToolsRectangleSelection",
+      "hideSettingsMenu",
+      "hideSnappingControls",
+      "hideUndoRedoMenu",
+      "label"
+    ),
+    arrays = "availableCreateTools"
+  ),
+  editor = list(
+    component = "arcgis-editor",
+    position = "top-right",
+    # Edits are applied in the browser and reported as input$<id>_edits;
+    # nothing is written back to the data frame the layer came from.
+    props = c(
+      "hideCreateFeaturesSection",
+      "hideEditFeaturesSection",
+      "hideLabelsToggle",
+      "hideMergeButton",
+      "hideSelectionToolbar",
+      "hideSettingsMenu",
+      "hideSketch",
+      "hideSplitButton",
+      "hideUndoRedoButtons",
+      "hideZoomToButton",
+      "syncViewSelection",
+      "headingLevel",
+      "label"
+    )
+  ),
+  `area-measurement` = list(
+    component = "arcgis-area-measurement-2d",
+    position = "top-right",
+    props = c(
+      "unit",
+      "unitOptions",
+      "hideStartButton",
+      "hideUnitSelect",
+      "hideVisualization",
+      "label",
+      "icon"
+    ),
+    arrays = "unitOptions"
+  ),
+  `distance-measurement` = list(
+    component = "arcgis-distance-measurement-2d",
+    position = "top-right",
+    props = c(
+      "unit",
+      "unitOptions",
+      "hideStartButton",
+      "hideUnitSelect",
+      "hideVisualization",
+      "label",
+      "icon"
+    ),
+    arrays = "unitOptions"
+  ),
   `scale-bar` = list(
     component = "arcgis-scale-bar",
     position = "bottom-left",
@@ -333,6 +415,12 @@ widget_props <- function(props, spec, widget, call) {
       ),
       call = call
     )
+  }
+
+  # A property the component declares as an array has to stay one: auto_unbox
+  # would send a single tool name as a bare string.
+  for (name in intersect(names(props), spec$arrays)) {
+    props[[name]] <- as.list(props[[name]])
   }
 
   props

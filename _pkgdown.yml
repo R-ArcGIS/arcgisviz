@@ -112,6 +112,7 @@ reference:
       - set_selection
       - arc_select
       - arc_selected
+      - arc_sf
       - set_legend
       - set_layer
       - arc_goto

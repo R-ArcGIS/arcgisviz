@@ -549,6 +549,35 @@ Widgets are keyed by component, so adding one twice replaces it - the same
 idempotence rule a named layer has, and what makes `add_widget()` safe to
 re-run through a proxy.
 
+**The four tool widgets report back, and each one reports from a different
+place.** This is not a choice; it is where the SDK puts the result.
+
+- **`sketch`** - its own events (`arcgisCreate`/`arcgisUpdate`/`arcgisDelete`,
+  gated on `state === "complete"` because they fire continuously while
+  drawing). The payload is every graphic on the component's own graphics
+  layer, not the one that changed.
+- **`editor`** - *the layer's* `edits` event (`EditBusLayer`,
+  `@arcgis/core` 5.0), never the component's: `arcgis-editor` emits only
+  `arcgisSketchCreate`/`arcgisSketchUpdate`, which fire mid-gesture and carry
+  no result. The event gives object ids, so the features are queried back out
+  of the layer.
+- **the two `*-measurement`** - `mapEl.whenAnalysisView(node.analysis)` then
+  `reactiveUtils.watch()` on `analysisView.result`. There is no event at all.
+
+Client side feature layers are editable: `FeatureLayer$editingEnabled` returns
+true for a memory source, and `clientSideDefaults.js` gives them add/update/
+delete capabilities and a "New Feature" template. **Edits live in the browser
+only** - R hears what changed and decides whether to persist it.
+
+**Geometry crosses back as an Esri feature set string**, which
+`arcgisutils::parse_esri_json()` reads and `arc_sf()` wraps - the mirror of
+`map_send()` sending a string rather than letting Shiny's jsonlite touch it.
+Drawn shapes are converted out of Web Mercator first
+(`webMercatorToGeographic()`), since the view draws in metres and the next
+line of R rarely wants them; edited features keep the layer's own CRS. Each
+feature carries an `object_id` attribute because `parse_esri_json()` builds
+its data frame from `attributes` and an empty one has no rows.
+
 **Selection is the view's `SelectionManager`, not a highlight handle.**
 `mapEl.selectionManager` (`@arcgis/core` 5.0, still `@beta`) owns a selection
 set across layers, highlights it, and emits `selection-change` - so the map
@@ -573,7 +602,8 @@ one friendly name: a lasso is the `polygon` create tool in `"freehand"`
 and `"point"` send no mode at all.
 
 `set_filter()` on a map is the layer's `definitionExpression`. Events become
-`input$<id>_click`/`_hover`/`_view`/`_selection`/`_screenshot`, plus `_error`
+`input$<id>_click`/`_hover`/`_view`/`_selection`/`_sketch`/`_edits`/
+`_measurement`/`_screenshot`, plus `_error`
 carrying a `kind` (`arcgisLoadError`, `arcgisViewReadyError`, or `"proxy"`
 with the failing `method` - a proxy message that throws reports itself rather
 than dying in the console).

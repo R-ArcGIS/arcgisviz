@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[69956],{69956(n,t,e){e.r(t),e.d(t,{extractRegion:()=>c,getCountry:()=>i});var r=e(15274);const u="Global";function c(n){if(function(n){return 0===(0,r.a)(n).countries.length}(n))return u;const t=n.indexOf("/");return-1===t?n:n.slice(0,t)}function i(n){return(0,r.g)(n)?.id??n}e.d(t,["global",0,u])}}]);

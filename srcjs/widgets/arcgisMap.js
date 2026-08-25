@@ -6,6 +6,8 @@ import Field from "@arcgis/core/layers/support/Field.js";
 import PopupTemplate from "@arcgis/core/PopupTemplate.js";
 import { fromJSON as rendererFromJSON } from "@arcgis/core/renderers/support/jsonUtils.js";
 import { debounce } from "@arcgis/core/core/promiseUtils.js";
+import { watch } from "@arcgis/core/core/reactiveUtils.js";
+import { webMercatorToGeographic } from "@arcgis/core/geometry/support/webMercatorUtils.js";
 import SelectionOperation from "@arcgis/core/views/selection/SelectionOperation.js";
 
 // Optional properties arrive as absent keys, and assigning `undefined` to an
@@ -189,8 +191,21 @@ var COMPONENTS = {
   "arcgis-bookmarks": function () {
     return import("@arcgis/map-components/components/arcgis-bookmarks");
   },
+  "arcgis-area-measurement-2d": function () {
+    return import(
+      "@arcgis/map-components/components/arcgis-area-measurement-2d"
+    );
+  },
   "arcgis-compass": function () {
     return import("@arcgis/map-components/components/arcgis-compass");
+  },
+  "arcgis-distance-measurement-2d": function () {
+    return import(
+      "@arcgis/map-components/components/arcgis-distance-measurement-2d"
+    );
+  },
+  "arcgis-editor": function () {
+    return import("@arcgis/map-components/components/arcgis-editor");
   },
   "arcgis-coordinate-conversion": function () {
     return import(
@@ -218,6 +233,9 @@ var COMPONENTS = {
   "arcgis-search": function () {
     return import("@arcgis/map-components/components/arcgis-search");
   },
+  "arcgis-sketch": function () {
+    return import("@arcgis/map-components/components/arcgis-sketch");
+  },
   "arcgis-track": function () {
     return import("@arcgis/map-components/components/arcgis-track");
   },
@@ -225,6 +243,51 @@ var COMPONENTS = {
     return import("@arcgis/map-components/components/arcgis-zoom");
   },
 };
+
+var ESRI_GEOMETRY = {
+  point: "esriGeometryPoint",
+  multipoint: "esriGeometryMultipoint",
+  polyline: "esriGeometryPolyline",
+  polygon: "esriGeometryPolygon",
+  extent: "esriGeometryEnvelope",
+};
+
+// Drawn geometry is in the view's spatial reference, which is Web Mercator
+// for every basemap the SDK ships, so R would get metres.
+function geographic(geometry) {
+  var sr = geometry && geometry.spatialReference;
+  return sr && sr.isWebMercator ? webMercatorToGeographic(geometry) : geometry;
+}
+
+// A feature set is what arcgisutils::parse_esri_json() reads, and it travels
+// as a string so R parses it rather than Shiny's jsonlite.
+function featureSetJson(graphics) {
+  var drawn = graphics
+    .map(function (graphic, i) {
+      var geometry = geographic(graphic.geometry);
+      if (!geometry) return null;
+      return {
+        geometry: geometry.toJSON(),
+        attributes: { object_id: i + 1 },
+      };
+    })
+    .filter(Boolean);
+
+  if (!drawn.length) return null;
+  var first = geographic(graphics[0].geometry);
+
+  return JSON.stringify({
+    geometryType: ESRI_GEOMETRY[first.type],
+    spatialReference: first.spatialReference.toJSON(),
+    features: drawn,
+  });
+}
+
+function editedIds(results) {
+  return (results || []).map(function (result) {
+    return result.objectId;
+  });
+}
 
 // Guarded rather than called by name: `mode` arrives from the wire, and
 // manager[mode] would otherwise reach any method on the manager.
@@ -334,6 +397,7 @@ HTMLWidgets.widget({
           mapEl.map.remove(existing);
         }
         state.layers[layer.id] = layer;
+        subscribeEdits(layer);
       });
       mapEl.map.addMany(layers);
       return layers;
@@ -416,7 +480,96 @@ HTMLWidgets.widget({
         assign(node, spec.props || {});
         mapEl.appendChild(node);
         state.widgets[spec.component] = node;
+        subscribeWidget(spec.component, node);
       }
+    }
+
+    // Only the tools have anything to report. Everything else on the map is
+    // furniture the reader drives and R never hears about.
+    function subscribeWidget(component, node) {
+      if (component === "arcgis-sketch") return subscribeSketch(node);
+      if (component.indexOf("-measurement-2d") !== -1) {
+        return subscribeMeasurement(component, node);
+      }
+    }
+
+    // The sketch component keeps its own graphics layer, so the payload is
+    // everything currently drawn rather than the one graphic that changed.
+    function subscribeSketch(node) {
+      var report = function (action) {
+        var graphics = node.layer ? node.layer.graphics.toArray() : [];
+        shinyInput(el, "sketch", {
+          action: action,
+          count: graphics.length,
+          features: featureSetJson(graphics),
+        });
+      };
+
+      // create and update fire continuously while the shape is being drawn.
+      node.addEventListener("arcgisCreate", function (event) {
+        if (event.detail.state === "complete") report("create");
+      });
+      node.addEventListener("arcgisUpdate", function (event) {
+        if (event.detail.state === "complete") report("update");
+      });
+      node.addEventListener("arcgisDelete", function () {
+        report("delete");
+      });
+      ["arcgisUndo", "arcgisRedo"].forEach(function (name) {
+        node.addEventListener(name, function () {
+          report(name === "arcgisUndo" ? "undo" : "redo");
+        });
+      });
+    }
+
+    // The result lives on the analysis *view*, which exists only once the
+    // component has made its analysis and the map has a view for it.
+    async function subscribeMeasurement(component, node) {
+      var tool = component.indexOf("area") !== -1 ? "area" : "distance";
+      await node.componentOnReady();
+      var analysisView = await mapEl.whenAnalysisView(node.analysis);
+
+      watch(
+        function () {
+          return analysisView.result;
+        },
+        function (result) {
+          if (!result) return shinyInput(el, "measurement", null);
+          shinyInput(el, "measurement", {
+            tool: tool,
+            mode: result.mode,
+            length: result.length || result.perimeter || null,
+            area: result.area || null,
+          });
+        },
+      );
+    }
+
+    // Edits reach R from the layer, not the editor: applyEdits() reports
+    // object ids, and the features themselves are queried back out.
+    function subscribeEdits(layer) {
+      layer.on("edits", async function (event) {
+        var added = editedIds(event.addedFeatures);
+        var updated = editedIds(event.updatedFeatures);
+        var deleted = editedIds(event.deletedFeatures);
+        var changed = added.concat(updated);
+
+        var set = changed.length
+          ? await layer.queryFeatures({
+              objectIds: changed,
+              outFields: ["*"],
+              returnGeometry: true,
+            })
+          : null;
+
+        shinyInput(el, "edits", {
+          layer: layer.id,
+          added: added,
+          updated: updated,
+          deleted: deleted,
+          features: set ? JSON.stringify(set.toJSON()) : null,
+        });
+      });
     }
 
     function removeWidgets(components) {

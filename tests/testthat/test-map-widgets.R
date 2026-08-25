@@ -85,3 +85,51 @@ test_that("map_widgets() lists every widget with what it takes", {
   expect_true("legend" %in% widgets$widget)
   expect_true("legendStyle" %in% widgets$properties[[1]])
 })
+
+test_that("an array property stays an array with one element", {
+  map <- add_widget(arc_map(), "sketch", available_create_tools = "polygon")
+
+  props <- as_widget_specs(map)[[1]]$props
+  expect_identical(props$availableCreateTools, list("polygon"))
+
+  # A scalar property is left alone.
+  expect_identical(
+    as_widget_specs(add_widget(arc_map(), "sketch", layout = "vertical"))[[
+      1
+    ]]$props$layout,
+    "vertical"
+  )
+})
+
+test_that("the tools are widgets like any other", {
+  widgets <- map_widgets()
+  tools <- c("sketch", "editor", "area-measurement", "distance-measurement")
+
+  expect_true(all(tools %in% widgets$widget))
+  expect_identical(
+    as_widget_specs(add_widget(arc_map(), "editor"))[[1]]$component,
+    "arcgis-editor"
+  )
+})
+
+test_that("arc_sf() reads an event's features and shrugs at an empty one", {
+  skip_if_not_installed("sf")
+  event <- list(
+    action = "create",
+    count = 1,
+    features = paste0(
+      '{"geometryType":"esriGeometryPoint",',
+      '"spatialReference":{"wkid":4326},',
+      '"features":[{"geometry":{"x":-80,"y":35},',
+      '"attributes":{"object_id":1}}]}'
+    )
+  )
+
+  drawn <- arc_sf(event)
+  expect_s3_class(drawn, "sf")
+  expect_identical(nrow(drawn), 1L)
+  expect_identical(drawn$object_id, 1L)
+
+  expect_null(arc_sf(list(action = "delete", count = 0, features = NULL)))
+  expect_null(arc_sf(list()))
+})

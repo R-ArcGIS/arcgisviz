@@ -187,6 +187,39 @@ arc_select <- function(
   )
 }
 
+#' Read what was drawn or edited on a map
+#'
+#' Turns an `input$<output_id>_sketch` or `input$<output_id>_edits` event into
+#' an `sf` object. Both carry their features as Esri feature JSON, which is
+#' what [arcgisutils::parse_esri_json()] reads.
+#'
+#' A drawn shape is returned in longitude/latitude, since the view draws in
+#' Web Mercator and metres are rarely what the next line of R wants. Edited
+#' features come back in the layer's own coordinate reference system, the one
+#' the data frame was sent in.
+#'
+#' @param x Defines which event to read, from `input$<output_id>_sketch` or
+#'   `input$<output_id>_edits`.
+#' @return An `sf` object, or `NULL` when the event carried no features - a
+#'   cleared sketch, or an edit that only deleted.
+#' @examples
+#' # Inside a Shiny server:
+#' if (interactive()) {
+#'   observeEvent(input$map_sketch, {
+#'     drawn <- arc_sf(input$map_sketch)
+#'     print(sf::st_area(drawn))
+#'   })
+#' }
+#' @export
+arc_sf <- function(x) {
+  features <- x$features
+  if (rlang::is_empty(features) || !rlang::is_string(features)) {
+    return(NULL)
+  }
+  rlang::check_installed(c("sf", "arcgisutils"))
+  arcgisutils::parse_esri_json(features)
+}
+
 #' Read a map selection
 #'
 #' Pulls the object ids out of an `input$<output_id>_selection` event. A

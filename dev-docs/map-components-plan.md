@@ -137,6 +137,16 @@ wiring on top, and that is per component rather than per widget.
    fourteen. This answers the "`{calcite}` problem" below: the containers
    take config, the widgets take a slot, and a registry is enough.
 
+5. **The tools**: sketch, editor, and the two 2D measurements. These are the
+   widgets with something to say, and each says it from a different place -
+   sketch from its own events, the editor from the *layer's* `edits` event,
+   the measurements from a `reactiveUtils.watch()` on the analysis view's
+   result. Geometry returns as an Esri feature set string that `arc_sf()`
+   parses, so a drawn polygon is an `sf` object one call later. Client side
+   layers turn out to be fully editable (`clientSideDefaults.js` gives them
+   add/update/delete and a default template), though the edits live in the
+   browser until R decides to keep them.
+
 ## Still to do
 
 1. **Click popups**, which are now one flag away but would duplicate the

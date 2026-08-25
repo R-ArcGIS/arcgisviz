@@ -178,7 +178,21 @@ default `position`, and a `props` allowlist. Adding a widget:
 
 Positions are the element's own slot names
 (`arcgis-map/customElement.d.ts:120`). Widgets are keyed by component, so
-adding one twice replaces it.
+adding one twice replaces it. A property the component declares as an array
+goes in the registry's `arrays` field, or `auto_unbox` sends a one-element
+vector as a bare string.
+
+**The four tools report from three different places**, none of them uniform:
+`sketch` from its own events (gated on `state === "complete"`); `editor` from
+*the layer's* `edits` event, because the component only emits mid-gesture
+sketch events; the measurements from `reactiveUtils.watch()` on
+`whenAnalysisView(node.analysis).result`, which has no event at all.
+
+Geometry returns as an Esri feature set **string** for
+`arcgisutils::parse_esri_json()` (`arc_sf()`), the mirror of `map_send()`.
+Drawn shapes leave Web Mercator first; edited features keep the layer's CRS.
+Every feature needs an `object_id` attribute - `parse_esri_json()` builds its
+data frame from `attributes`, and an empty one has no rows.
 
 ## Selection is the view's SelectionManager
 
