@@ -199,7 +199,7 @@ data frame from `attributes`, and an empty one has no rows.
 `mapEl.selectionManager` (`@arcgis/core` 5.0, `@beta`) owns a selection set
 across layers, highlights it, and emits `selection-change`. Three routes write
 to the same set - `set_selection(mode =)`, a click on a `selectable = TRUE`
-layer, and `arc_select()`'s `SelectionOperation` (the SDK's own
+layer, and `arc_draw_selection()`'s `SelectionOperation` (the SDK's own
 draw-to-select) - and all three report through `input$<id>_selection`, which
 `arc_selected()` reads.
 
