@@ -44,7 +44,7 @@ from.}
 }
 \description{
 Measures distance along a drawn line, or the area and perimeter of a drawn
-shape. The result arrives in Shiny as \verb{input$<output_id>_measurement}, a
+shape. The result arrives in Shiny as \verb{input$<output_id>$measurement}, a
 value and its unit.
 }
 \examples{

@@ -122,7 +122,7 @@ wiring on top, and that is per component rather than per widget.
    popups stay off (`popupEnabled = false`) - see CLAUDE.md's map section.
 3. **Selection**, on the view's `SelectionManager` rather than a per-layer
    highlight handle. It is one set across layers with a `selection-change`
-   event, so `input$<id>_selection` finally exists and a map can drive a
+   event, so `input$<output_id>$selection` finally exists and a map can drive a
    chart. `set_selection(mode =)`, `add_layer(selectable =)` and
    `arc_draw_selection()` all write to it; `arc_selected()` reads it and
    `set_highlight()` styles it. `SelectionOperation` (5.1) is the SDK's own

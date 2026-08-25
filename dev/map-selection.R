@@ -1,6 +1,6 @@
 # A map selection is a set that lives in the browser and is reported back to
 # R. Three things put features into it - a click, a drawn shape, and R itself
-# - and all three land in the same `input$<id>_selection`.
+# - and all three land in the same `input$<output_id>$selection`.
 devtools::load_all()
 library(sf)
 library(shiny)
@@ -138,7 +138,7 @@ server <- function(input, output, session) {
 
   # Every one of the three routes above arrives here.
   output$selected <- renderTable({
-    ids <- arc_selected(input$map_selection, layer = "Counties")
+    ids <- arc_selected(input$map$selection, layer = "Counties")
     if (!length(ids)) {
       return(NULL)
     }

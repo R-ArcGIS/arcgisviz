@@ -174,9 +174,22 @@ function featurePayload(hit) {
   };
 }
 
-function shinyInput(el, name, value) {
-  if (!HTMLWidgets.shinyMode || !el.id) return;
-  Shiny.setInputValue(el.id + "_" + name, value, { priority: "event" });
+// Every event lands on one input named by the output id, so a map rendered as
+// arcgisMapOutput("my_map") reports input$my_map$click and input$my_map$sketch.
+// el.id is already namespaced, so this is what a module reads too.
+//
+// The object accumulates: a click does not wipe out the sketch beside it. It
+// is sent with "event" priority so repeating an identical event still fires.
+function shinyReporter(el) {
+  var events = {};
+
+  return function (name, value) {
+    if (!HTMLWidgets.shinyMode || !el.id) return;
+    events[name] = value;
+    Shiny.setInputValue(el.id, Object.assign({}, events), {
+      priority: "event",
+    });
+  };
 }
 
 // One import() per component, written out rather than built from the name:
@@ -347,9 +360,12 @@ HTMLWidgets.widget({
     tip.className = "arcgisviz-tooltip";
     el.appendChild(tip);
 
+    var report = shinyReporter(el);
+
     // Layers stay in the closure so a proxy can filter, highlight, or hide
     // one without the data crossing the wire a second time.
     var state = {
+
       layers: {},
       widgets: {},
       watches: {},
@@ -382,7 +398,7 @@ HTMLWidgets.widget({
       tip.style.display = "none";
       if (state.hovered !== null) {
         state.hovered = null;
-        shinyInput(el, "hover", null);
+        report("hover", null);
       }
     }
 
@@ -503,7 +519,7 @@ HTMLWidgets.widget({
       if (component.indexOf("-measurement-2d") === -1) return;
 
       subscribeMeasurement(component, node).catch(function (err) {
-        shinyInput(el, "error", {
+        report("error", {
           kind: "widget",
           method: component,
           detail: err && err.message ? err.message : String(err),
@@ -516,7 +532,7 @@ HTMLWidgets.widget({
     function subscribeSketch(node) {
       var report = function (action) {
         var graphics = node.layer ? node.layer.graphics.toArray() : [];
-        shinyInput(el, "sketch", {
+        report("sketch", {
           action: action,
           count: graphics.length,
           features: featureSetJson(graphics),
@@ -552,8 +568,8 @@ HTMLWidgets.widget({
           return analysisView.result;
         },
         function (result) {
-          if (!result) return shinyInput(el, "measurement", null);
-          shinyInput(el, "measurement", {
+          if (!result) return report("measurement", null);
+          report("measurement", {
             tool: tool,
             mode: result.mode,
             length: result.length || result.perimeter || null,
@@ -580,7 +596,7 @@ HTMLWidgets.widget({
             })
           : null;
 
-        shinyInput(el, "edits", {
+        report("edits", {
           layer: layer.id,
           added: added,
           updated: updated,
@@ -641,7 +657,7 @@ HTMLWidgets.widget({
       var key = payload.layer + "\r" + payload.objectId;
       if (key !== state.hovered) {
         state.hovered = key;
-        shinyInput(el, "hover", payload);
+        report("hover", payload);
       }
     });
 
@@ -651,7 +667,7 @@ HTMLWidgets.widget({
       if (state.viewTimer) clearTimeout(state.viewTimer);
       state.viewTimer = setTimeout(function () {
         var extent = mapEl.extent;
-        shinyInput(el, "view", {
+        report("view", {
           zoom: mapEl.zoom,
           center: mapEl.center
             ? [mapEl.center.longitude, mapEl.center.latitude]
@@ -677,7 +693,7 @@ HTMLWidgets.widget({
 
       if (mapEl.selectionManager) {
         mapEl.selectionManager.on("selection-change", function () {
-          shinyInput(el, "selection", selectionPayload(mapEl.selectionManager));
+          report("selection", selectionPayload(mapEl.selectionManager));
         });
       }
 
@@ -694,7 +710,7 @@ HTMLWidgets.widget({
           ]);
         }
 
-        shinyInput(el, "click", {
+        report("click", {
           longitude: point && point.longitude,
           latitude: point && point.latitude,
           feature: hit ? featurePayload(hit) : null,
@@ -705,7 +721,7 @@ HTMLWidgets.widget({
 
       ["arcgisLoadError", "arcgisViewReadyError"].forEach(function (name) {
         mapEl.addEventListener(name, function (event) {
-          shinyInput(el, "error", { kind: name, detail: String(event.detail) });
+          report("error", { kind: name, detail: String(event.detail) });
         });
       });
     }
@@ -747,11 +763,11 @@ HTMLWidgets.widget({
             await mapEl.goTo(t.extent || t, payload.options);
           } else if (msg.method === "screenshot") {
             var shot = await mapEl.takeScreenshot({ format: payload.format });
-            shinyInput(el, "screenshot", shot.dataUrl);
+            report("screenshot", shot.dataUrl);
           }
         } catch (err) {
           console.error("arcgisMap proxy:", err);
-          shinyInput(el, "error", {
+          report("error", {
             kind: "proxy",
             method: msg.method,
             detail: err && err.message ? err.message : String(err),
@@ -761,6 +777,7 @@ HTMLWidgets.widget({
 
       renderValue: async function (x) {
         try {
+
           assign(mapEl, {
             basemap: x.basemap,
             center: x.center,

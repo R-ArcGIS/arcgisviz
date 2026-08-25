@@ -214,7 +214,7 @@ data frame from `attributes`, and an empty one has no rows.
 across layers, highlights it, and emits `selection-change`. Three routes write
 to the same set - `set_selection(mode =)`, a click on a `selectable = TRUE`
 layer, and `arc_draw_selection()`'s `SelectionOperation` (the SDK's own
-draw-to-select) - and all three report through `input$<id>_selection`, which
+draw-to-select) - and all three report through `input$<output_id>$selection`, which
 `arc_selected()` reads.
 
 The manager only selects in layers that are its `sources`, so `syncSources()`
@@ -239,9 +239,17 @@ in `"freehand"` mode (`views/draw/types.d.ts:20`); the other four tools send
 no mode.
 
 `set_filter()` is the layer's `definitionExpression`. Events become
-`input$<id>_click`/`_hover`/`_view`/`_selection`/
-`_screenshot`, plus `_error` carrying a `kind` - including `"proxy"`, which a
+`input$click`/`hover`/`view`/`selection`/`sketch`/`edits`/`measurement`/
+`screenshot`, plus `error` carrying a `kind` - including `"proxy"`, which a
 failing proxy message reports itself rather than dying in the console.
+
+**One input per widget, named by the output id, with the event as a field.**
+`arcgisMapOutput("my_map")` reports `input$my_map$click`, never
+`input$my_map_click`. `shinyReporter(el)` keeps the accumulated object and
+writes `Shiny.setInputValue(el.id, ...)` - `el.id` is already namespaced, so
+a module needs nothing extra. The object accumulates, so a click does not
+wipe out the sketch beside it; and because a Shiny input is atomic, an
+observer on one field is invalidated by any event on that widget.
 
 **Every proxy message awaits `whenReady()`** (the memoized `viewOnReady()`
 promise): an observer firing on app start reaches the widget before

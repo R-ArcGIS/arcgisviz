@@ -198,10 +198,10 @@ server <- function(input, output, session) {
   )
 
   # Hovering a feature sends its attributes; the tooltip draws itself.
-  output$hover <- renderPrint(input$map_hover)
+  output$hover <- renderPrint(input$map$hover)
 
   # A click reports where, and which feature if one was under the pointer.
-  output$click <- renderPrint(input$map_click)
+  output$click <- renderPrint(input$map$click)
 }
 
 shinyApp(ui, server)

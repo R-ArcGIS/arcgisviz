@@ -16,7 +16,7 @@ arc_selected(x, layer = NULL)
 An integer vector of object ids.
 }
 \description{
-Pulls the object ids out of an \verb{input$<output_id>_selection} event. A
+Pulls the object ids out of an \verb{input$<output_id>$selection} event. A
 selection can span several layers, so \code{layer} narrows it to one.
 }
 \examples{

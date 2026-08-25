@@ -41,7 +41,7 @@ the map share one selection.}
 \description{
 Lets the reader change the features on the map - move them, retype their
 attributes, add and delete. Edits happen in the browser and arrive in Shiny
-as \verb{input$<output_id>_edits}; nothing is written back to the data frame the
+as \verb{input$<output_id>$edits}; nothing is written back to the data frame the
 layer came from unless R does it.
 }
 \examples{

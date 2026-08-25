@@ -80,7 +80,7 @@ server <- function(input, output, session) {
 
   # A drawn shape arrives as an Esri feature set; arc_sf() makes it sf, in
   # longitude/latitude whatever the view was drawn in.
-  drawn <- reactive(arc_sf(input$map_sketch))
+  drawn <- reactive(arc_sf(input$map$sketch))
 
   output$covered <- renderTable({
     shape <- drawn()
@@ -98,7 +98,7 @@ server <- function(input, output, session) {
 
   # A measurement is a value and its unit, so it needs no conversion.
   output$measured <- renderPrint({
-    result <- input$map_measurement
+    result <- input$map$measurement
     if (is.null(result)) {
       return(cat("Start a measurement.\n"))
     }
@@ -108,7 +108,7 @@ server <- function(input, output, session) {
   # Edits are applied to the browser's copy of the layer. R hears what
   # changed and can write it wherever it likes - nothing is saved for you.
   output$edited <- renderPrint({
-    edits <- input$map_edits
+    edits <- input$map$edits
     if (is.null(edits)) {
       return(cat("Edit a feature with the editor.\n"))
     }
