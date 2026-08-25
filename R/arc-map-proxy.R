@@ -67,6 +67,12 @@ S7::method(arc_update, ArcMapProxy) <- function(proxy, ...) {
       center = if (rlang::is_empty(proxy@center)) NULL else proxy@center,
       zoom = if (is.na(proxy@zoom)) NULL else proxy@zoom,
       extent = if (rlang::is_empty(proxy@extent)) NULL else proxy@extent,
+      selectable = selectable_ids(proxy@layers),
+      highlight = if (rlang::is_empty(proxy@highlight)) {
+        NULL
+      } else {
+        proxy@highlight
+      },
       layers = layers
     )
   )
@@ -99,20 +105,120 @@ S7::method(set_selection, ArcMapProxy) <- function(
   proxy,
   object_ids,
   layer = NULL,
+  mode = "replace",
   ...
 ) {
+  mode <- rlang::arg_match0(
+    mode,
+    c("replace", "add", "remove", "toggle"),
+    arg_nm = "mode"
+  )
+
   map_send(
     proxy,
-    "highlight",
+    "select",
     list(
       ids = layer_ids(layer),
+      mode = mode,
+      # A list, so that selecting one feature still sends an array: a bare
+      # number has no length and the client would read it as a clear.
       objectIds = if (rlang::is_empty(object_ids)) {
         NULL
       } else {
-        as.integer(object_ids)
+        as.list(as.integer(object_ids))
       }
     )
   )
+}
+
+# Friendly tool names in, the two spec properties out: a lasso is the polygon
+# tool in freehand mode (views/draw/types.d.ts:20).
+select_tool_map <- list(
+  rectangle = list(createTool = "rectangle"),
+  polygon = list(createTool = "polygon"),
+  lasso = list(createTool = "polygon", mode = "freehand"),
+  circle = list(createTool = "circle"),
+  point = list(createTool = "point")
+)
+
+#' Select features by drawing on the map
+#'
+#' Hands the reader a drawing tool. Whatever the shape they draw covers becomes
+#' the selection, which arrives back as `input$<output_id>_selection` the same
+#' way [set_selection()]'s does. The tool is live from the moment this is
+#' called and is put away once the shape is finished.
+#'
+#' @param proxy Defines which [arc_map_proxy()] to draw on.
+#' @param tool default `"rectangle"`. Defines what the reader draws, one of
+#'   `"rectangle"`, `"polygon"`, `"lasso"`, `"circle"`, or `"point"`.
+#' @param mode default `"replace"`. Defines what the drawn shape does to the
+#'   existing selection, one of `"replace"`, `"add"`, or `"remove"`.
+#' @param layer default `NULL`. Defines which layers can be selected in, by
+#'   name. `NULL` means every layer on the map.
+#' @return `proxy`, invisibly.
+#' @examples
+#' if (interactive()) {
+#'   arc_map_proxy("map") |>
+#'     arc_select(tool = "lasso")
+#' }
+#' @export
+arc_select <- function(
+  proxy,
+  tool = "rectangle",
+  mode = "replace",
+  layer = NULL
+) {
+  check_map_proxy(proxy)
+  tool <- rlang::arg_match0(tool, names(select_tool_map), arg_nm = "tool")
+  mode <- rlang::arg_match0(
+    mode,
+    c("replace", "add", "remove"),
+    arg_nm = "mode"
+  )
+
+  map_send(
+    proxy,
+    "selectBy",
+    c(
+      select_tool_map[[tool]],
+      list(type = mode, ids = layer_ids(layer))
+    )
+  )
+}
+
+#' Read a map selection
+#'
+#' Pulls the object ids out of an `input$<output_id>_selection` event. A
+#' selection can span several layers, so `layer` narrows it to one.
+#'
+#' @param x Defines which selection event to read.
+#' @param layer default `NULL`. Defines which layer's ids to return, by name.
+#'   `NULL` returns every selected id, across layers.
+#' @return An integer vector of object ids.
+#' @examples
+#' event <- list(
+#'   count = 3,
+#'   layers = list(list(layer = "Counties", objectIds = c(1, 2, 5)))
+#' )
+#'
+#' arc_selected(event)
+#' arc_selected(event, layer = "Counties")
+#' @export
+arc_selected <- function(x, layer = NULL) {
+  entries <- x$layers
+  if (rlang::is_empty(entries)) {
+    return(integer())
+  }
+
+  if (!rlang::is_null(layer)) {
+    entries <- entries[vapply(
+      entries,
+      function(entry) identical(entry$layer, layer),
+      logical(1)
+    )]
+  }
+
+  as.integer(unlist(lapply(entries, function(entry) entry$objectIds)))
 }
 
 #' Show, hide, or fade a layer that is already drawn

@@ -74,6 +74,7 @@ reference:
       - new_legend_options
       - set_basemap
       - set_view
+      - set_highlight
       - ArcMap
       - MapLayer
 
@@ -106,6 +107,8 @@ reference:
       - arc_update
       - set_filter
       - set_selection
+      - arc_select
+      - arc_selected
       - set_legend
       - set_layer
       - arc_goto

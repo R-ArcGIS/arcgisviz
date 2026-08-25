@@ -11,6 +11,7 @@ ArcMapProxy(
   center = integer(0),
   zoom = NA_real_,
   extent = list(),
+  highlight = list(),
   output_id = NA_character_,
   session = NULL
 )

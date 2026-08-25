@@ -10,6 +10,8 @@ arcgis_map(
   center = NULL,
   zoom = NULL,
   extent = NULL,
+  selectable = NULL,
+  highlight = NULL,
   width = NULL,
   height = NULL,
   element_id = NULL
@@ -29,6 +31,12 @@ When unset the map frames the layers.}
 
 \item{extent}{default \code{NULL}. Defines the initial extent, overriding
 \code{center} and \code{zoom}.}
+
+\item{selectable}{default \code{NULL}. Defines which layers a click selects in,
+by layer id.}
+
+\item{highlight}{default \code{NULL}. Defines the selection highlight styles, as
+a list of named \code{HighlightOptions}. See \code{\link[=set_highlight]{set_highlight()}}.}
 
 \item{width, height}{default \code{NULL}. Defines the widget size, passed to
 \code{\link[htmlwidgets:createWidget]{htmlwidgets::createWidget()}}.}

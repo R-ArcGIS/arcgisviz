@@ -6,6 +6,7 @@ import Field from "@arcgis/core/layers/support/Field.js";
 import PopupTemplate from "@arcgis/core/PopupTemplate.js";
 import { fromJSON as rendererFromJSON } from "@arcgis/core/renderers/support/jsonUtils.js";
 import { debounce } from "@arcgis/core/core/promiseUtils.js";
+import SelectionOperation from "@arcgis/core/views/selection/SelectionOperation.js";
 
 // Optional properties arrive as absent keys, and assigning `undefined` to an
 // autocasting Accessor is not the same as never setting it.
@@ -175,6 +176,36 @@ function shinyInput(el, name, value) {
   Shiny.setInputValue(el.id + "_" + name, value, { priority: "event" });
 }
 
+// Guarded rather than called by name: `mode` arrives from the wire, and
+// manager[mode] would otherwise reach any method on the manager.
+var SELECTION_MODES = { replace: 1, add: 1, remove: 1, toggle: 1 };
+
+// A selection identifier is an object id for a layer that has one and a
+// Graphic for a layer that does not (views/selection/types.d.ts:78).
+function selectionId(layer, item) {
+  return item && typeof item === "object"
+    ? item.attributes[layer.objectIdField]
+    : item;
+}
+
+function selectionPayload(manager) {
+  var layers = manager.selections.map(function (entry) {
+    return {
+      layer: entry.layer.id,
+      objectIds: entry.selection.map(function (item) {
+        return selectionId(entry.layer, item);
+      }),
+    };
+  });
+
+  return {
+    count: layers.reduce(function (n, entry) {
+      return n + entry.objectIds.length;
+    }, 0),
+    layers: layers,
+  };
+}
+
 if (typeof Shiny !== "undefined" && Shiny.addCustomMessageHandler) {
   Shiny.addCustomMessageHandler("arcgisviz-map", function (msg) {
     var widget = HTMLWidgets.find("#" + msg.id);
@@ -204,11 +235,23 @@ HTMLWidgets.widget({
     var state = {
       layers: {},
       highlights: {},
+      selectable: {},
+      operation: null,
       hovered: null,
       ready: null,
       subscribed: false,
       viewTimer: null,
     };
+
+    // The SelectionManager owns the selection set, its highlight, and the
+    // change event. It is beta in 5.1, so its absence is worth a real error.
+    function selectionManager() {
+      var manager = mapEl.selectionManager;
+      if (!manager) {
+        throw new Error("this @arcgis/core build has no selectionManager");
+      }
+      return manager;
+    }
 
     // mapEl.map is not there until the view resolves, and a proxy message can
     // arrive before renderValue has finished. Everything awaits this.
@@ -250,8 +293,60 @@ HTMLWidgets.widget({
         dropHighlight(layer.id);
         mapEl.map.remove(layer);
         delete state.layers[layer.id];
+        delete state.selectable[layer.id];
       });
       hideTooltip();
+      syncSelectable();
+    }
+
+    // The manager only selects in layers it holds as sources, and a layer
+    // added later is not one until this runs.
+    function syncSelectable(ids) {
+      (Array.isArray(ids) ? ids : []).forEach(function (id) {
+        state.selectable[id] = true;
+      });
+      if (mapEl.selectionManager) mapEl.selectionManager.syncSources();
+    }
+
+    function applySelection(ids, objectIds, mode) {
+      if (!SELECTION_MODES[mode]) {
+        throw new Error("unknown selection mode: " + mode);
+      }
+      var manager = selectionManager();
+      var layers = targetLayers(ids);
+
+      if (!objectIds || !objectIds.length) {
+        if (!ids) return manager.clear();
+        return layers.forEach(function (layer) {
+          manager.replace(layer, []);
+        });
+      }
+
+      layers.forEach(function (layer) {
+        manager[mode](layer, objectIds);
+      });
+    }
+
+    // The tool is live on the view the moment the operation exists, and each
+    // one is single use (SelectionOperation.d.ts:57).
+    function selectBy(payload) {
+      if (state.operation && !state.operation.completed) {
+        state.operation.cancel();
+      }
+
+      var operation = new SelectionOperation({
+        view: mapEl.view,
+        selectionManager: selectionManager(),
+        createTool: payload.createTool,
+        mode: payload.mode,
+        type: payload.type,
+        sources: payload.ids ? targetLayers(payload.ids) : undefined,
+      });
+
+      operation.on("complete", function () {
+        state.operation = null;
+      });
+      state.operation = operation;
     }
 
     function targetLayers(ids) {
@@ -319,10 +414,25 @@ HTMLWidgets.widget({
 
       mapEl.addEventListener("arcgisViewPointerLeave", hideTooltip);
 
+      if (mapEl.selectionManager) {
+        mapEl.selectionManager.on("selection-change", function () {
+          shinyInput(el, "selection", selectionPayload(mapEl.selectionManager));
+        });
+      }
+
       mapEl.addEventListener("arcgisViewClick", async function (event) {
         var point = event.detail.mapPoint;
         var response = await mapEl.hitTest(event.detail);
         var hit = hitGraphic(response, state.layers);
+
+        // Toggling is what a click means on a selectable layer; clicking the
+        // background is left alone so a selection is never lost by accident.
+        if (hit && state.selectable[hit.layer.id]) {
+          selectionManager().toggle(hit.layer, [
+            hit.graphic.attributes[hit.layer.objectIdField],
+          ]);
+        }
+
         shinyInput(el, "click", {
           longitude: point && point.longitude,
           latitude: point && point.latitude,
@@ -339,19 +449,6 @@ HTMLWidgets.widget({
       });
     }
 
-    async function highlight(ids, objectIds) {
-      var layers = targetLayers(ids);
-      for (var i = 0; i < layers.length; i++) {
-        var layer = layers[i];
-        var handle = state.highlights[layer.id];
-        if (handle) handle.remove();
-        delete state.highlights[layer.id];
-        if (!objectIds || !objectIds.length) continue;
-        var view = await mapEl.whenLayerView(layer);
-        state.highlights[layer.id] = view.highlight(objectIds);
-      }
-    }
-
     return {
       receiveMessage: async function (msg) {
         try {
@@ -364,7 +461,9 @@ HTMLWidgets.widget({
               zoom: payload.zoom,
               extent: payload.extent,
             });
+            if (payload.highlight) mapEl.highlights = payload.highlight;
             if (payload.layers) await addLayers(payload.layers);
+            syncSelectable(payload.selectable);
           } else if (msg.method === "remove") {
             removeLayers(payload.ids);
           } else if (msg.method === "layer") {
@@ -375,8 +474,10 @@ HTMLWidgets.widget({
             targetLayers(payload.ids).forEach(function (layer) {
               layer.definitionExpression = payload.where || null;
             });
-          } else if (msg.method === "highlight") {
-            await highlight(payload.ids, payload.objectIds);
+          } else if (msg.method === "select") {
+            applySelection(payload.ids, payload.objectIds, payload.mode);
+          } else if (msg.method === "selectBy") {
+            selectBy(payload);
           } else if (msg.method === "goto") {
             var t = payload.target;
             await mapEl.goTo(t.extent || t, payload.options);
@@ -404,12 +505,14 @@ HTMLWidgets.widget({
           });
 
           await whenReady();
+          if (x.highlight) mapEl.highlights = x.highlight;
           subscribeEvents();
 
           // A re-render replaces the map's contents rather than adding to
           // whatever the previous one left behind.
           removeLayers(null);
           var layers = await addLayers(x.layers || []);
+          syncSelectable(x.selectable);
 
           if (!x.center && !x.extent) await frameLayers(mapEl, layers);
         } catch (err) {

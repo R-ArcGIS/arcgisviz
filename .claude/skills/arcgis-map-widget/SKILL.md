@@ -157,13 +157,32 @@ jsonlite, which sends `layerDefinition$fields` columnar and breaks
 `Field.fromJSON` - the same trap `TOJSON_FUNC` avoids on the render path.
 
 Protocol mirrors the chart's: one handler, `"arcgisviz-map"`, with a `method`
-discriminator - `update`, `remove`, `layer`, `filter`, `highlight`, `goto`,
-`screenshot`. The layer stays in the factory closure, so **the data never
-crosses the wire twice**.
+discriminator - `update`, `remove`, `layer`, `filter`, `select`, `selectBy`,
+`goto`, `screenshot`. The layer stays in the factory closure, so **the data
+never crosses the wire twice**.
 
-`set_filter()` is the layer's `definitionExpression`; `set_selection()` is
-`layerView.highlight()`, whose handle must be kept per layer and removed
-before the next one. Events become `input$<id>_click`/`_hover`/`_view`/
+## Selection is the view's SelectionManager
+
+`mapEl.selectionManager` (`@arcgis/core` 5.0, `@beta`) owns a selection set
+across layers, highlights it, and emits `selection-change`. Three routes write
+to the same set - `set_selection(mode =)`, a click on a `selectable = TRUE`
+layer, and `arc_select()`'s `SelectionOperation` (the SDK's own
+draw-to-select) - and all three report through `input$<id>_selection`, which
+`arc_selected()` reads.
+
+The manager only selects in layers that are its `sources`, so `syncSources()`
+runs after every add or remove. A selection identifier is an object id *or* a
+`Graphic` depending on the layer (`views/selection/types.d.ts:78`), so the
+payload normalizes through `objectIdField`.
+
+`set_highlight()` writes the view's *named* `"default"` highlight options -
+`mapEl.highlights` is a collection keyed by name, and any highlight that does
+not ask for another one reads that entry. A lasso is the `polygon` create tool
+in `"freehand"` mode (`views/draw/types.d.ts:20`); the other four tools send
+no mode.
+
+`set_filter()` is the layer's `definitionExpression`. Events become
+`input$<id>_click`/`_hover`/`_view`/`_selection`/
 `_screenshot`, plus `_error` carrying a `kind` - including `"proxy"`, which a
 failing proxy message reports itself rather than dying in the console.
 

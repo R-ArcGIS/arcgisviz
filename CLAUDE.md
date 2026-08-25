@@ -525,15 +525,36 @@ Shiny would use jsonlite, which sends `layerDefinition$fields` columnar and
 breaks `Field.fromJSON` - the same trap `TOJSON_FUNC` avoids on the render
 path. Message protocol mirrors the chart's: one handler, `"arcgisviz-map"`,
 with a `method` discriminator (`update`, `remove`, `layer`, `filter`,
-`highlight`, `goto`, `screenshot`).
+`select`, `selectBy`, `goto`, `screenshot`).
 
-`set_filter()` on a map is the layer's `definitionExpression`;
-`set_selection()` is `layerView.highlight()`, whose handle has to be kept per
-layer and removed before the next one. Events become
-`input$<id>_click`/`_hover`/`_view`/`_screenshot`, plus `_error` carrying a
-`kind` (`arcgisLoadError`, `arcgisViewReadyError`, or `"proxy"` with the
-failing `method` - a proxy message that throws reports itself rather than
-dying in the console).
+**Selection is the view's `SelectionManager`, not a highlight handle.**
+`mapEl.selectionManager` (`@arcgis/core` 5.0, still `@beta`) owns a selection
+set across layers, highlights it, and emits `selection-change` - so the map
+finally reports selection back the way charts always have. Three routes write
+to the same set: `set_selection(mode = )` (`replace`/`add`/`remove`/`toggle`),
+a click on a layer added with `selectable = TRUE`, and `arc_select()`, which
+constructs a `SelectionOperation` - the SDK's own draw-to-select tool.
+`arc_selected()` reads the event back, and `set_highlight()` styles the set by
+writing the view's *named* `"default"` highlight options, since
+`mapEl.highlights` is a collection keyed by name and every highlight that does
+not ask for another one reads that entry.
+
+Two things the manager needs that are easy to miss. It only selects in layers
+that are its `sources`, so `syncSources()` runs after every layer add or
+remove. And a selection identifier is an object id *or* a `Graphic` depending
+on the layer (`views/selection/types.d.ts:78`), so the payload normalizes
+through `objectIdField` rather than assuming.
+
+`arc_select(tool = "lasso")` is the one place two spec properties hide behind
+one friendly name: a lasso is the `polygon` create tool in `"freehand"`
+`mode` (`views/draw/types.d.ts:20`). `"rectangle"`, `"polygon"`, `"circle"`
+and `"point"` send no mode at all.
+
+`set_filter()` on a map is the layer's `definitionExpression`. Events become
+`input$<id>_click`/`_hover`/`_view`/`_selection`/`_screenshot`, plus `_error`
+carrying a `kind` (`arcgisLoadError`, `arcgisViewReadyError`, or `"proxy"`
+with the failing `method` - a proxy message that throws reports itself rather
+than dying in the console).
 
 **Three event rules, all about not flooding the websocket or double-binding.**
 `_hover` fires only when the feature under the pointer *changes*. `_view` is

@@ -119,6 +119,14 @@ bindings.
 2. **Hover tooltips.** `add_layer(tooltip =)` builds a `popupInfo` through
    `as_layer(popup_info =)` and the client reads its `fieldInfos`. Click
    popups stay off (`popupEnabled = false`) - see CLAUDE.md's map section.
+3. **Selection**, on the view's `SelectionManager` rather than a per-layer
+   highlight handle. It is one set across layers with a `selection-change`
+   event, so `input$<id>_selection` finally exists and a map can drive a
+   chart. `set_selection(mode =)`, `add_layer(selectable =)` and
+   `arc_select()` all write to it; `arc_selected()` reads it and
+   `set_highlight()` styles it. `SelectionOperation` (5.1) is the SDK's own
+   draw-to-select, so rectangle/polygon/lasso/circle/point selection needed
+   no sketch wiring of our own.
 
 ## Still to do
 
