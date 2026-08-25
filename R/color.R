@@ -55,6 +55,19 @@ color_rgba <- function(x, arg = "colour", call = rlang::caller_env()) {
   t(rgba)
 }
 
+# HighlightOptions takes a CSS colour rather than the spec's [r,g,b,a] tuple,
+# so this is the one place a colour leaves R as a string.
+hex_color <- function(x, arg = "color", call = rlang::caller_env()) {
+  rgba <- color_rgba(x, arg = arg, call = call)
+  grDevices::rgb(
+    rgba[, 1],
+    rgba[, 2],
+    rgba[, 3],
+    rgba[, 4],
+    maxColorValue = 255
+  )
+}
+
 #' Parse colours into `Color` objects
 #'
 #' @param x A character vector of R colour names or hex strings.

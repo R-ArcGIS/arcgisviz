@@ -103,12 +103,13 @@ cost on top of the 2.7MB the map bundle already carries. **Not decided.**
   `arcgis-layer-list`, `arcgis-time-slider`, the `arcgis-print-*` and
   `arcgis-utility-network-*` families.
 
-The widgets are the `{calcite}` problem: `htmltools` tag constructors plus
-Shiny input bindings, one file per component. Modeling them as S7 config
-would fight the grain. They slot in as children of the container, so
-`add_widget(map, "legend", position = "top-right")` emitting a slotted
-element is the cheap version, and only the ones with real inputs need
-bindings.
+The widgets looked like the `{calcite}` problem - `htmltools` tag
+constructors plus Shiny input bindings, one file per component - but they are
+not. They slot in as children of the container, so **one** `add_widget(map,
+"legend", position = "top-right")` covers all of them: the R side is a
+registry row, the JS side an `import()` and three property assignments. No
+tag constructor, no S7 config. Only the ones with real inputs need event
+wiring on top, and that is per component rather than per widget.
 
 ## Done since
 
@@ -119,13 +120,37 @@ bindings.
 2. **Hover tooltips.** `add_layer(tooltip =)` builds a `popupInfo` through
    `as_layer(popup_info =)` and the client reads its `fieldInfos`. Click
    popups stay off (`popupEnabled = false`) - see CLAUDE.md's map section.
+3. **Selection**, on the view's `SelectionManager` rather than a per-layer
+   highlight handle. It is one set across layers with a `selection-change`
+   event, so `input$<id>_selection` finally exists and a map can drive a
+   chart. `set_selection(mode =)`, `add_layer(selectable =)` and
+   `arc_draw_selection()` all write to it; `arc_selected()` reads it and
+   `set_highlight()` styles it. `SelectionOperation` (5.1) is the SDK's own
+   draw-to-select, so rectangle/polygon/lasso/circle/point selection needed
+   no sketch wiring of our own.
+
+4. **The widget components**, through one `add_widget()` idiom rather than a
+   function per component. Fourteen so far - legend, layer list, basemap
+   gallery and toggle, search, bookmarks, zoom, home, compass, fullscreen,
+   locate, track, scale bar, coordinate conversion. Each is an explicit
+   `import()` so webpack code-splits it; the entry bundle grew 29KB for all
+   fourteen. This answers the "`{calcite}` problem" below: the containers
+   take config, the widgets take a slot, and a registry is enough.
+
+5. **The tools**: sketch, editor, and the two 2D measurements. These are the
+   widgets with something to say, and each says it from a different place -
+   sketch from its own events, the editor from the *layer's* `edits` event,
+   the measurements from a `reactiveUtils.watch()` on the analysis view's
+   result. Geometry returns as an Esri feature set string that `arc_sf()`
+   parses, so a drawn polygon is an `sf` object one call later. Client side
+   layers turn out to be fully editable (`clientSideDefaults.js` gives them
+   add/update/delete and a default template), though the edits live in the
+   browser until R decides to keep them.
 
 ## Still to do
 
 1. **Click popups**, which are now one flag away but would duplicate the
    hover text until they can show something the tooltip does not.
-2. **A legend**, which is `arcgis-legend` slotted in, and the first real
-   test of the widget-component idiom.
 3. **Layer types beyond feature collections.** `IFeatureLayer` is modeled;
    the image-service, tiled-image-service, and WCS members of
    `WebChart$iLayer`'s union are not, and a layer here always carries a

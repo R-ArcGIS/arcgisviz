@@ -35,6 +35,12 @@ sent_payload <- function(session, i = 1) {
   )
 }
 
+# Reading the payload back simplifies a one-element array to a scalar, which
+# is exactly the distinction some of these tests are about.
+sent_json <- function(session, i = 1) {
+  session$sent()[[i]]$message$payload
+}
+
 test_that("a map proxy inherits ArcMap, so every set_*() works on it", {
   p <- fake_map_proxy()$proxy
 
@@ -119,13 +125,85 @@ test_that("a cleared filter or selection sends no value at all", {
   expect_false("objectIds" %in% names(sent_payload(f$session, 2)))
 })
 
-test_that("set_selection() highlights by object id", {
+test_that("set_selection() selects by object id", {
   f <- fake_map_proxy()
   f$proxy |> set_selection(c(1, 2), layer = "Points")
 
   msg <- f$session$sent()[[1]]$message
-  expect_identical(msg$method, "highlight")
-  expect_identical(sent_payload(f$session)$objectIds, c(1L, 2L))
+  expect_identical(msg$method, "select")
+
+  payload <- sent_payload(f$session)
+  expect_identical(payload$objectIds, c(1L, 2L))
+  expect_identical(payload$mode, "replace")
+})
+
+# A bare number has no length in JS, so the client would read it as a clear.
+test_that("selecting one feature still sends an array", {
+  f <- fake_map_proxy()
+  f$proxy |> set_selection(7)
+
+  expect_match(sent_json(f$session), '"objectIds":[7]', fixed = TRUE)
+})
+
+test_that("set_selection() carries the mode the selection set is changed by", {
+  f <- fake_map_proxy()
+  f$proxy |> set_selection(3, mode = "toggle")
+
+  expect_identical(sent_payload(f$session)$mode, "toggle")
+  expect_error(set_selection(f$proxy, 3, mode = "invert"), "mode")
+})
+
+test_that("arc_draw_selection() turns a friendly tool into the two spec properties", {
+  f <- fake_map_proxy()
+  f$proxy |> arc_draw_selection(tool = "lasso", mode = "add", layer = "Points")
+
+  msg <- f$session$sent()[[1]]$message
+  expect_identical(msg$method, "selectBy")
+
+  payload <- sent_payload(f$session)
+  expect_identical(payload$createTool, "polygon")
+  expect_identical(payload$mode, "freehand")
+  expect_identical(payload$type, "add")
+  expect_match(sent_json(f$session), '"ids":["Points"]', fixed = TRUE)
+})
+
+test_that("arc_draw_selection() sends no draw mode for a tool that has none", {
+  f <- fake_map_proxy()
+  f$proxy |> arc_draw_selection()
+
+  payload <- sent_payload(f$session)
+  expect_identical(payload$createTool, "rectangle")
+  expect_false("mode" %in% names(payload))
+  expect_error(arc_draw_selection(f$proxy, tool = "freehand"), "tool")
+})
+
+test_that("arc_selected() reads the ids out of a selection event", {
+  event <- list(
+    count = 3,
+    layers = list(
+      list(layer = "Counties", objectIds = list(1, 2)),
+      list(layer = "Seats", objectIds = list(9))
+    )
+  )
+
+  expect_identical(arc_selected(event), c(1L, 2L, 9L))
+  expect_identical(arc_selected(event, layer = "Seats"), 9L)
+  expect_identical(arc_selected(list(count = 0, layers = list())), integer())
+})
+
+test_that("a selectable layer and a highlight style ride on the update", {
+  f <- fake_map_proxy()
+  f$proxy |>
+    add_layer(map_points(), name = "Points", selectable = TRUE) |>
+    set_highlight(color = "orange", fill_opacity = 0.4) |>
+    arc_update()
+
+  payload <- sent_payload(f$session)
+  expect_match(sent_json(f$session), '"selectable":["Points"]', fixed = TRUE)
+  expect_identical(payload$highlight[[1]]$name, "default")
+  expect_identical(payload$highlight[[1]]$color, "#FFA500FF")
+  expect_identical(payload$highlight[[1]]$fillOpacity, 0.4)
+  expect_false("haloOpacity" %in% names(payload$highlight[[1]]))
 })
 
 test_that("arc_goto() drops what it was not given", {

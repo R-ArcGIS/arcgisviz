@@ -16,6 +16,36 @@ output**, not source. The source is `srcjs/widgets/arcgisChart.js`. If you
 edit the generated files directly, your changes are silently lost the next
 time someone bundles.
 
+## The two dependencies, and why publicPath is set by hand
+
+Each widget reaches the page through **two** htmlDependency objects, and the
+difference between them is load-bearing:
+
+| dependency | built by | `all_files` | contains |
+|---|---|---|---|
+| `<name>-binding-<pkg version>` | `htmlwidgets::getDependency()` | **FALSE** | `<name>.js` alone |
+| `<name>-1.0.0` | `inst/htmlwidgets/<name>.yaml` | TRUE (default) | the whole build - every chunk |
+
+The **binding** one is what loads and runs the bundle, so webpack's automatic
+publicPath resolves async chunks against a directory holding one file, and
+every chunk 404s: no basemap, `MapView.loadAsyncDependencies` throws
+`ChunkLoadError`, no lazily imported component. `srcjs/modules/public-path.js`
+repoints publicPath at the yaml dependency's sibling directory, and **both
+entries import it first** - a chunk requested while another module is still
+evaluating would otherwise resolve against the wrong path.
+
+Two traps around this, both already sprung once:
+
+- **Do not add `script:` back to the yaml** to "fix" chunk loading. That
+  executes the bundle a second time under a second webpack runtime, which
+  gives two instances of `@arcgis/core`'s `Layer.js` and breaks layer views
+  with "Layer does not support creating a layer view".
+- The yaml's `name`/`version` are part of the publicPath contract. Change one
+  and you must change `srcjs/modules/public-path.js`.
+
+Symptom to recognize: 404s under `lib/<name>-binding-<version>/*.js` while
+the same files exist under `lib/<name>-1.0.0/`.
+
 ## Build commands
 
 This project uses `just` as the command-runner interface for everything

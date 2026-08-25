@@ -47,6 +47,7 @@ MapLayer := new_class(
     size = s7x::class_float,
     opacity = s7x::class_float,
     visible = s7x::class_boolean,
+    selectable = s7x::class_boolean,
     tooltip = S7::class_character
   )
 )
@@ -61,10 +62,12 @@ MapLayer := new_class(
 ArcMap := new_class(
   properties = list(
     layers = S7::class_list,
+    widgets = S7::class_list,
     basemap = s7x::class_string,
     center = S7::class_numeric,
     zoom = s7x::class_float,
-    extent = S7::class_list
+    extent = S7::class_list,
+    highlight = S7::class_list
   )
 )
 
@@ -139,6 +142,69 @@ set_view <- function(map, center = NULL, zoom = NULL, extent = NULL) {
   map
 }
 
+#' Style the selection highlight
+#'
+#' Changes how selected features are drawn. Works on an [arc_map()] before it
+#' is rendered and on an [arc_map_proxy()] after, and applies to every
+#' selection - the ones [set_selection()] makes, the ones a click on a
+#' `selectable` layer makes, and the ones [arc_draw_selection()] draws.
+#'
+#' @param map Defines which map or proxy to modify.
+#' @param color default `NULL`. Defines the highlight colour, as a name or hex
+#'   string.
+#' @param halo_opacity default `NULL`. Defines the opacity of the outline drawn
+#'   around a selected feature, from `0` to `1`.
+#' @param fill_opacity default `NULL`. Defines the opacity of the fill drawn
+#'   over a selected feature, from `0` to `1`.
+#' @param shadow_color default `NULL`. Defines the colour of the shadow cast
+#'   over everything that is *not* selected.
+#' @param shadow_opacity default `NULL`. Defines that shadow's opacity, from
+#'   `0` to `1`.
+#' @param shadow_difference default `NULL`. Defines how much the shadow dims
+#'   the unselected features, from `0` to `1`.
+#' @return `map`, with the highlight style set.
+#' @examples
+#' arc_map() |>
+#'   set_highlight(color = "orange", fill_opacity = 0.4)
+#' @export
+set_highlight <- function(
+  map,
+  color = NULL,
+  halo_opacity = NULL,
+  fill_opacity = NULL,
+  shadow_color = NULL,
+  shadow_opacity = NULL,
+  shadow_difference = NULL
+) {
+  check_map(map)
+  call <- rlang::caller_env()
+
+  options <- drop_null(list(
+    color = if (!rlang::is_null(color)) hex_color(color, "color", call),
+    haloOpacity = halo_opacity,
+    fillOpacity = fill_opacity,
+    shadowColor = if (!rlang::is_null(shadow_color)) {
+      hex_color(shadow_color, "shadow_color", call)
+    },
+    shadowOpacity = shadow_opacity,
+    shadowDifference = shadow_difference
+  ))
+
+  # The view keeps a named collection of highlight styles and reads "default"
+  # for any highlight that does not ask for another one.
+  map@highlight <- list(c(list(name = "default"), options))
+  map
+}
+
+# Only the ids, since the client already has the layers themselves. A list so
+# that one selectable layer still serializes as an array.
+selectable_ids <- function(layers) {
+  ids <- lapply(seq_along(layers), function(i) {
+    if (isTRUE(layers[[i]]@selectable)) map_layer_id(layers[[i]], i) else NULL
+  })
+  ids[!vapply(ids, rlang::is_null, logical(1))]
+}
+
 #' Add a layer to a map
 #'
 #' Draws a data frame or `sf` object as a client side feature layer. Colour
@@ -158,6 +224,9 @@ set_view <- function(map, center = NULL, zoom = NULL, extent = NULL) {
 #' @param tooltip default `NULL`. Defines which columns are shown when a
 #'   feature is hovered, as bare column names wrapped in `c()`. Name one to
 #'   label it, as in `c(County = NAME)`.
+#' @param selectable default `NULL`. Defines whether clicking a feature adds it
+#'   to the selection, which arrives in Shiny as `input$<id>_selection`. See
+#'   [set_selection()].
 #' @param visible default `NULL`. Defines whether the layer starts drawn.
 #'   Only when `.data` is an [IFeatureLayer].
 #' @param ... Passed between methods. Must be empty when `.data` is an
@@ -194,6 +263,7 @@ S7::method(add_layer, list(ArcMap, S7::class_any)) <- function(
   opacity = NULL,
   name = NULL,
   tooltip = NULL,
+  selectable = NULL,
   ...
 ) {
   call <- rlang::caller_env()
@@ -205,6 +275,7 @@ S7::method(add_layer, list(ArcMap, S7::class_any)) <- function(
     size = if (rlang::is_null(size)) NA_real_ else as.double(size),
     opacity = if (rlang::is_null(opacity)) NA_real_ else as.double(opacity),
     visible = TRUE,
+    selectable = isTRUE(selectable),
     tooltip = tooltip_columns(rlang::enquo(tooltip), .data, call)
   )
 
@@ -243,7 +314,8 @@ S7::method(add_layer, list(ArcMap, IFeatureLayer)) <- function(
   ...,
   name = NULL,
   opacity = NULL,
-  visible = NULL
+  visible = NULL,
+  selectable = NULL
 ) {
   call <- rlang::caller_env()
   rlang::check_dots_empty(call = call)
@@ -255,6 +327,7 @@ S7::method(add_layer, list(ArcMap, IFeatureLayer)) <- function(
     size = NA_real_,
     opacity = if (rlang::is_null(opacity)) NA_real_ else as.double(opacity),
     visible = if (rlang::is_null(visible)) TRUE else visible,
+    selectable = isTRUE(selectable),
     color = list(),
     tooltip = character()
   )
@@ -521,6 +594,9 @@ S7::method(as_widget, ArcMap) <- function(
     center = x@center,
     zoom = if (is.na(x@zoom)) NULL else x@zoom,
     extent = if (rlang::is_empty(x@extent)) NULL else x@extent,
+    selectable = selectable_ids(x@layers),
+    highlight = if (rlang::is_empty(x@highlight)) NULL else x@highlight,
+    widgets = map_widget_specs(x@widgets),
     width = width,
     height = height,
     element_id = element_id

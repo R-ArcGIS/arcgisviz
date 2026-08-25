@@ -57,6 +57,14 @@ just bundle       # rebuild the JS widget bundle (production, minified)
 just watch        # rebuild JS on every srcjs/ change
 ```
 
+**Both bundles set webpack's `publicPath` by hand**
+(`srcjs/modules/public-path.js`, imported first by each entry). htmlwidgets
+loads the bundle through the binding dependency it builds with
+`all_files = FALSE`, so that directory holds the entry file alone and every
+async chunk 404s against it; the chunks travel with the `.yaml` dependency
+instead. Adding `script:` back to a yaml is *not* the fix - that runs the
+bundle twice under two webpack runtimes. See the `arcgis-js-widget` skill.
+
 ## Every new feature needs a `dev/` example
 
 Every user-facing feature gets a `dev/` example (one file per feature,
@@ -464,7 +472,10 @@ neither should be hand-rolled: `FeatureSet.fromJSON()` (Esri feature JSON ->
 (`ILayer`, `rest-js-types.d.ts:1324`).
 
 `viewOnReady()` gates everything - `mapEl.map` is not there before it
-resolves, so layers are added after.
+resolves, so layers are added after. **Proxy messages await the same promise**
+(`whenReady()`, memoized in the factory): an observer that fires on app start
+can reach the widget before `renderValue()` has finished, and without the gate
+it lands on an undefined `mapEl.map`.
 
 **A map renderer resolves per feature against the layer**, so the
 `uniqueValue` branch that charts can only reach while aggregating is always
@@ -521,15 +532,118 @@ across flushes.
 Shiny would use jsonlite, which sends `layerDefinition$fields` columnar and
 breaks `Field.fromJSON` - the same trap `TOJSON_FUNC` avoids on the render
 path. Message protocol mirrors the chart's: one handler, `"arcgisviz-map"`,
-with a `method` discriminator (`update`, `remove`, `layer`, `filter`,
-`highlight`, `goto`, `screenshot`).
+with a `method` discriminator (`update`, `remove`, `removeWidget`, `layer`,
+`filter`, `select`, `selectBy`, `goto`, `screenshot`).
 
-`set_filter()` on a map is the layer's `definitionExpression`;
-`set_selection()` is `layerView.highlight()`, whose handle has to be kept per
-layer and removed before the next one. Events become
-`input$<id>_click`/`_hover`/`_view`/`_screenshot`, plus `_error`. `_hover`
-only fires when the feature under the pointer *changes* - every pointer move
-would otherwise be a websocket message.
+**Map furniture is `add_widget()`, one idiom for the whole SDK component
+set.** A legend, layer list, search box or basemap gallery is a real
+`<arcgis-*>` web component slotted into `<arcgis-map>`, and a slotted child
+finds the map itself - nothing sets `referenceElement` or `view`. So the R
+side is a registry (`map_widget_map`, `R/arc-map-widgets.R`) of
+`component`/`position`/`props`, and the JS creates the element, sets its
+`slot`, and assigns the props.
+
+Three rules hold it together. **Each component is its own `import()`, written
+out by hand**: a template literal would make webpack bundle all 179
+components, while explicit imports code-split into a chunk each, so a map pays
+only for the widgets it asks for (the entry bundle grew 29KB for fourteen).
+**`props` is an allowlist per widget**, because most accessors take
+Collections, Portals, or callbacks that cannot travel from R at all - a name
+outside it errors with the ones that exist. And **positions are the element's
+own slot names** (`arcgis-map/customElement.d.ts:120`), not an invented
+vocabulary.
+
+Widgets are keyed by component, so adding one twice replaces it - the same
+idempotence rule a named layer has, and what makes `add_widget()` safe to
+re-run through a proxy. `add_widget(expand = TRUE)` wraps one in
+`arcgis-expand`, and expands sharing a corner share a `group`, so opening one
+closes the other.
+
+**`add_widget()` is the mechanism; `R/arc-map-shortcuts.R` is the public
+surface** - `add_legend()`, `add_search()`, `add_measurement(type =)` and the
+rest, the same relationship `arc_bar()` has to `arc_chart() |> set_type()`.
+Each is `add_widget()` and nothing else, arguments are the snake_case of the
+component's own property names (one vocabulary, no second mapping table), and
+they call through `rlang::inject()` so errors blame the shortcut rather than
+the internals. Adding a widget means a registry entry, an `import()`, and a
+shortcut.
+
+**The four tool widgets report back, and each one reports from a different
+place.** This is not a choice; it is where the SDK puts the result.
+
+- **`sketch`** - its own events (`arcgisCreate`/`arcgisUpdate`/`arcgisDelete`,
+  gated on `state === "complete"` because they fire continuously while
+  drawing). The payload is every graphic on the component's own graphics
+  layer, not the one that changed.
+- **`editor`** - *the layer's* `edits` event (`EditBusLayer`,
+  `@arcgis/core` 5.0), never the component's: `arcgis-editor` emits only
+  `arcgisSketchCreate`/`arcgisSketchUpdate`, which fire mid-gesture and carry
+  no result. The event gives object ids, so the features are queried back out
+  of the layer.
+- **the two `*-measurement`** - `mapEl.whenAnalysisView(node.analysis)` then
+  `reactiveUtils.watch()` on `analysisView.result`. There is no event at all.
+
+Client side feature layers are editable: `FeatureLayer$editingEnabled` returns
+true for a memory source, and `clientSideDefaults.js` gives them add/update/
+delete capabilities and a "New Feature" template. **Edits live in the browser
+only** - R hears what changed and decides whether to persist it.
+
+**Geometry crosses back as an Esri feature set string**, which
+`arcgisutils::parse_esri_json()` reads and `arc_sf()` wraps - the mirror of
+`map_send()` sending a string rather than letting Shiny's jsonlite touch it.
+Drawn shapes are converted out of Web Mercator first
+(`webMercatorToGeographic()`), since the view draws in metres and the next
+line of R rarely wants them; edited features keep the layer's own CRS. Each
+feature carries an `object_id` attribute because `parse_esri_json()` builds
+its data frame from `attributes` and an empty one has no rows.
+
+**Selection is the view's `SelectionManager`, not a highlight handle.**
+`mapEl.selectionManager` (`@arcgis/core` 5.0, still `@beta`) owns a selection
+set across layers, highlights it, and emits `selection-change` - so the map
+finally reports selection back the way charts always have. Three routes write
+to the same set: `set_selection(mode = )` (`replace`/`add`/`remove`/`toggle`),
+a click on a layer added with `selectable = TRUE`, and `arc_draw_selection()`, which
+constructs a `SelectionOperation` - the SDK's own draw-to-select tool.
+`arc_selected()` reads the event back, and `set_highlight()` styles the set by
+writing the view's *named* `"default"` highlight options, since
+`mapEl.highlights` is a collection keyed by name and every highlight that does
+not ask for another one reads that entry.
+
+Two things the manager needs that are easy to miss. It only selects in layers
+that are its `sources`, so `syncSources()` runs after every layer add or
+remove. And a selection identifier is an object id *or* a `Graphic` depending
+on the layer (`views/selection/types.d.ts:78`), so the payload normalizes
+through `objectIdField` rather than assuming.
+
+`arc_draw_selection(tool = "lasso")` is the one place two spec properties hide behind
+one friendly name: a lasso is the `polygon` create tool in `"freehand"`
+`mode` (`views/draw/types.d.ts:20`). `"rectangle"`, `"polygon"`, `"circle"`
+and `"point"` send no mode at all.
+
+**A `SelectionOperation` must be given `sources` even when that means every
+layer.** It runs its query only `if (s && null != c)`, where `c` is the
+operation's own `sources` - while the *outer* guard is satisfied by the
+manager's sources. So an unset `sources` draws the rubber band, queries
+nothing, persists nothing, and throws nothing: a silent no-op that looks like
+a dead tool. `layer = NULL` resolves to `targetLayers(null)`, never
+`undefined`. Its own name is also load-bearing: `arc_select()` masks
+`arcgislayers::arc_select()`, hence `arc_draw_selection()`. **Check the
+`arc_*` surface against arcgislayers before adding one.**
+
+`set_filter()` on a map is the layer's `definitionExpression`. Events become
+`input$<id>_click`/`_hover`/`_view`/`_selection`/`_sketch`/`_edits`/
+`_measurement`/`_screenshot`, plus `_error`
+carrying a `kind` (`arcgisLoadError`, `arcgisViewReadyError`, or `"proxy"`
+with the failing `method` - a proxy message that throws reports itself rather
+than dying in the console).
+
+**Three event rules, all about not flooding the websocket or double-binding.**
+`_hover` fires only when the feature under the pointer *changes*. `_view` is
+debounced 250ms, because `arcgisViewChange` fires throughout a pan or zoom
+animation. And `subscribeEvents()` is guarded by `state.subscribed`:
+`renderValue()` runs again on every re-render, and listeners bound twice send
+every event twice. A re-render also clears the layers the previous one left
+behind (`removeLayers(null)`) rather than adding to them.
 
 ## Deliberately deferred (don't "fix" these without asking)
 

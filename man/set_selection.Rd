@@ -14,16 +14,28 @@ vector clears the selection.}
 
 \item{...}{Reserved for methods.}
 
-\item{layer}{default \code{NULL}. Defines which map layer to highlight in, by
-name. \code{NULL} highlights in every layer. Maps only.}
+\item{layer}{default \code{NULL}. Defines which map layer to select in, by
+name. \code{NULL} selects in every layer. Maps only.}
+
+\item{mode}{default \code{"replace"}. Defines what these ids do to the current
+selection, one of \code{"replace"}, \code{"add"}, \code{"remove"}, or \code{"toggle"}. Maps
+only.}
 }
 \value{
 \code{proxy}, invisibly.
 }
 \description{
 Marks rows as selected by object id. A chart draws them as its own
-selection; a map highlights them in the view's highlight colour, which is
-what makes a chart and a map on the same data link up.
+selection; a map hands them to the view's selection manager, which
+highlights them and reports the new selection back as
+\verb{input$<output_id>_selection}. Object ids are row numbers, so a chart and a
+map built from the same data frame select each other's rows.
+}
+\details{
+On a map the selection is a set that persists across calls, which is what
+\code{mode} operates on and what a click on a \code{selectable} layer
+(\code{\link[=add_layer]{add_layer()}}) or a drawn \code{\link[=arc_draw_selection]{arc_draw_selection()}} shape adds to. \code{\link[=set_highlight]{set_highlight()}}
+styles it and \code{\link[=arc_selected]{arc_selected()}} reads it.
 }
 \examples{
 df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))

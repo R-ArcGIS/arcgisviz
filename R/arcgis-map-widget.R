@@ -19,6 +19,13 @@ NULL
 #' @param zoom default `NULL`. Defines the initial zoom level.
 #' @param extent default `NULL`. Defines the initial extent, overriding
 #'   `center` and `zoom`.
+#' @param selectable default `NULL`. Defines which layers a click selects in,
+#'   by layer id.
+#' @param highlight default `NULL`. Defines the selection highlight styles, as
+#'   a list of named `HighlightOptions`. See [set_highlight()].
+#' @param widgets default `list()`. Defines the SDK components drawn over the
+#'   map, each a list of `component`, `position`, and `props`. See
+#'   [add_widget()].
 #' @param width,height default `NULL`. Defines the widget size, passed to
 #'   [htmlwidgets::createWidget()].
 #' @param element_id default `NULL`. Defines the DOM element id to render into.
@@ -32,6 +39,9 @@ arcgis_map <- function(
   center = NULL,
   zoom = NULL,
   extent = NULL,
+  selectable = NULL,
+  highlight = NULL,
+  widgets = list(),
   width = NULL,
   height = NULL,
   element_id = NULL
@@ -42,7 +52,10 @@ arcgis_map <- function(
     basemap = basemap,
     center = as.list(center),
     zoom = zoom,
-    extent = extent
+    extent = extent,
+    selectable = as.list(selectable),
+    highlight = highlight,
+    widgets = unname(widgets)
   )
   x <- x[!vapply(x, is_unset, logical(1))]
 

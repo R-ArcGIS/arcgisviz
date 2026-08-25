@@ -166,15 +166,25 @@ is_blank_filter <- function(x) {
 #' Select features on a rendered chart or map
 #'
 #' Marks rows as selected by object id. A chart draws them as its own
-#' selection; a map highlights them in the view's highlight colour, which is
-#' what makes a chart and a map on the same data link up.
+#' selection; a map hands them to the view's selection manager, which
+#' highlights them and reports the new selection back as
+#' `input$<output_id>_selection`. Object ids are row numbers, so a chart and a
+#' map built from the same data frame select each other's rows.
+#'
+#' On a map the selection is a set that persists across calls, which is what
+#' `mode` operates on and what a click on a `selectable` layer
+#' ([add_layer()]) or a drawn [arc_draw_selection()] shape adds to. [set_highlight()]
+#' styles it and [arc_selected()] reads it.
 #'
 #' @param proxy Defines which [arc_proxy()] or [arc_map_proxy()] to select on.
 #' @param object_ids Defines which rows to select, by object id. An empty
 #'   vector clears the selection.
 #' @param ... Reserved for methods.
-#' @param layer default `NULL`. Defines which map layer to highlight in, by
-#'   name. `NULL` highlights in every layer. Maps only.
+#' @param layer default `NULL`. Defines which map layer to select in, by
+#'   name. `NULL` selects in every layer. Maps only.
+#' @param mode default `"replace"`. Defines what these ids do to the current
+#'   selection, one of `"replace"`, `"add"`, `"remove"`, or `"toggle"`. Maps
+#'   only.
 #' @return `proxy`, invisibly.
 #' @examples
 #' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))

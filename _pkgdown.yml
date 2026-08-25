@@ -74,8 +74,30 @@ reference:
       - new_legend_options
       - set_basemap
       - set_view
+      - set_highlight
       - ArcMap
       - MapLayer
+
+  - title: Map widgets
+    desc: >
+      The Maps SDK's own components, drawn over the map. Each is a real web
+      component that finds the map itself. `add_widget()` is the mechanism
+      the rest are sugar for, and reaches components without a wrapper.
+    contents:
+      - add_legend
+      - add_layer_list
+      - add_basemap_gallery
+      - add_search
+      - add_bookmarks
+      - add_scale_bar
+      - add_coordinate_conversion
+      - add_zoom
+      - add_sketch
+      - add_editor
+      - add_measurement
+      - add_widget
+      - map_widgets
+      - MapWidget
 
   - title: Palettes
     desc: >
@@ -106,6 +128,9 @@ reference:
       - arc_update
       - set_filter
       - set_selection
+      - arc_draw_selection
+      - arc_selected
+      - arc_sf
       - set_legend
       - set_layer
       - arc_goto

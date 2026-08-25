@@ -118,6 +118,32 @@ test_that("opacity and visibility ride on the layer, not the definition", {
   )
 })
 
+test_that("selectable layers travel as ids, and only the selectable ones", {
+  map <- arc_map() |>
+    add_layer(test_points(), name = "Points", selectable = TRUE) |>
+    add_layer(test_points(), name = "Other")
+
+  expect_identical(as_widget(map)$x$selectable, list("Points"))
+
+  plain <- add_layer(arc_map(), test_points())
+  expect_false("selectable" %in% names(as_widget(plain)$x))
+})
+
+test_that("set_highlight() names the style the view reads by default", {
+  map <- arc_map() |>
+    add_layer(test_points()) |>
+    set_highlight(color = "steelblue", shadow_opacity = 0.6)
+
+  style <- as_widget(map)$x$highlight[[1]]
+  expect_identical(style$name, "default")
+  expect_identical(style$color, "#4682B4FF")
+  expect_identical(style$shadowOpacity, 0.6)
+
+  # Unset properties are dropped, so the view keeps its own defaults.
+  expect_named(style, c("name", "color", "shadowOpacity"))
+  expect_error(set_highlight(arc_map(), color = "nope"), "recognized colour")
+})
+
 test_that("the view is only sent when it is set", {
   framed <- as_widget(add_layer(arc_map(), test_points()))
   expect_null(framed$x$center)
