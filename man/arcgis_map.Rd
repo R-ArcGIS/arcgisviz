@@ -12,6 +12,7 @@ arcgis_map(
   extent = NULL,
   selectable = NULL,
   highlight = NULL,
+  widgets = list(),
   width = NULL,
   height = NULL,
   element_id = NULL
@@ -37,6 +38,10 @@ by layer id.}
 
 \item{highlight}{default \code{NULL}. Defines the selection highlight styles, as
 a list of named \code{HighlightOptions}. See \code{\link[=set_highlight]{set_highlight()}}.}
+
+\item{widgets}{default \code{list()}. Defines the SDK components drawn over the
+map, each a list of \code{component}, \code{position}, and \code{props}. See
+\code{\link[=add_widget]{add_widget()}}.}
 
 \item{width, height}{default \code{NULL}. Defines the widget size, passed to
 \code{\link[htmlwidgets:createWidget]{htmlwidgets::createWidget()}}.}

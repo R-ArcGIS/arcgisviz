@@ -524,8 +524,30 @@ across flushes.
 Shiny would use jsonlite, which sends `layerDefinition$fields` columnar and
 breaks `Field.fromJSON` - the same trap `TOJSON_FUNC` avoids on the render
 path. Message protocol mirrors the chart's: one handler, `"arcgisviz-map"`,
-with a `method` discriminator (`update`, `remove`, `layer`, `filter`,
-`select`, `selectBy`, `goto`, `screenshot`).
+with a `method` discriminator (`update`, `remove`, `removeWidget`, `layer`,
+`filter`, `select`, `selectBy`, `goto`, `screenshot`).
+
+**Map furniture is `add_widget()`, one idiom for the whole SDK component
+set.** A legend, layer list, search box or basemap gallery is a real
+`<arcgis-*>` web component slotted into `<arcgis-map>`, and a slotted child
+finds the map itself - nothing sets `referenceElement` or `view`. So the R
+side is a registry (`map_widget_map`, `R/arc-map-widgets.R`) of
+`component`/`position`/`props`, and the JS creates the element, sets its
+`slot`, and assigns the props.
+
+Three rules hold it together. **Each component is its own `import()`, written
+out by hand**: a template literal would make webpack bundle all 179
+components, while explicit imports code-split into a chunk each, so a map pays
+only for the widgets it asks for (the entry bundle grew 29KB for fourteen).
+**`props` is an allowlist per widget**, because most accessors take
+Collections, Portals, or callbacks that cannot travel from R at all - a name
+outside it errors with the ones that exist. And **positions are the element's
+own slot names** (`arcgis-map/customElement.d.ts:120`), not an invented
+vocabulary.
+
+Widgets are keyed by component, so adding one twice replaces it - the same
+idempotence rule a named layer has, and what makes `add_widget()` safe to
+re-run through a proxy.
 
 **Selection is the view's `SelectionManager`, not a highlight handle.**
 `mapEl.selectionManager` (`@arcgis/core` 5.0, still `@beta`) owns a selection

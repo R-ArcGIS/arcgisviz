@@ -39,6 +39,7 @@ Collate:
     'palettes.R'
     'arc-proxy.R'
     'arc-map-proxy.R'
+    'arc-map-widgets.R'
     'arcgisviz-package.R'
     'constructors.R'
     'zzz.R'

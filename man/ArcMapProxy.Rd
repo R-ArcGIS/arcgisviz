@@ -7,6 +7,7 @@
 \usage{
 ArcMapProxy(
   layers = list(),
+  widgets = list(),
   basemap = NA_character_,
   center = integer(0),
   zoom = NA_real_,

@@ -68,6 +68,7 @@ S7::method(arc_update, ArcMapProxy) <- function(proxy, ...) {
       zoom = if (is.na(proxy@zoom)) NULL else proxy@zoom,
       extent = if (rlang::is_empty(proxy@extent)) NULL else proxy@extent,
       selectable = selectable_ids(proxy@layers),
+      widgets = map_widget_specs(proxy@widgets),
       highlight = if (rlang::is_empty(proxy@highlight)) {
         NULL
       } else {

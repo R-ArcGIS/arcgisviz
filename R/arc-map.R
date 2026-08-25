@@ -62,6 +62,7 @@ MapLayer := new_class(
 ArcMap := new_class(
   properties = list(
     layers = S7::class_list,
+    widgets = S7::class_list,
     basemap = s7x::class_string,
     center = S7::class_numeric,
     zoom = s7x::class_float,
@@ -595,6 +596,7 @@ S7::method(as_widget, ArcMap) <- function(
     extent = if (rlang::is_empty(x@extent)) NULL else x@extent,
     selectable = selectable_ids(x@layers),
     highlight = if (rlang::is_empty(x@highlight)) NULL else x@highlight,
+    widgets = map_widget_specs(x@widgets),
     width = width,
     height = height,
     element_id = element_id

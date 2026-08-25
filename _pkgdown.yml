@@ -75,8 +75,11 @@ reference:
       - set_basemap
       - set_view
       - set_highlight
+      - add_widget
+      - map_widgets
       - ArcMap
       - MapLayer
+      - MapWidget
 
   - title: Palettes
     desc: >

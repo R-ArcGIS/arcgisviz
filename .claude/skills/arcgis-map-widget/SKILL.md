@@ -161,6 +161,25 @@ discriminator - `update`, `remove`, `layer`, `filter`, `select`, `selectBy`,
 `goto`, `screenshot`. The layer stays in the factory closure, so **the data
 never crosses the wire twice**.
 
+## Widgets are slotted components, one registry
+
+`add_widget(map, "legend", position =, ...)` creates an `<arcgis-*>` element,
+sets its `slot`, assigns props, and appends it to `<arcgis-map>`. A slotted
+child finds the map itself, so **never set `referenceElement` or `view`**.
+
+`map_widget_map` (`R/arc-map-widgets.R`) is the registry: `component`,
+default `position`, and a `props` allowlist. Adding a widget:
+
+1. add its entry to `map_widget_map`, curating `props` down to accessors that
+   can travel from R - not Collections, Portals, or callbacks;
+2. add an explicit `import()` to `COMPONENTS` in `srcjs/widgets/arcgisMap.js`.
+   **Write it out** - a template literal makes webpack pull in all 179
+   components instead of code-splitting one chunk each.
+
+Positions are the element's own slot names
+(`arcgis-map/customElement.d.ts:120`). Widgets are keyed by component, so
+adding one twice replaces it.
+
 ## Selection is the view's SelectionManager
 
 `mapEl.selectionManager` (`@arcgis/core` 5.0, `@beta`) owns a selection set

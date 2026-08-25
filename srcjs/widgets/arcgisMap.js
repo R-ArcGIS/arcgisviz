@@ -176,6 +176,56 @@ function shinyInput(el, name, value) {
   Shiny.setInputValue(el.id + "_" + name, value, { priority: "event" });
 }
 
+// One import() per component, written out rather than built from the name:
+// a template literal makes webpack bundle all 179 of them. Each becomes its
+// own chunk, so a map pays only for the widgets it asks for.
+var COMPONENTS = {
+  "arcgis-basemap-gallery": function () {
+    return import("@arcgis/map-components/components/arcgis-basemap-gallery");
+  },
+  "arcgis-basemap-toggle": function () {
+    return import("@arcgis/map-components/components/arcgis-basemap-toggle");
+  },
+  "arcgis-bookmarks": function () {
+    return import("@arcgis/map-components/components/arcgis-bookmarks");
+  },
+  "arcgis-compass": function () {
+    return import("@arcgis/map-components/components/arcgis-compass");
+  },
+  "arcgis-coordinate-conversion": function () {
+    return import(
+      "@arcgis/map-components/components/arcgis-coordinate-conversion"
+    );
+  },
+  "arcgis-fullscreen": function () {
+    return import("@arcgis/map-components/components/arcgis-fullscreen");
+  },
+  "arcgis-home": function () {
+    return import("@arcgis/map-components/components/arcgis-home");
+  },
+  "arcgis-layer-list": function () {
+    return import("@arcgis/map-components/components/arcgis-layer-list");
+  },
+  "arcgis-legend": function () {
+    return import("@arcgis/map-components/components/arcgis-legend");
+  },
+  "arcgis-locate": function () {
+    return import("@arcgis/map-components/components/arcgis-locate");
+  },
+  "arcgis-scale-bar": function () {
+    return import("@arcgis/map-components/components/arcgis-scale-bar");
+  },
+  "arcgis-search": function () {
+    return import("@arcgis/map-components/components/arcgis-search");
+  },
+  "arcgis-track": function () {
+    return import("@arcgis/map-components/components/arcgis-track");
+  },
+  "arcgis-zoom": function () {
+    return import("@arcgis/map-components/components/arcgis-zoom");
+  },
+};
+
 // Guarded rather than called by name: `mode` arrives from the wire, and
 // manager[mode] would otherwise reach any method on the manager.
 var SELECTION_MODES = { replace: 1, add: 1, remove: 1, toggle: 1 };
@@ -234,6 +284,7 @@ HTMLWidgets.widget({
     // one without the data crossing the wire a second time.
     var state = {
       layers: {},
+      widgets: {},
       highlights: {},
       selectable: {},
       operation: null,
@@ -347,6 +398,38 @@ HTMLWidgets.widget({
         state.operation = null;
       });
       state.operation = operation;
+    }
+
+    // A slotted child of <arcgis-map> finds the map itself, so nothing here
+    // sets referenceElement or view.
+    async function addWidgets(list) {
+      var specs = Array.isArray(list) ? list : [];
+      for (var i = 0; i < specs.length; i++) {
+        var spec = specs[i];
+        var loader = COMPONENTS[spec.component];
+        if (!loader) throw new Error("unknown map widget: " + spec.component);
+        await loader();
+
+        removeWidgets([spec.component]);
+        var node = document.createElement(spec.component);
+        node.slot = spec.position;
+        assign(node, spec.props || {});
+        mapEl.appendChild(node);
+        state.widgets[spec.component] = node;
+      }
+    }
+
+    function removeWidgets(components) {
+      var wanted = Array.isArray(components)
+        ? components
+        : Object.keys(state.widgets);
+
+      wanted.forEach(function (component) {
+        var node = state.widgets[component];
+        if (!node) return;
+        node.remove();
+        delete state.widgets[component];
+      });
     }
 
     function targetLayers(ids) {
@@ -464,6 +547,9 @@ HTMLWidgets.widget({
             if (payload.highlight) mapEl.highlights = payload.highlight;
             if (payload.layers) await addLayers(payload.layers);
             syncSelectable(payload.selectable);
+            await addWidgets(payload.widgets);
+          } else if (msg.method === "removeWidget") {
+            removeWidgets(payload.components);
           } else if (msg.method === "remove") {
             removeLayers(payload.ids);
           } else if (msg.method === "layer") {
@@ -511,8 +597,10 @@ HTMLWidgets.widget({
           // A re-render replaces the map's contents rather than adding to
           // whatever the previous one left behind.
           removeLayers(null);
+          removeWidgets(null);
           var layers = await addLayers(x.layers || []);
           syncSelectable(x.selectable);
+          await addWidgets(x.widgets);
 
           if (!x.center && !x.extent) await frameLayers(mapEl, layers);
         } catch (err) {
