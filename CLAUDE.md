@@ -555,7 +555,18 @@ vocabulary.
 
 Widgets are keyed by component, so adding one twice replaces it - the same
 idempotence rule a named layer has, and what makes `add_widget()` safe to
-re-run through a proxy.
+re-run through a proxy. `add_widget(expand = TRUE)` wraps one in
+`arcgis-expand`, and expands sharing a corner share a `group`, so opening one
+closes the other.
+
+**`add_widget()` is the mechanism; `R/arc-map-shortcuts.R` is the public
+surface** - `add_legend()`, `add_search()`, `add_measurement(type =)` and the
+rest, the same relationship `arc_bar()` has to `arc_chart() |> set_type()`.
+Each is `add_widget()` and nothing else, arguments are the snake_case of the
+component's own property names (one vocabulary, no second mapping table), and
+they call through `rlang::inject()` so errors blame the shortcut rather than
+the internals. Adding a widget means a registry entry, an `import()`, and a
+shortcut.
 
 **The four tool widgets report back, and each one reports from a different
 place.** This is not a choice; it is where the SDK puts the result.

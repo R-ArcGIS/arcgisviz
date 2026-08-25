@@ -174,7 +174,21 @@ default `position`, and a `props` allowlist. Adding a widget:
    can travel from R - not Collections, Portals, or callbacks;
 2. add an explicit `import()` to `COMPONENTS` in `srcjs/widgets/arcgisMap.js`.
    **Write it out** - a template literal makes webpack pull in all 179
-   components instead of code-splitting one chunk each.
+   components instead of code-splitting one chunk each;
+3. add an `add_<widget>()` shortcut in `R/arc-map-shortcuts.R`.
+
+**The shortcuts are the public surface; `add_widget()` is the mechanism.**
+Same shape as `arc_bar()` over `arc_chart() |> set_type()`. Each one is
+`add_widget()` and nothing else, so the registry stays the single
+implementation:
+
+- arguments are the **snake_case of the component's own property names**, so
+  there is one vocabulary and no second mapping table (`add_sketch(tools =)`
+  is the only rename, for `availableCreateTools`);
+- expose the handful worth documenting and let the rest ride in `...`;
+- call `add_widget()` through `rlang::inject()`, never `exec()` - the frame is
+  what makes errors blame `add_legend()` rather than the internals;
+- `drop_null()` the arguments, so an unset one never reaches the component.
 
 Positions are the element's own slot names
 (`arcgis-map/customElement.d.ts:120`). Widgets are keyed by component, so
