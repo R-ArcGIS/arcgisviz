@@ -1,3 +1,4 @@
+import "../modules/public-path.js";
 import "widgets";
 import { defineCustomElements as defineChartElements } from "@arcgis/charts-components/loader";
 import { createModel } from "@arcgis/charts-components";
