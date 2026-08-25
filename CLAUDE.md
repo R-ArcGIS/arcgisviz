@@ -57,6 +57,14 @@ just bundle       # rebuild the JS widget bundle (production, minified)
 just watch        # rebuild JS on every srcjs/ change
 ```
 
+**Both bundles set webpack's `publicPath` by hand**
+(`srcjs/modules/public-path.js`, imported first by each entry). htmlwidgets
+loads the bundle through the binding dependency it builds with
+`all_files = FALSE`, so that directory holds the entry file alone and every
+async chunk 404s against it; the chunks travel with the `.yaml` dependency
+instead. Adding `script:` back to a yaml is *not* the fix - that runs the
+bundle twice under two webpack runtimes. See the `arcgis-js-widget` skill.
+
 ## Every new feature needs a `dev/` example
 
 Every user-facing feature gets a `dev/` example (one file per feature,
