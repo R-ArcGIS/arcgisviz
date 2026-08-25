@@ -1,3 +1,4 @@
+import "../modules/public-path.js";
 import "widgets";
 import "@arcgis/map-components/components/arcgis-map";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer.js";

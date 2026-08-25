@@ -1,6 +1,12 @@
 # arcgisMap.js is already attached as the `arcgisMap-binding` dependency by
 # htmlwidgets' inst/htmlwidgets/<name>.js convention. Listing it here too
 # loads the bundle a second time under a different dependency name.
+#
+# This dependency still earns its place: htmlwidgets builds the binding one
+# with `all_files = FALSE`, so it copies the entry file alone. This one
+# defaults to TRUE and carries the async chunks with it, which is why
+# srcjs/modules/public-path.js points webpack's publicPath here. The name and
+# version below are part of that contract - see that file before editing.
 dependencies:
   - name: arcgisMap
     version: 1.0.0
