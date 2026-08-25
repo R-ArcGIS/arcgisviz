@@ -41,6 +41,7 @@ Collate:
     'arc-proxy.R'
     'arc-map-proxy.R'
     'arc-map-widgets.R'
+    'arc-map-shortcuts.R'
     'arcgisviz-package.R'
     'constructors.R'
     'zzz.R'
