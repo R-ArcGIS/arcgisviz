@@ -554,7 +554,7 @@ re-run through a proxy.
 set across layers, highlights it, and emits `selection-change` - so the map
 finally reports selection back the way charts always have. Three routes write
 to the same set: `set_selection(mode = )` (`replace`/`add`/`remove`/`toggle`),
-a click on a layer added with `selectable = TRUE`, and `arc_select()`, which
+a click on a layer added with `selectable = TRUE`, and `arc_draw_selection()`, which
 constructs a `SelectionOperation` - the SDK's own draw-to-select tool.
 `arc_selected()` reads the event back, and `set_highlight()` styles the set by
 writing the view's *named* `"default"` highlight options, since
@@ -567,7 +567,7 @@ remove. And a selection identifier is an object id *or* a `Graphic` depending
 on the layer (`views/selection/types.d.ts:78`), so the payload normalizes
 through `objectIdField` rather than assuming.
 
-`arc_select(tool = "lasso")` is the one place two spec properties hide behind
+`arc_draw_selection(tool = "lasso")` is the one place two spec properties hide behind
 one friendly name: a lasso is the `polygon` create tool in `"freehand"`
 `mode` (`views/draw/types.d.ts:20`). `"rectangle"`, `"polygon"`, `"circle"`
 and `"point"` send no mode at all.

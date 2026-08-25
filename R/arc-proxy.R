@@ -173,7 +173,7 @@ is_blank_filter <- function(x) {
 #'
 #' On a map the selection is a set that persists across calls, which is what
 #' `mode` operates on and what a click on a `selectable` layer
-#' ([add_layer()]) or a drawn [arc_select()] shape adds to. [set_highlight()]
+#' ([add_layer()]) or a drawn [arc_draw_selection()] shape adds to. [set_highlight()]
 #' styles it and [arc_selected()] reads it.
 #'
 #' @param proxy Defines which [arc_proxy()] or [arc_map_proxy()] to select on.

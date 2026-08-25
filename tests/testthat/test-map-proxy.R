@@ -153,9 +153,9 @@ test_that("set_selection() carries the mode the selection set is changed by", {
   expect_error(set_selection(f$proxy, 3, mode = "invert"), "mode")
 })
 
-test_that("arc_select() turns a friendly tool into the two spec properties", {
+test_that("arc_draw_selection() turns a friendly tool into the two spec properties", {
   f <- fake_map_proxy()
-  f$proxy |> arc_select(tool = "lasso", mode = "add", layer = "Points")
+  f$proxy |> arc_draw_selection(tool = "lasso", mode = "add", layer = "Points")
 
   msg <- f$session$sent()[[1]]$message
   expect_identical(msg$method, "selectBy")
@@ -167,14 +167,14 @@ test_that("arc_select() turns a friendly tool into the two spec properties", {
   expect_match(sent_json(f$session), '"ids":["Points"]', fixed = TRUE)
 })
 
-test_that("arc_select() sends no draw mode for a tool that has none", {
+test_that("arc_draw_selection() sends no draw mode for a tool that has none", {
   f <- fake_map_proxy()
-  f$proxy |> arc_select()
+  f$proxy |> arc_draw_selection()
 
   payload <- sent_payload(f$session)
   expect_identical(payload$createTool, "rectangle")
   expect_false("mode" %in% names(payload))
-  expect_error(arc_select(f$proxy, tool = "freehand"), "tool")
+  expect_error(arc_draw_selection(f$proxy, tool = "freehand"), "tool")
 })
 
 test_that("arc_selected() reads the ids out of a selection event", {

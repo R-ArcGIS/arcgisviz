@@ -110,14 +110,14 @@ server <- function(input, output, session) {
 
   observeEvent(
     input$rectangle$clicks,
-    arc_map_proxy("map") |> arc_select(tool = "rectangle", mode = mode()),
+    arc_map_proxy("map") |> arc_draw_selection(tool = "rectangle", mode = mode()),
     ignoreInit = TRUE
   )
 
   # A lasso is the polygon tool drawn freehand.
   observeEvent(
     input$lasso$clicks,
-    arc_map_proxy("map") |> arc_select(tool = "lasso", mode = mode()),
+    arc_map_proxy("map") |> arc_draw_selection(tool = "lasso", mode = mode()),
     ignoreInit = TRUE
   )
 

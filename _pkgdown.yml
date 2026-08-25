@@ -110,7 +110,7 @@ reference:
       - arc_update
       - set_filter
       - set_selection
-      - arc_select
+      - arc_draw_selection
       - arc_selected
       - set_legend
       - set_layer

@@ -42,7 +42,7 @@ the unselected features, from \code{0} to \code{1}.}
 Changes how selected features are drawn. Works on an \code{\link[=arc_map]{arc_map()}} before it
 is rendered and on an \code{\link[=arc_map_proxy]{arc_map_proxy()}} after, and applies to every
 selection - the ones \code{\link[=set_selection]{set_selection()}} makes, the ones a click on a
-\code{selectable} layer makes, and the ones \code{\link[=arc_select]{arc_select()}} draws.
+\code{selectable} layer makes, and the ones \code{\link[=arc_draw_selection]{arc_draw_selection()}} draws.
 }
 \examples{
 arc_map() |>
