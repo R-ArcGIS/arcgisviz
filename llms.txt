@@ -164,9 +164,55 @@ a feature collection, so no feature service is involved.
   : Set the basemap
 - [`set_view()`](http://r.esri.com/arcgisviz/reference/set_view.md) :
   Set the initial view
+- [`set_highlight()`](http://r.esri.com/arcgisviz/reference/set_highlight.md)
+  : Style the selection highlight
 - [`ArcMap`](http://r.esri.com/arcgisviz/reference/ArcMap.md) : A map
 - [`MapLayer`](http://r.esri.com/arcgisviz/reference/MapLayer.md) : A
   layer on a map
+
+## Map widgets
+
+The Maps SDK’s own components, drawn over the map. Each is a real web
+component that finds the map itself.
+[`add_widget()`](http://r.esri.com/arcgisviz/reference/add_widget.md) is
+the mechanism the rest are sugar for, and reaches components without a
+wrapper.
+
+- [`add_legend()`](http://r.esri.com/arcgisviz/reference/add_legend.md)
+  : Add a legend
+- [`add_layer_list()`](http://r.esri.com/arcgisviz/reference/add_layer_list.md)
+  : Add a layer list
+- [`add_basemap_gallery()`](http://r.esri.com/arcgisviz/reference/add_basemap_gallery.md)
+  [`add_basemap_toggle()`](http://r.esri.com/arcgisviz/reference/add_basemap_gallery.md)
+  : Add a basemap gallery
+- [`add_search()`](http://r.esri.com/arcgisviz/reference/add_search.md)
+  : Add a search box
+- [`add_bookmarks()`](http://r.esri.com/arcgisviz/reference/add_bookmarks.md)
+  : Add a bookmark list
+- [`add_scale_bar()`](http://r.esri.com/arcgisviz/reference/add_scale_bar.md)
+  : Add a scale bar
+- [`add_coordinate_conversion()`](http://r.esri.com/arcgisviz/reference/add_coordinate_conversion.md)
+  : Add a coordinate readout
+- [`add_zoom()`](http://r.esri.com/arcgisviz/reference/add_zoom.md)
+  [`add_home()`](http://r.esri.com/arcgisviz/reference/add_zoom.md)
+  [`add_compass()`](http://r.esri.com/arcgisviz/reference/add_zoom.md)
+  [`add_fullscreen()`](http://r.esri.com/arcgisviz/reference/add_zoom.md)
+  [`add_locate()`](http://r.esri.com/arcgisviz/reference/add_zoom.md)
+  [`add_track()`](http://r.esri.com/arcgisviz/reference/add_zoom.md) :
+  Add a navigation control
+- [`add_sketch()`](http://r.esri.com/arcgisviz/reference/add_sketch.md)
+  : Add a drawing tool
+- [`add_editor()`](http://r.esri.com/arcgisviz/reference/add_editor.md)
+  : Add an editor
+- [`add_measurement()`](http://r.esri.com/arcgisviz/reference/add_measurement.md)
+  : Add a measurement tool
+- [`add_widget()`](http://r.esri.com/arcgisviz/reference/add_widget.md)
+  [`remove_widget()`](http://r.esri.com/arcgisviz/reference/add_widget.md)
+  : Add a widget to a map
+- [`map_widgets()`](http://r.esri.com/arcgisviz/reference/map_widgets.md)
+  : Every widget a map can carry
+- [`MapWidget`](http://r.esri.com/arcgisviz/reference/MapWidget.md) : A
+  widget on a map
 
 ## Palettes
 
@@ -218,6 +264,12 @@ data, and read back what the reader did to it.
   : Filter a rendered chart or map in the browser
 - [`set_selection()`](http://r.esri.com/arcgisviz/reference/set_selection.md)
   : Select features on a rendered chart or map
+- [`arc_draw_selection()`](http://r.esri.com/arcgisviz/reference/arc_draw_selection.md)
+  : Select features by drawing on the map
+- [`arc_selected()`](http://r.esri.com/arcgisviz/reference/arc_selected.md)
+  : Read a map selection
+- [`arc_sf()`](http://r.esri.com/arcgisviz/reference/arc_sf.md) : Read
+  what was drawn or edited on a map
 - [`set_legend()`](http://r.esri.com/arcgisviz/reference/set_legend.md)
   : Control a rendered chart's legend
 - [`set_layer()`](http://r.esri.com/arcgisviz/reference/set_layer.md)

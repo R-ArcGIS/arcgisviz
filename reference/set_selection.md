@@ -1,8 +1,10 @@
 # Select features on a rendered chart or map
 
 Marks rows as selected by object id. A chart draws them as its own
-selection; a map highlights them in the view's highlight colour, which
-is what makes a chart and a map on the same data link up.
+selection; a map hands them to the view's selection manager, which
+highlights them and reports the new selection back as
+`input$<output_id>_selection`. Object ids are row numbers, so a chart
+and a map built from the same data frame select each other's rows.
 
 ## Usage
 
@@ -30,12 +32,31 @@ set_selection(proxy, object_ids, ...)
 
 - layer:
 
-  default `NULL`. Defines which map layer to highlight in, by name.
-  `NULL` highlights in every layer. Maps only.
+  default `NULL`. Defines which map layer to select in, by name. `NULL`
+  selects in every layer. Maps only.
+
+- mode:
+
+  default `"replace"`. Defines what these ids do to the current
+  selection, one of `"replace"`, `"add"`, `"remove"`, or `"toggle"`.
+  Maps only.
 
 ## Value
 
 `proxy`, invisibly.
+
+## Details
+
+On a map the selection is a set that persists across calls, which is
+what `mode` operates on and what a click on a `selectable` layer
+([`add_layer()`](http://r.esri.com/arcgisviz/reference/add_layer.md)) or
+a drawn
+[`arc_draw_selection()`](http://r.esri.com/arcgisviz/reference/arc_draw_selection.md)
+shape adds to.
+[`set_highlight()`](http://r.esri.com/arcgisviz/reference/set_highlight.md)
+styles it and
+[`arc_selected()`](http://r.esri.com/arcgisviz/reference/arc_selected.md)
+reads it.
 
 ## Examples
 

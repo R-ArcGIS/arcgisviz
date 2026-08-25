@@ -65,6 +65,12 @@ add_layer(map, .data, ...)
   [`c()`](https://rdrr.io/r/base/c.html). Name one to label it, as in
   `c(County = NAME)`.
 
+- selectable:
+
+  default `NULL`. Defines whether clicking a feature adds it to the
+  selection, which arrives in Shiny as `input$<id>_selection`. See
+  [`set_selection()`](http://r.esri.com/arcgisviz/reference/set_selection.md).
+
 - visible:
 
   default `NULL`. Defines whether the layer starts drawn. Only when

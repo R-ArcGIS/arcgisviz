@@ -53,6 +53,9 @@ and <code><a href="add_layer.html">add_layer()</a></code>, which build the argum
 <span>  center <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  zoom <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  extent <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  selectable <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  highlight <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  widgets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  height <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  element_id <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -85,6 +88,22 @@ When unset the map frames the layers.</p></dd>
 <dt id="arg-extent">extent<a class="anchor" aria-label="anchor" href="#arg-extent"></a></dt>
 <dd><p>default <code>NULL</code>. Defines the initial extent, overriding
 <code>center</code> and <code>zoom</code>.</p></dd>
+
+
+<dt id="arg-selectable">selectable<a class="anchor" aria-label="anchor" href="#arg-selectable"></a></dt>
+<dd><p>default <code>NULL</code>. Defines which layers a click selects in,
+by layer id.</p></dd>
+
+
+<dt id="arg-highlight">highlight<a class="anchor" aria-label="anchor" href="#arg-highlight"></a></dt>
+<dd><p>default <code>NULL</code>. Defines the selection highlight styles, as
+a list of named <code>HighlightOptions</code>. See <code><a href="set_highlight.html">set_highlight()</a></code>.</p></dd>
+
+
+<dt id="arg-widgets">widgets<a class="anchor" aria-label="anchor" href="#arg-widgets"></a></dt>
+<dd><p>default <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code>. Defines the SDK components drawn over the
+map, each a list of <code>component</code>, <code>position</code>, and <code>props</code>. See
+<code><a href="add_widget.html">add_widget()</a></code>.</p></dd>
 
 
 <dt id="arg-width-height">width, height<a class="anchor" aria-label="anchor" href="#arg-width-height"></a></dt>

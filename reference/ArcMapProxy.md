@@ -13,10 +13,12 @@ sends the accumulated changes to the browser as one message.
 ``` r
 ArcMapProxy(
   layers = list(),
+  widgets = list(),
   basemap = NA_character_,
   center = integer(0),
   zoom = NA_real_,
   extent = list(),
+  highlight = list(),
   output_id = NA_character_,
   session = NULL
 )
