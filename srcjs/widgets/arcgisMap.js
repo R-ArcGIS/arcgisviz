@@ -349,7 +349,6 @@ HTMLWidgets.widget({
       layers: {},
       widgets: {},
       watches: {},
-      highlights: {},
       selectable: {},
       operation: null,
       hovered: null,
@@ -375,12 +374,6 @@ HTMLWidgets.widget({
       return state.ready;
     }
 
-    function dropHighlight(id) {
-      var handle = state.highlights[id];
-      if (handle) handle.remove();
-      delete state.highlights[id];
-    }
-
     function hideTooltip() {
       tip.style.display = "none";
       if (state.hovered !== null) {
@@ -393,10 +386,7 @@ HTMLWidgets.widget({
       var layers = list.map(featureLayer);
       layers.forEach(function (layer) {
         var existing = state.layers[layer.id];
-        if (existing) {
-          dropHighlight(layer.id);
-          mapEl.map.remove(existing);
-        }
+        if (existing) mapEl.map.remove(existing);
         state.layers[layer.id] = layer;
         subscribeEdits(layer);
       });
@@ -406,7 +396,6 @@ HTMLWidgets.widget({
 
     function removeLayers(ids) {
       targetLayers(ids).forEach(function (layer) {
-        dropHighlight(layer.id);
         mapEl.map.remove(layer);
         delete state.layers[layer.id];
         delete state.selectable[layer.id];
