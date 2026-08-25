@@ -601,6 +601,16 @@ one friendly name: a lasso is the `polygon` create tool in `"freehand"`
 `mode` (`views/draw/types.d.ts:20`). `"rectangle"`, `"polygon"`, `"circle"`
 and `"point"` send no mode at all.
 
+**A `SelectionOperation` must be given `sources` even when that means every
+layer.** It runs its query only `if (s && null != c)`, where `c` is the
+operation's own `sources` - while the *outer* guard is satisfied by the
+manager's sources. So an unset `sources` draws the rubber band, queries
+nothing, persists nothing, and throws nothing: a silent no-op that looks like
+a dead tool. `layer = NULL` resolves to `targetLayers(null)`, never
+`undefined`. Its own name is also load-bearing: `arc_select()` masks
+`arcgislayers::arc_select()`, hence `arc_draw_selection()`. **Check the
+`arc_*` surface against arcgislayers before adding one.**
+
 `set_filter()` on a map is the layer's `definitionExpression`. Events become
 `input$<id>_click`/`_hover`/`_view`/`_selection`/`_sketch`/`_edits`/
 `_measurement`/`_screenshot`, plus `_error`

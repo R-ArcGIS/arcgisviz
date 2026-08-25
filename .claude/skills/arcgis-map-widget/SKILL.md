@@ -208,6 +208,16 @@ runs after every add or remove. A selection identifier is an object id *or* a
 `Graphic` depending on the layer (`views/selection/types.d.ts:78`), so the
 payload normalizes through `objectIdField`.
 
+**A `SelectionOperation` needs explicit `sources`.** It queries only
+`if (s && null != c)` (`c` = its own `sources`), while the outer guard is
+satisfied by the *manager's* sources - so an unset one draws the shape,
+selects nothing, and throws nothing. `layer = NULL` means `targetLayers(null)`,
+never `undefined`.
+
+**Check any new `arc_*` name against arcgislayers** (`arc_open`, `arc_raster`,
+`arc_read`, `arc_select`). `arc_select()` masked theirs, hence
+`arc_draw_selection()`.
+
 `set_highlight()` writes the view's *named* `"default"` highlight options -
 `mapEl.highlights` is a collection keyed by name, and any highlight that does
 not ask for another one reads that entry. A lasso is the `polygon` create tool
