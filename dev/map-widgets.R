@@ -21,7 +21,7 @@ arc_map() |>
 # Positions are the map element's own slots. Two widgets in one corner stack
 # in the order they were added.
 arc_map() |>
-  add_layer(nc, color = SID74, palette = "Reds", name = "Deaths, 1974") |>
+  add_layer(nc, color = SID74, palette = "Red 5", name = "Deaths, 1974") |>
   add_widget("legend", position = "top-left") |>
   add_widget("scale-bar", position = "bottom-right") |>
   add_widget("zoom", position = "bottom-left")

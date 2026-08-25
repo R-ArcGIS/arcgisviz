@@ -10,6 +10,7 @@ Roxygen: list(markdown = TRUE, roclets = c("collate", "namespace", "s7x::enum_ro
 Suggests:
     sf,
     shiny,
+    pillar,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Collate:

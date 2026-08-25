@@ -62,7 +62,7 @@ server <- function(input, output, session) {
       add_layer(
         nc,
         color = BIR74,
-        palette = "Blues",
+        palette = "Blue 5",
         name = "Counties",
         tooltip = c(County = NAME, Births = BIR74)
       ) |>
