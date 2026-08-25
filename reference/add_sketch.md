@@ -1,7 +1,7 @@
 # Add a drawing tool
 
 Hands the reader tools to draw with. What they draw arrives in Shiny as
-`input$<output_id>_sketch`, which
+`input$<output_id>$sketch`, which
 [`arc_sf()`](http://r.esri.com/arcgisviz/reference/arc_sf.md) turns into
 an `sf` object.
 

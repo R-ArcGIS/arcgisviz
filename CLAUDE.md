@@ -499,8 +499,8 @@ uses the element’s `runtimeDataFilters`
 holds - no model rebuild at all, the cheapest interaction available. The
 model’s `setDataFilters()` is the persistent half and is not wired up.
 
-Events become `input$<id>_selection`/`_legend`/`_axes`/`_colors`/
-`_series_order`/`_status`/`_data`, plus one `_error` carrying a `kind`.
+Events become `input$<output_id>$selection`/`$legend`/`$axes`/`$colors`/
+`$series_order`/`$status`/`$data`, plus one `$error` carrying a `kind`.
 Three traps, all handled in `cleanPayload()`/the factory: payloads carry
 the circular `model` and must be stripped; `selectionIndexes` is a JS
 `Map` that stringifies to [`{}`](https://rdrr.io/r/base/Paren.html); and
@@ -740,15 +740,28 @@ load-bearing: `arc_select()` masks `arcgislayers::arc_select()`, hence
 
 [`set_filter()`](http://r.esri.com/arcgisviz/reference/set_filter.md) on
 a map is the layer’s `definitionExpression`. Events become
-`input$<id>_click`/`_hover`/`_view`/`_selection`/`_sketch`/`_edits`/
-`_measurement`/`_screenshot`, plus `_error` carrying a `kind`
+`input$<output_id>$click`/`$hover`/`$view`/`$selection`/`$sketch`/`$edits`/
+`$measurement`/`$screenshot`, plus `$error` carrying a `kind`
 (`arcgisLoadError`, `arcgisViewReadyError`, or `"proxy"` with the
 failing `method` - a proxy message that throws reports itself rather
 than dying in the console).
 
+**Every event for a widget lands on one input, named by the output id,
+with the event as a field on it.** `arcgisMapOutput("my_map")` reports
+`input$my_map$click` and `input$my_map$sketch` - never
+`input$my_map_click`. `shinyReporter(el)` holds the accumulated object
+and writes `Shiny.setInputValue(el.id, ...)`; `el.id` is already
+namespaced, so a widget inside a module needs nothing extra. Two
+consequences worth knowing: the object **accumulates**, so a click does
+not wipe out the sketch beside it and `input$my_map$sketch` still reads
+after one; and since Shiny inputs are atomic, an observer on one field
+is invalidated by *any* event on that widget -
+`observeEvent(input$my_map$sketch, )` re-fires on a click. Compare
+values yourself where that matters.
+
 **Three event rules, all about not flooding the websocket or
-double-binding.** `_hover` fires only when the feature under the pointer
-*changes*. `_view` is debounced 250ms, because `arcgisViewChange` fires
+double-binding.** `$hover` fires only when the feature under the pointer
+*changes*. `$view` is debounced 250ms, because `arcgisViewChange` fires
 throughout a pan or zoom animation. And `subscribeEvents()` is guarded
 by `state.subscribed`: `renderValue()` runs again on every re-render,
 and listeners bound twice send every event twice. A re-render also

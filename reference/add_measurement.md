@@ -2,7 +2,7 @@
 
 Measures distance along a drawn line, or the area and perimeter of a
 drawn shape. The result arrives in Shiny as
-`input$<output_id>_measurement`, a value and its unit.
+`input$<output_id>$measurement`, a value and its unit.
 
 ## Usage
 

@@ -1,6 +1,6 @@
 # Read what was drawn or edited on a map
 
-Turns an `input$<output_id>_sketch` or `input$<output_id>_edits` event
+Turns an `input$<output_id>$sketch` or `input$<output_id>$edits` event
 into an `sf` object. Both carry their features as Esri feature JSON,
 which is what
 [`arcgisutils::parse_esri_json()`](https://rdrr.io/pkg/arcgisutils/man/parse_esri_json.html)
@@ -16,8 +16,8 @@ arc_sf(x)
 
 - x:
 
-  Defines which event to read, from `input$<output_id>_sketch` or
-  `input$<output_id>_edits`.
+  Defines which event to read, from `input$<output_id>$sketch` or
+  `input$<output_id>$edits`.
 
 ## Value
 
@@ -36,8 +36,8 @@ one the data frame was sent in.
 ``` r
 # Inside a Shiny server:
 if (interactive()) {
-  observeEvent(input$map_sketch, {
-    drawn <- arc_sf(input$map_sketch)
+  observeEvent(input$map$sketch, {
+    drawn <- arc_sf(input$map$sketch)
     print(sf::st_area(drawn))
   })
 }

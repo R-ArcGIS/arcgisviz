@@ -68,7 +68,8 @@ add_layer(map, .data, ...)
 - selectable:
 
   default `NULL`. Defines whether clicking a feature adds it to the
-  selection, which arrives in Shiny as `input$<id>_selection`. See
+  selection, which arrives in Shiny as `input$<output_id>$selection`.
+  See
   [`set_selection()`](http://r.esri.com/arcgisviz/reference/set_selection.md).
 
 - visible:

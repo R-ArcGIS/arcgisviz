@@ -2,7 +2,7 @@
 
 Hands the reader a drawing tool. Whatever the shape they draw covers
 becomes the selection, which arrives back as
-`input$<output_id>_selection` the same way
+`input$<output_id>$selection` the same way
 [`set_selection()`](http://r.esri.com/arcgisviz/reference/set_selection.md)'s
 does. The tool is live from the moment this is called and is put away
 once the shape is finished.

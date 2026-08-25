@@ -4,7 +4,7 @@
 [`set_view()`](http://r.esri.com/arcgisviz/reference/set_view.md) on a
 proxy, which jumps to the new position. `arc_screenshot()` captures the
 view as a PNG data URL and sends it back as
-`input$<output_id>_screenshot`.
+`input$<output_id>$screenshot`.
 
 ## Usage
 

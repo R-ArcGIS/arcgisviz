@@ -3,7 +3,7 @@
 Marks rows as selected by object id. A chart draws them as its own
 selection; a map hands them to the view's selection manager, which
 highlights them and reports the new selection back as
-`input$<output_id>_selection`. Object ids are row numbers, so a chart
+`input$<output_id>$selection`. Object ids are row numbers, so a chart
 and a map built from the same data frame select each other's rows.
 
 ## Usage
