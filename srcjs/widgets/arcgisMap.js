@@ -348,6 +348,7 @@ HTMLWidgets.widget({
     var state = {
       layers: {},
       widgets: {},
+      watches: {},
       highlights: {},
       selectable: {},
       operation: null,
@@ -488,9 +489,15 @@ HTMLWidgets.widget({
     // furniture the reader drives and R never hears about.
     function subscribeWidget(component, node) {
       if (component === "arcgis-sketch") return subscribeSketch(node);
-      if (component.indexOf("-measurement-2d") !== -1) {
-        return subscribeMeasurement(component, node);
-      }
+      if (component.indexOf("-measurement-2d") === -1) return;
+
+      subscribeMeasurement(component, node).catch(function (err) {
+        shinyInput(el, "error", {
+          kind: "widget",
+          method: component,
+          detail: err && err.message ? err.message : String(err),
+        });
+      });
     }
 
     // The sketch component keeps its own graphics layer, so the payload is
@@ -529,7 +536,7 @@ HTMLWidgets.widget({
       await node.componentOnReady();
       var analysisView = await mapEl.whenAnalysisView(node.analysis);
 
-      watch(
+      state.watches[component] = watch(
         function () {
           return analysisView.result;
         },
@@ -580,6 +587,13 @@ HTMLWidgets.widget({
       wanted.forEach(function (component) {
         var node = state.widgets[component];
         if (!node) return;
+
+        // The watch outlives the element, and reading a destroyed analysis
+        // view's result throws.
+        var handle = state.watches[component];
+        if (handle) handle.remove();
+        delete state.watches[component];
+
         node.remove();
         delete state.widgets[component];
       });
