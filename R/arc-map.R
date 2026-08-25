@@ -146,7 +146,7 @@ set_view <- function(map, center = NULL, zoom = NULL, extent = NULL) {
 #' Changes how selected features are drawn. Works on an [arc_map()] before it
 #' is rendered and on an [arc_map_proxy()] after, and applies to every
 #' selection - the ones [set_selection()] makes, the ones a click on a
-#' `selectable` layer makes, and the ones [arc_select()] draws.
+#' `selectable` layer makes, and the ones [arc_draw_selection()] draws.
 #'
 #' @param map Defines which map or proxy to modify.
 #' @param color default `NULL`. Defines the highlight colour, as a name or hex

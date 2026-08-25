@@ -334,13 +334,16 @@ HTMLWidgets.widget({
         state.operation.cancel();
       }
 
+      // sources must be set even when it means every layer: the operation
+      // queries only `if (s && null != c)` (SelectionOperation.js), so an
+      // unset one draws the shape and silently selects nothing.
       var operation = new SelectionOperation({
         view: mapEl.view,
         selectionManager: selectionManager(),
         createTool: payload.createTool,
         mode: payload.mode,
         type: payload.type,
-        sources: payload.ids ? targetLayers(payload.ids) : undefined,
+        sources: targetLayers(payload.ids),
       });
 
       operation.on("complete", function () {

@@ -159,10 +159,10 @@ select_tool_map <- list(
 #' @examples
 #' if (interactive()) {
 #'   arc_map_proxy("map") |>
-#'     arc_select(tool = "lasso")
+#'     arc_draw_selection(tool = "lasso")
 #' }
 #' @export
-arc_select <- function(
+arc_draw_selection <- function(
   proxy,
   tool = "rectangle",
   mode = "replace",

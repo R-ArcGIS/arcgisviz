@@ -34,7 +34,7 @@ map built from the same data frame select each other's rows.
 \details{
 On a map the selection is a set that persists across calls, which is what
 \code{mode} operates on and what a click on a \code{selectable} layer
-(\code{\link[=add_layer]{add_layer()}}) or a drawn \code{\link[=arc_select]{arc_select()}} shape adds to. \code{\link[=set_highlight]{set_highlight()}}
+(\code{\link[=add_layer]{add_layer()}}) or a drawn \code{\link[=arc_draw_selection]{arc_draw_selection()}} shape adds to. \code{\link[=set_highlight]{set_highlight()}}
 styles it and \code{\link[=arc_selected]{arc_selected()}} reads it.
 }
 \examples{
