@@ -201,7 +201,27 @@ HTMLWidgets.widget({
 
     // Layers stay in the closure so a proxy can filter, highlight, or hide
     // one without the data crossing the wire a second time.
-    var state = { layers: {}, highlights: {}, hovered: null };
+    var state = {
+      layers: {},
+      highlights: {},
+      hovered: null,
+      ready: null,
+      subscribed: false,
+      viewTimer: null,
+    };
+
+    // mapEl.map is not there until the view resolves, and a proxy message can
+    // arrive before renderValue has finished. Everything awaits this.
+    function whenReady() {
+      if (!state.ready) state.ready = mapEl.viewOnReady();
+      return state.ready;
+    }
+
+    function dropHighlight(id) {
+      var handle = state.highlights[id];
+      if (handle) handle.remove();
+      delete state.highlights[id];
+    }
 
     function hideTooltip() {
       tip.style.display = "none";
@@ -215,11 +235,23 @@ HTMLWidgets.widget({
       var layers = list.map(featureLayer);
       layers.forEach(function (layer) {
         var existing = state.layers[layer.id];
-        if (existing) mapEl.map.remove(existing);
+        if (existing) {
+          dropHighlight(layer.id);
+          mapEl.map.remove(existing);
+        }
         state.layers[layer.id] = layer;
       });
       mapEl.map.addMany(layers);
       return layers;
+    }
+
+    function removeLayers(ids) {
+      targetLayers(ids).forEach(function (layer) {
+        dropHighlight(layer.id);
+        mapEl.map.remove(layer);
+        delete state.layers[layer.id];
+      });
+      hideTooltip();
     }
 
     function targetLayers(ids) {
@@ -257,7 +289,28 @@ HTMLWidgets.widget({
       }
     });
 
+    // arcgisViewChange fires throughout a pan or zoom animation, and each one
+    // would be a websocket message. Only the settled view is reported.
+    function reportView() {
+      if (state.viewTimer) clearTimeout(state.viewTimer);
+      state.viewTimer = setTimeout(function () {
+        var extent = mapEl.extent;
+        shinyInput(el, "view", {
+          zoom: mapEl.zoom,
+          center: mapEl.center
+            ? [mapEl.center.longitude, mapEl.center.latitude]
+            : null,
+          extent: extent ? extent.toJSON() : null,
+        });
+      }, 250);
+    }
+
+    // renderValue runs again on every re-render; listeners bound twice would
+    // send every event twice.
     function subscribeEvents() {
+      if (state.subscribed) return;
+      state.subscribed = true;
+
       mapEl.addEventListener("arcgisViewPointerMove", function (event) {
         updateHover(event.detail).catch(function (err) {
           if (err && err.name !== "AbortError") console.error(err);
@@ -277,16 +330,7 @@ HTMLWidgets.widget({
         });
       });
 
-      mapEl.addEventListener("arcgisViewChange", function () {
-        var extent = mapEl.extent;
-        shinyInput(el, "view", {
-          zoom: mapEl.zoom,
-          center: mapEl.center
-            ? [mapEl.center.longitude, mapEl.center.latitude]
-            : null,
-          extent: extent ? extent.toJSON() : null,
-        });
-      });
+      mapEl.addEventListener("arcgisViewChange", reportView);
 
       ["arcgisLoadError", "arcgisViewReadyError"].forEach(function (name) {
         mapEl.addEventListener(name, function (event) {
@@ -311,6 +355,7 @@ HTMLWidgets.widget({
     return {
       receiveMessage: async function (msg) {
         try {
+          await whenReady();
           var payload = JSON.parse(msg.payload);
           if (msg.method === "update") {
             assign(mapEl, {
@@ -321,11 +366,7 @@ HTMLWidgets.widget({
             });
             if (payload.layers) await addLayers(payload.layers);
           } else if (msg.method === "remove") {
-            targetLayers(payload.ids).forEach(function (layer) {
-              mapEl.map.remove(layer);
-              delete state.layers[layer.id];
-            });
-            hideTooltip();
+            removeLayers(payload.ids);
           } else if (msg.method === "layer") {
             targetLayers(payload.ids).forEach(function (layer) {
               assign(layer, payload.props);
@@ -345,6 +386,11 @@ HTMLWidgets.widget({
           }
         } catch (err) {
           console.error("arcgisMap proxy:", err);
+          shinyInput(el, "error", {
+            kind: "proxy",
+            method: msg.method,
+            detail: err && err.message ? err.message : String(err),
+          });
         }
       },
 
@@ -357,9 +403,12 @@ HTMLWidgets.widget({
             extent: x.extent,
           });
 
-          await mapEl.viewOnReady();
+          await whenReady();
           subscribeEvents();
 
+          // A re-render replaces the map's contents rather than adding to
+          // whatever the previous one left behind.
+          removeLayers(null);
           var layers = await addLayers(x.layers || []);
 
           if (!x.center && !x.extent) await frameLayers(mapEl, layers);

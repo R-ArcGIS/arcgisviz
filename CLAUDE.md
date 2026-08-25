@@ -464,7 +464,10 @@ neither should be hand-rolled: `FeatureSet.fromJSON()` (Esri feature JSON ->
 (`ILayer`, `rest-js-types.d.ts:1324`).
 
 `viewOnReady()` gates everything - `mapEl.map` is not there before it
-resolves, so layers are added after.
+resolves, so layers are added after. **Proxy messages await the same promise**
+(`whenReady()`, memoized in the factory): an observer that fires on app start
+can reach the widget before `renderValue()` has finished, and without the gate
+it lands on an undefined `mapEl.map`.
 
 **A map renderer resolves per feature against the layer**, so the
 `uniqueValue` branch that charts can only reach while aggregating is always
@@ -527,9 +530,18 @@ with a `method` discriminator (`update`, `remove`, `layer`, `filter`,
 `set_filter()` on a map is the layer's `definitionExpression`;
 `set_selection()` is `layerView.highlight()`, whose handle has to be kept per
 layer and removed before the next one. Events become
-`input$<id>_click`/`_hover`/`_view`/`_screenshot`, plus `_error`. `_hover`
-only fires when the feature under the pointer *changes* - every pointer move
-would otherwise be a websocket message.
+`input$<id>_click`/`_hover`/`_view`/`_screenshot`, plus `_error` carrying a
+`kind` (`arcgisLoadError`, `arcgisViewReadyError`, or `"proxy"` with the
+failing `method` - a proxy message that throws reports itself rather than
+dying in the console).
+
+**Three event rules, all about not flooding the websocket or double-binding.**
+`_hover` fires only when the feature under the pointer *changes*. `_view` is
+debounced 250ms, because `arcgisViewChange` fires throughout a pan or zoom
+animation. And `subscribeEvents()` is guarded by `state.subscribed`:
+`renderValue()` runs again on every re-render, and listeners bound twice send
+every event twice. A re-render also clears the layers the previous one left
+behind (`removeLayers(null)`) rather than adding to them.
 
 ## Deliberately deferred (don't "fix" these without asking)
 

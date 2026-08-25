@@ -164,9 +164,18 @@ crosses the wire twice**.
 `set_filter()` is the layer's `definitionExpression`; `set_selection()` is
 `layerView.highlight()`, whose handle must be kept per layer and removed
 before the next one. Events become `input$<id>_click`/`_hover`/`_view`/
-`_screenshot`, plus `_error`. `_hover` fires only when the feature under the
-pointer *changes* - every pointer move would otherwise be a websocket
-message.
+`_screenshot`, plus `_error` carrying a `kind` - including `"proxy"`, which a
+failing proxy message reports itself rather than dying in the console.
+
+**Every proxy message awaits `whenReady()`** (the memoized `viewOnReady()`
+promise): an observer firing on app start reaches the widget before
+`renderValue()` is done, and `mapEl.map` is undefined until the view resolves.
+
+Three rules keep the event stream sane: `_hover` fires only when the feature
+under the pointer *changes*, `_view` is debounced 250ms because
+`arcgisViewChange` fires throughout an animation, and `subscribeEvents()` is
+guarded by `state.subscribed` because `renderValue()` runs again on every
+re-render.
 
 ## Verifying a change (no browser available here)
 
