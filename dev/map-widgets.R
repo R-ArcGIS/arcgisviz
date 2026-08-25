@@ -41,6 +41,15 @@ arc_map("gray-vector") |>
   add_widget("search") |>
   add_widget("home")
 
+# A panel widget covers the map it explains. `expand` collapses it behind a
+# button instead. Two of them in one corner close each other when opened, so
+# the map is never hidden by both at once.
+arc_map() |>
+  add_layer(nc, color = BIR74, palette = "Orange 5", name = "Births, 1974") |>
+  add_widget("legend", position = "top-right", expand = TRUE) |>
+  add_widget("basemap-gallery", position = "top-right", expand = TRUE) |>
+  add_widget("layer-list", position = "top-right", expand = TRUE)
+
 # Adding the same widget twice replaces it, so a pipeline can override an
 # earlier choice - and so re-running one through a proxy is idempotent.
 arc_map() |>
