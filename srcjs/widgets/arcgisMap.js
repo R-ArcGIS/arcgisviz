@@ -200,7 +200,6 @@ var COMPONENTS = {
   "arcgis-compass": function () {
     return import("@arcgis/map-components/components/arcgis-compass");
   },
-<<<<<<< HEAD
   "arcgis-distance-measurement-2d": function () {
     return import(
       "@arcgis/map-components/components/arcgis-distance-measurement-2d"
@@ -208,10 +207,9 @@ var COMPONENTS = {
   },
   "arcgis-editor": function () {
     return import("@arcgis/map-components/components/arcgis-editor");
-=======
+  },
   "arcgis-expand": function () {
     return import("@arcgis/map-components/components/arcgis-expand");
->>>>>>> feat/map-widgets
   },
   "arcgis-coordinate-conversion": function () {
     return import(
@@ -476,11 +474,26 @@ HTMLWidgets.widget({
         removeWidgets([spec.component]);
         var node = document.createElement(spec.component);
         assign(node, spec.props || {});
-<<<<<<< HEAD
-        mapEl.appendChild(node);
-        state.widgets[spec.component] = node;
+        var mounted = spec.expand ? await expandWrapper(spec, node) : node;
+        mounted.slot = spec.position;
+        mapEl.appendChild(mounted);
+
+        // The wrapper is what a later remove takes off the map; the
+        // component inside is what reports back.
+        state.widgets[spec.component] = mounted;
         subscribeWidget(spec.component, node);
       }
+    }
+
+    // A collapsed widget is arcgis-expand with the component in its default
+    // slot. Expands sharing a corner share a group, so opening one closes the
+    // other - Esri's own pattern (arcgis-expand/customElement.d.ts:126).
+    async function expandWrapper(spec, node) {
+      await COMPONENTS["arcgis-expand"]();
+      var wrapper = document.createElement("arcgis-expand");
+      wrapper.group = spec.position;
+      wrapper.appendChild(node);
+      return wrapper;
     }
 
     // Only the tools have anything to report. Everything else on the map is
@@ -575,27 +588,6 @@ HTMLWidgets.widget({
           features: set ? JSON.stringify(set.toJSON()) : null,
         });
       });
-=======
-
-        var mounted = spec.expand ? await expandWrapper(spec, node) : node;
-        mounted.slot = spec.position;
-        mapEl.appendChild(mounted);
-
-        // The wrapper is what a later remove has to take off the map.
-        state.widgets[spec.component] = mounted;
-      }
-    }
-
-    // A collapsed widget is arcgis-expand with the component in its default
-    // slot. Expands sharing a corner share a group, so opening one closes the
-    // other - Esri's own pattern (arcgis-expand/customElement.d.ts:126).
-    async function expandWrapper(spec, node) {
-      await COMPONENTS["arcgis-expand"]();
-      var wrapper = document.createElement("arcgis-expand");
-      wrapper.group = spec.position;
-      wrapper.appendChild(node);
-      return wrapper;
->>>>>>> feat/map-widgets
     }
 
     function removeWidgets(components) {

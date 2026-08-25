@@ -92,7 +92,6 @@ test_that("map_widgets() lists every widget with what it takes", {
   expect_true("legendStyle" %in% widgets$properties[[1]])
 })
 
-<<<<<<< HEAD
 test_that("an array property stays an array with one element", {
   map <- add_widget(arc_map(), "sketch", available_create_tools = "polygon")
 
@@ -139,7 +138,8 @@ test_that("arc_sf() reads an event's features and shrugs at an empty one", {
 
   expect_null(arc_sf(list(action = "delete", count = 0, features = NULL)))
   expect_null(arc_sf(list()))
-=======
+})
+
 test_that("expand wraps a widget and is only sent when asked for", {
   plain <- as_widget_specs(add_widget(arc_map(), "basemap-gallery"))[[1]]
   expect_false("expand" %in% names(plain))
@@ -174,5 +174,4 @@ test_that("a collapsed widget survives the proxy path too", {
     opts = yyjsonr::opts_read_json(arr_of_objs_to_df = FALSE)
   )
   expect_true(payload$widgets[[1]]$expand)
->>>>>>> feat/map-widgets
 })
