@@ -38,5 +38,4 @@ set_view(map, center = NULL, zoom = NULL, extent = NULL)
 
 ``` r
 set_view(arc_map(), center = c(-98.3, 38.2), zoom = 4)
-#> Error in `method(as_widget, arcgisviz::ArcMap)`(x = <object>, width = NULL,     height = NULL, element_id = NULL): `x` has no layers to render.
 ```

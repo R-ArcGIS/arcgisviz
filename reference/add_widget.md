@@ -63,5 +63,4 @@ flushes. `remove_widget()` takes one off again.
 arc_map() |>
   add_widget("legend") |>
   add_widget("layer-list", position = "top-right", show_filter = TRUE)
-#> Error in `method(as_widget, arcgisviz::ArcMap)`(x = <object>, width = NULL,     height = NULL, element_id = NULL): `x` has no layers to render.
 ```

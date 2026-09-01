@@ -1,0 +1,3 @@
+# WebChartGaugeFixedProgressBands
+
+WebChartGaugeFixedProgressBands

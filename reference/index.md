@@ -27,6 +27,14 @@ and
   : Box plot
 - [`arc_heat()`](http://r.esri.com/arcgisviz/reference/arc_heat.md) :
   Heat chart
+- [`arc_pie()`](http://r.esri.com/arcgisviz/reference/arc_pie.md)
+  [`set_pie()`](http://r.esri.com/arcgisviz/reference/arc_pie.md) : Pie
+  chart
+- [`arc_radar()`](http://r.esri.com/arcgisviz/reference/arc_radar.md) :
+  Radar chart
+- [`arc_gauge()`](http://r.esri.com/arcgisviz/reference/arc_gauge.md)
+  [`set_gauge()`](http://r.esri.com/arcgisviz/reference/arc_gauge.md) :
+  Gauge
 - [`ArcChart()`](http://r.esri.com/arcgisviz/reference/ArcChart.md) : A
   chart specification
 
@@ -52,7 +60,8 @@ Bind columns and text to a chart.
 
 ## Scales and orientation
 
-How the axes are scaled and which way the chart is drawn.
+How the axes are scaled, which way the chart is drawn, and how its
+groups are keyed.
 
 - [`set_axis()`](http://r.esri.com/arcgisviz/reference/set_axis.md) :
   Set an axis
@@ -60,6 +69,8 @@ How the axes are scaled and which way the chart is drawn.
   : Swap a chart's axes
 - [`set_position()`](http://r.esri.com/arcgisviz/reference/set_position.md)
   : Arrange grouped bars and lines
+- [`set_legend()`](http://r.esri.com/arcgisviz/reference/set_legend.md)
+  : Position or hide a chart's legend
 
 ## Maps
 
@@ -188,8 +199,6 @@ data, and read back what the reader did to it.
   : Read a map selection
 - [`arc_sf()`](http://r.esri.com/arcgisviz/reference/arc_sf.md) : Read
   what was drawn or edited on a map
-- [`set_legend()`](http://r.esri.com/arcgisviz/reference/set_legend.md)
-  : Control a rendered chart's legend
 - [`set_layer()`](http://r.esri.com/arcgisviz/reference/set_layer.md)
   [`remove_layer()`](http://r.esri.com/arcgisviz/reference/set_layer.md)
   : Show, hide, or fade a layer that is already drawn
@@ -215,8 +224,16 @@ for you by the functions above.
   WebBoxPlot
 - [`WebHeatChart`](http://r.esri.com/arcgisviz/reference/WebHeatChart.md)
   : WebHeatChart
+- [`WebGaugeChart`](http://r.esri.com/arcgisviz/reference/WebGaugeChart.md)
+  : WebGaugeChart
+- [`WebRadarChart`](http://r.esri.com/arcgisviz/reference/WebRadarChart.md)
+  : WebRadarChart
 - [`WebChartAxis()`](http://r.esri.com/arcgisviz/reference/WebChartAxis.md)
   : WebChartAxis
+- [`WebChartGaugeAxis`](http://r.esri.com/arcgisviz/reference/WebChartGaugeAxis.md)
+  : WebChartGaugeAxis
+- [`WebChartRadarChartAxis`](http://r.esri.com/arcgisviz/reference/WebChartRadarChartAxis.md)
+  : WebChartRadarChartAxis
 - [`WebChartAxisScrollBar()`](http://r.esri.com/arcgisviz/reference/WebChartAxisScrollBar.md)
   : WebChartAxisScrollBar
 - [`WebChartCursorCrosshair()`](http://r.esri.com/arcgisviz/reference/WebChartCursorCrosshair.md)
@@ -227,6 +244,8 @@ for you by the functions above.
   : WebChartGuide
 - [`WebChartLegend()`](http://r.esri.com/arcgisviz/reference/WebChartLegend.md)
   : WebChartLegend
+- [`WebChartPieChartLegend`](http://r.esri.com/arcgisviz/reference/WebChartPieChartLegend.md)
+  : WebChartPieChartLegend
 - [`WebChartNullCategory()`](http://r.esri.com/arcgisviz/reference/WebChartNullCategory.md)
   : WebChartNullCategory
 - [`WebChartOverlay()`](http://r.esri.com/arcgisviz/reference/WebChartOverlay.md)
@@ -267,6 +286,10 @@ One class per chart type, plus the query that feeds it.
   : WebChartBoxPlotSeries
 - [`WebChartHeatChartSeries`](http://r.esri.com/arcgisviz/reference/WebChartHeatChartSeries.md)
   : WebChartHeatChartSeries
+- [`WebChartPieChartSeries`](http://r.esri.com/arcgisviz/reference/WebChartPieChartSeries.md)
+  : WebChartPieChartSeries
+- [`WebChartGaugeSeries`](http://r.esri.com/arcgisviz/reference/WebChartGaugeSeries.md)
+  : WebChartGaugeSeries
 - [`WebChartSeriesQuery()`](http://r.esri.com/arcgisviz/reference/WebChartSeriesQuery.md)
   : WebChartSeriesQuery
 - [`WebChartTemporalBinning()`](http://r.esri.com/arcgisviz/reference/WebChartTemporalBinning.md)
@@ -312,6 +335,28 @@ continuous colour and a unique value renderer covers categories.
   : IUniqueValueInfo
 - [`ILegendOptions`](http://r.esri.com/arcgisviz/reference/ILegendOptions.md)
   : ILegendOptions
+
+## Pie slices and gauge dials
+
+The parts only these two types have: a pie’s slices and their ticks, a
+gauge’s needle and its progress bands.
+
+- [`WebChartPieChartSlice`](http://r.esri.com/arcgisviz/reference/WebChartPieChartSlice.md)
+  : WebChartPieChartSlice
+- [`WebChartPieChartGroupSlice`](http://r.esri.com/arcgisviz/reference/WebChartPieChartGroupSlice.md)
+  : WebChartPieChartGroupSlice
+- [`WebChartPieChartTick`](http://r.esri.com/arcgisviz/reference/WebChartPieChartTick.md)
+  : WebChartPieChartTick
+- [`WebChartNeedle`](http://r.esri.com/arcgisviz/reference/WebChartNeedle.md)
+  : WebChartNeedle
+- [`WebChartGaugeAxisTick`](http://r.esri.com/arcgisviz/reference/WebChartGaugeAxisTick.md)
+  : WebChartGaugeAxisTick
+- [`WebChartGaugeFixedProgressBands`](http://r.esri.com/arcgisviz/reference/WebChartGaugeFixedProgressBands.md)
+  : WebChartGaugeFixedProgressBands
+- [`WebChartGaugeFixedProgressBandsBands`](http://r.esri.com/arcgisviz/reference/WebChartGaugeFixedProgressBandsBands.md)
+  : WebChartGaugeFixedProgressBandsBands
+- [`ValueConversion`](http://r.esri.com/arcgisviz/reference/ValueConversion.md)
+  : ValueConversion
 
 ## Symbols and colour
 
@@ -362,6 +407,8 @@ single property of the classes above.
 
 - [`ModelTypes()`](http://r.esri.com/arcgisviz/reference/ModelTypes.md)
   : ModelTypes
+- [`GaugeChartSubTypes()`](http://r.esri.com/arcgisviz/reference/GaugeChartSubTypes.md)
+  : GaugeChartSubTypes
 - [`IFeatureLayerFeatureCollectionType()`](http://r.esri.com/arcgisviz/reference/IFeatureLayerFeatureCollectionType.md)
   : IFeatureLayerFeatureCollectionType
 - [`Basemaps()`](http://r.esri.com/arcgisviz/reference/Basemaps.md) :
@@ -398,6 +445,8 @@ single property of the classes above.
   : WebChartLegendPositions
 - [`WebChartNullPolicyTypes()`](http://r.esri.com/arcgisviz/reference/WebChartNullPolicyTypes.md)
   : WebChartNullPolicyTypes
+- [`WebChartRadarChartAxisLabelsOrientation()`](http://r.esri.com/arcgisviz/reference/WebChartRadarChartAxisLabelsOrientation.md)
+  : WebChartRadarChartAxisLabelsOrientation
 - [`WebChartQuerySpatialRelationship()`](http://r.esri.com/arcgisviz/reference/WebChartQuerySpatialRelationship.md)
   : WebChartQuerySpatialRelationship
 - [`WebChartSortOrderKinds()`](http://r.esri.com/arcgisviz/reference/WebChartSortOrderKinds.md)

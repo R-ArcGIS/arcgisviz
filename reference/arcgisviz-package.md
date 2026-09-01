@@ -1,6 +1,11 @@
-# arcgisviz: What the Package Does (One Line, Title Case)
+# arcgisviz: Interactive Charts and Maps with the 'ArcGIS Maps SDK'
 
-What the package does (one paragraph).
+Build interactive charts and maps from data frames and simple feature
+objects using the 'ArcGIS Maps SDK for JavaScript'. Charts are described
+with a grammar of graphics style pipeline and render as htmlwidgets, so
+they work in the viewer, in 'Quarto' documents, and in 'shiny'
+applications. Data travels to the browser as a client side feature
+collection, so no feature service is required.
 
 ## See also
 
@@ -10,8 +15,10 @@ Useful links:
 
 ## Author
 
-**Maintainer**: First Last <first.last@example.com>
+**Maintainer**: Josiah Parry <josiah.parry@gmail.com>
+([ORCID](https://orcid.org/0000-0001-9910-865X))
 
 Authors:
 
-- First Last <first.last@example.com>
+- Josiah Parry <josiah.parry@gmail.com>
+  ([ORCID](https://orcid.org/0000-0001-9910-865X))

@@ -18,7 +18,8 @@ set_type(chart, type)
 - type:
 
   Defines which series the chart draws. One of `"bar"`, `"scatter"`,
-  `"line"`, `"histogram"`, `"boxplot"`, or `"heat"`.
+  `"line"`, `"histogram"`, `"boxplot"`, `"heat"`, `"pie"`, `"radar"`, or
+  `"gauge"`.
 
 ## Value
 

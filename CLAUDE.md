@@ -120,40 +120,50 @@ see below), marker size
 ([`set_size()`](http://r.esri.com/arcgisviz/reference/set_size.md)),
 hover text
 ([`set_tooltip()`](http://r.esri.com/arcgisviz/reference/set_tooltip.md)),
-and scales
-([`set_axis()`](http://r.esri.com/arcgisviz/reference/set_axis.md)/[`set_flipped()`](http://r.esri.com/arcgisviz/reference/set_flipped.md)/[`set_position()`](http://r.esri.com/arcgisviz/reference/set_position.md)).
-Six chart types are modeled: bar, line, scatter, histogram, box plot,
-and heat (plus combo bar-line for free). Pie, gauge, and radar are not.
-On top of that sits a Shiny layer (`R/arc-proxy.R`):
+scales
+([`set_axis()`](http://r.esri.com/arcgisviz/reference/set_axis.md)/[`set_flipped()`](http://r.esri.com/arcgisviz/reference/set_flipped.md)/[`set_position()`](http://r.esri.com/arcgisviz/reference/set_position.md)),
+and the legend
+([`set_legend()`](http://r.esri.com/arcgisviz/reference/set_legend.md),
+see below). All nine chart types the spec defines are modeled: bar,
+line, scatter, histogram, box plot, heat, pie, radar, and gauge (plus
+combo bar-line for free). On top of that sits a Shiny layer
+(`R/arc-proxy.R`):
 [`arc_proxy()`](http://r.esri.com/arcgisviz/reference/ArcProxy.md)
 returns an `ArcChart` subclass, so every `set_*()` works on a rendered
 chart, and
 [`arc_update()`](http://r.esri.com/arcgisviz/reference/arc_update.md)
-flushes.
-[`set_legend()`](http://r.esri.com/arcgisviz/reference/set_legend.md)
-exists on the proxy only - `WebChart$legend` is still modeled-but-unset
-on the `ArcChart` side, which grouped charts make worth closing.
-Alongside all of that, and sharing its renderer and palette code but
-almost nothing else, sits a second widget: `arc_map() |> add_layer()`
-draws an `sf` object on `<arcgis-map>` as a client side feature layer
-(`R/arc-map.R`, `srcjs/widgets/arcgisMap.js`), with hover tooltips
-(`add_layer(tooltip =)`) and its own Shiny proxy (`R/arc-map-proxy.R`).
+flushes. Alongside all of that, and sharing its renderer and palette
+code but almost nothing else, sits a second widget:
+`arc_map() |> add_layer()` draws an `sf` object on `<arcgis-map>` as a
+client side feature layer (`R/arc-map.R`, `srcjs/widgets/arcgisMap.js`),
+with hover tooltips (`add_layer(tooltip =)`) and its own Shiny proxy
+(`R/arc-map-proxy.R`).
 
-Two shapes worth knowing before adding a seventh chart type.
+Three shapes worth knowing before touching a chart type.
 `chart_type_map` (`R/arc-chart.R`) carries `config_class`, `has_y`,
-`aggregates`, `tooltip_fields`, `splits`, `stacks`, and `sizes` per
-type, and `build_webchart()` reads them rather than branching on the
-type name. Chart types whose spec defines a `WebChart` subtype get it as
-a real S7 subclass (`WebBoxPlot`, `WebHeatChart`), which is how they
-inherit the `as_vector()` method that drops unset properties. And
-**every axis must carry `type = "chartAxis"`**: `deepMerge()` maps over
-the source array (`srcjs/widgets/arcgisChart.js:24`), so an axis that
-compacts away to nothing shortens `axes` and deletes one of the model’s
-own.
+`aggregates`, `tooltip_fields`, `splits`, `stacks`, `sizes`,
+`legend_ramp`, `axis_count`, `axis_class`, and `value_on_x` per type,
+and `build_webchart()` reads them rather than branching on the type
+name. Chart types whose spec defines a `WebChart` subtype get it as a
+real S7 subclass (`WebBoxPlot`, `WebHeatChart`, `WebGaugeChart`,
+`WebRadarChart`), which is how they inherit the `as_vector()` method
+that drops unset properties. And **every axis must carry
+`type = "chartAxis"`**: `deepMerge()` maps over the source array
+(`srcjs/widgets/arcgisChart.js:24`), so an axis that compacts away to
+nothing shortens `axes` and deletes one of the model’s own.
+
+**The axis *count* has to match the model’s too**, for the same reason,
+and it is not two everywhere: a gauge has one (`ce()`,
+`dist/chunks/index.js:463`) and a pie has none at all - `tt()` (`:765`)
+is the one default config that omits the key. `chart_axes()` reads
+`axis_count`, and `axis_class` swaps in the subtype a gauge’s axis
+needs.
 
 Options that belong to one chart type get a `set_<type>()` function
 ([`set_histogram()`](http://r.esri.com/arcgisviz/reference/arc_histogram.md),
-[`set_boxplot()`](http://r.esri.com/arcgisviz/reference/arc_boxplot.md))
+[`set_boxplot()`](http://r.esri.com/arcgisviz/reference/arc_boxplot.md),
+[`set_pie()`](http://r.esri.com/arcgisviz/reference/arc_pie.md),
+[`set_gauge()`](http://r.esri.com/arcgisviz/reference/arc_gauge.md))
 whose arguments are also arguments on the `arc_<type>()` shortcut, both
 documented in one Rd via `@rdname`. Not one exported function per
 property - that contradicts
@@ -417,6 +427,100 @@ those be scalar columns rather than list ones: every ramp carries
 is the full vocabulary. It builds the frame with
 [`arcgisutils::data_frame()`](https://rdrr.io/pkg/arcgisutils/man/utilities.html),
 which adds a `tbl` class for printing without pulling in tibble.
+
+## Pie, radar, and gauge: three types, three different shapes
+
+**A radar chart is a line chart.** The spec declares
+`WebChartRadarChartSeries = WebChartLineChartSeries<"radarSeries">`
+(`web-chart.d.ts:1236`) - the same interface with a different `type` -
+and `k()` (`dist/chunks/index2.js:601`) routes `RadarSeries` through
+`ga()`, the bar/line subtype detection. So `chart_type_map$radar` reuses
+`WebChartLineChartSeries` outright, aggregates and splits exactly as a
+line does, and needs no series class of its own. It does not stack, like
+everything except bar and line.
+
+Its **axes go untitled** (`chart_type_map$untitled_axes`), because
+`k()`/`B()` (`chunks/index.js:243`, `:222`) centre an axis title inside
+its own axis - on a circular one, the middle of the plot.
+`build_webchart()` sends `""` rather than nothing, to blank the client’s
+own localized default;
+[`set_labs()`](http://r.esri.com/arcgisviz/reference/set_labs.md) still
+wins, and the series keeps its `axis_lab()` name so the legend entry is
+unaffected.
+
+**A pie is a bar chart with no axes.** `ya()` (`index2.js:589`) reads
+the same query shape `ga()` does - no `outStatistics` is
+`PieNoAggregation`, grouped statistics is `PieFromCategory` - so `stat`
+works unchanged and `series_as_vector()`’s `query: null` is just as
+necessary. There is no split-by subtype, so colour stays per slice
+through `chartRenderer`. What is different: **no `axes` key at all**,
+and `Zc()` puts pie with heat in the “always has a legend” set.
+
+**A gauge is neither.** It draws one number, so:
+
+- The value rides **`x`**, not `y` (`u()`, `chunks/gauge-model.js:70`),
+  and under aggregation `x` must *equal* the statistic’s
+  `outStatisticFieldName`. `chart_type_map$value_on_x` is what routes
+  [`set_x()`](http://r.esri.com/arcgisviz/reference/set_x.md) there.
+- Its query groups by **nothing** (`ue()`, `:47`). A
+  `groupByFieldsForStatistics` would return a row per group instead of
+  the single reading, which is why `series_aggregation(group =)` exists.
+- One axis, carrying the needle, and `set_axis("x")` is it - so a
+  gauge’s scale needs no `min`/`max` arguments of its own.
+- `subType` picks the source: `statisticGauge` (the default) reduces the
+  whole layer, `featureGauge` reads one row by `featureIndex`.
+  `set_gauge(feature =)` switches to the latter and clears `stat`; **R
+  counts rows from one and the spec indexes from zero**.
+- [`set_color()`](http://r.esri.com/arcgisviz/reference/set_color.md)
+  **errors** on a gauge rather than building a renderer nothing
+  resolves - one reading has no marks for a scale to vary.
+
+## The legend (`set_legend()`), and why `visible = TRUE` can be an error
+
+**The client decides whether a chart has a legend at all, and the config
+cannot argue.** `Zc()` (`chunks/index3.js:654`) answers “is there
+anything to key”: heat and pie always, bar/line/combo/radar/box plot
+only past one series, scatter/histogram only with an overlay whose
+`created` is true. Then
+`showLegend = Zc(series) && legend !== undefined && legend.visible !== false`
+(`customElement.js:12080`). So `visible: true` on a single-series bar
+chart is read and discarded - **`chart_legend()` must not re-implement
+`Zc()`, it must respect it**. It sends a `legend` only where one was
+asked for, and `check_legend()` errors on a `visible = TRUE` the client
+would ignore, the same call
+[`set_position()`](http://r.esri.com/arcgisviz/reference/set_position.md)
+makes for unstackable types.
+
+That error fires from `build_webchart()`, not from the setter, because
+whether a chart is grouped depends on a
+[`set_color()`](http://r.esri.com/arcgisviz/reference/set_color.md) that
+may come after - same as `color_renderer()`’s “must be a grouping
+column” error.
+
+Every default config ships a *visible* legend (`b()`,
+`dist/chunks/index.js:262`: `visible: true`, empty but visible title,
+`position: right`), so hiding one that does render means an explicit
+`visible: false`; an absent key leaves it showing.
+
+Two smaller consequences. An unsplit series is named after what it plots
+(`axis_lab(labs$y, y_label)`, so `"mean(body_mass)"`) rather than
+`"series1"` - which surfaces once a scatter or histogram overlay gives
+that one series a legend. `split_series()` still renames each of its own
+after its level, and `tooltip_payload()` is unaffected because an
+unsplit lookup is keyed `"*"`. And a title built here sets its own
+`visible`: the client’s text setter (`P()`,
+`chunks/data-labels-visibility.js:25`) writes `title.content.text`
+without touching `title.visible`, so a title merged over a config with
+no legend yet would otherwise be invisible.
+
+[`set_legend()`](http://r.esri.com/arcgisviz/reference/set_legend.md) is
+an `ArcChart` setter like every other, **not a proxy method**. It used
+to write the model’s `legendVisibility`/`legendPosition`/
+`legendTitleText` accessors and existed on `ArcProxy` alone; those
+accessors mutate the same `_config`, so the property covers both paths
+and the proxy inherits it. Its old `position` vocabulary was wrong
+anyway - `leading`/ `trailing` are not `WebChartLegendPositions`, which
+is `right`/`left`/`top`/`bottom`.
 
 ## Tooltips (`set_tooltip()`), and why they take two paths
 
@@ -778,11 +882,15 @@ rather than adding to them.
 - **Geometry types** (`IPoint`/`IPolygon`/etc.) - handled elsewhere, not
   modeled in this package’s type registry.
   `WebChartDataFilters$geometry` stays `class_any`.
-- **Pie, gauge, and radar series shapes** - `web-chart.d.ts` has all of
-  these in one file, so adding one is reading the relevant interface(s)
-  there and following the `arcgis-spec-types` skill’s conventions plus
-  the `chart_type_map` notes above. Not blocked on anything, just not
-  done yet.
+- **A pie’s `slices` and a gauge’s progress bands.** Both are modeled
+  (`WebChartPieChartSlice`, `WebChartGaugeFixedProgressBands`) and
+  nothing sets them: per-slice styling duplicates what
+  [`set_color()`](http://r.esri.com/arcgisviz/reference/set_color.md)
+  already does, and progress bands replace the axis guides this package
+  doesn’t build either. `sliceGrouping` (fold slices under N% into one
+  “Other”) is the one with no equivalent, and is worth a
+  [`set_pie()`](http://r.esri.com/arcgisviz/reference/arc_pie.md)
+  argument when asked for.
 - **Calendar heat charts.** `WebChartCalendarDatePartsBinning` is
   modeled but nothing sets it. A heat series with `xTemporalBinning`
   takes the client’s calendar branch instead of the matrix one (`Te()`,

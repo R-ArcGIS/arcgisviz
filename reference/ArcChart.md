@@ -18,6 +18,7 @@ ArcChart(
   size = list(),
   tooltip = character(0),
   axes = list(),
+  legend = list(),
   flipped = NA,
   position = NA_character_,
   series_opts = list(),
@@ -295,7 +296,7 @@ arc_col(df, species, mass)@webchart
 #>  ..  ..@ dataTooltipPercentFormat     : NULL
 #>  ..  ..@ dataTooltipDateFormat        : NULL
 #>  ..  ..@ dataTooltipFontSize          : num NA
-#>  ..  ..@ name                         : chr "series1"
+#>  ..  ..@ name                         : chr "mass"
 #>  ..  ..@ query                        : NULL
 #>  ..  ..@ x                            : chr "species"
 #>  ..  ..@ dataLabels                   : NULL

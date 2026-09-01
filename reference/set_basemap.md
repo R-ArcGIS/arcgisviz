@@ -27,5 +27,4 @@ set_basemap(map, basemap)
 
 ``` r
 set_basemap(arc_map(), "satellite")
-#> Error in `method(as_widget, arcgisviz::ArcMap)`(x = <object>, width = NULL,     height = NULL, element_id = NULL): `x` has no layers to render.
 ```

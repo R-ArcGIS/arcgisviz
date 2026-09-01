@@ -69,7 +69,5 @@ add_basemap_toggle(
 
 ``` r
 arc_map() |> add_basemap_gallery(expand = TRUE)
-#> Error in `method(as_widget, arcgisviz::ArcMap)`(x = <object>, width = NULL,     height = NULL, element_id = NULL): `x` has no layers to render.
 arc_map() |> add_basemap_toggle(next_basemap = "satellite")
-#> Error in `method(as_widget, arcgisviz::ArcMap)`(x = <object>, width = NULL,     height = NULL, element_id = NULL): `x` has no layers to render.
 ```

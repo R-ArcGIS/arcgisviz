@@ -67,5 +67,4 @@ set_highlight(
 ``` r
 arc_map() |>
   set_highlight(color = "orange", fill_opacity = 0.4)
-#> Error in `method(as_widget, arcgisviz::ArcMap)`(x = <object>, width = NULL,     height = NULL, element_id = NULL): `x` has no layers to render.
 ```

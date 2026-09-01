@@ -65,5 +65,4 @@ add_editor(
 
 ``` r
 arc_map() |> add_editor(position = "top-right")
-#> Error in `method(as_widget, arcgisviz::ArcMap)`(x = <object>, width = NULL,     height = NULL, element_id = NULL): `x` has no layers to render.
 ```
