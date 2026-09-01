@@ -67,3 +67,47 @@ test_that("the WebChart subtypes inherit their parent's properties and methods",
   # pick it up by inheritance or unset properties stop being dropped.
   expect_named(s7x::as_vector(heat), c("version", "type", "title"))
 })
+
+test_that("the pie, gauge, and radar classes construct minimally", {
+  expect_true(is.na(WebChartPieChartSeries(type = "pieSeries")@innerRadius))
+  expect_null(WebChartPieChartSeries(type = "pieSeries")@ticks)
+  expect_true(is.na(WebChartPieChartTick(type = "pieTick")@visible))
+  expect_true(is.na(WebChartPieChartSlice()@label))
+  expect_true(is.na(WebChartPieChartGroupSlice()@percentageThreshold))
+
+  expect_true(is.na(WebChartGaugeSeries(type = "gaugeSeries")@featureIndex))
+  expect_true(is.na(ValueConversion()@factor))
+  expect_true(is.na(WebChartNeedle(type = "gaugeNeedle")@displayPin))
+  expect_true(is.na(WebChartGaugeAxisTick(type = "gaugeAxisTick")@visible))
+  expect_null(WebChartGaugeFixedProgressBands(type = "fixed")@bands)
+  expect_null(WebChartGaugeFixedProgressBandsBands()@target)
+
+  expect_true(is.na(
+    WebChartRadarChartAxis(type = "chartAxis")@labelsOrientation@value
+  ))
+})
+
+test_that("the pie legend and the three new subtypes inherit their parents", {
+  # WebChartPieChartLegend extends WebChartLegend (web-chart.d.ts:143), so
+  # WebChart$legend takes it without widening the union.
+  legend <- WebChartPieChartLegend(
+    type = "chartLegend",
+    displayPercentage = TRUE
+  )
+  expect_true(S7::S7_inherits(legend, WebChartLegend))
+  expect_true(WebChart(legend = legend)@legend@displayPercentage)
+
+  gauge <- WebGaugeChart(version = "25.1.0", type = "chart", series = list())
+  expect_true(S7::S7_inherits(gauge, WebChart))
+  expect_true(is.na(gauge@subType@value))
+  expect_named(s7x::as_vector(gauge), c("version", "type", "title"))
+
+  radar <- WebRadarChart(version = "25.1.0", type = "chart", series = list())
+  expect_true(S7::S7_inherits(radar, WebChart))
+  expect_named(s7x::as_vector(radar), c("version", "type", "title"))
+
+  # A gauge axis is a WebChartAxis, so set_axis()'s options apply to it.
+  axis <- WebChartGaugeAxis(type = "chartAxis", minimum = 0, maximum = 100)
+  expect_true(S7::S7_inherits(axis, WebChartAxis))
+  expect_identical(axis@maximum, 100)
+})

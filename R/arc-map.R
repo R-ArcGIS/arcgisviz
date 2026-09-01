@@ -579,10 +579,6 @@ S7::method(as_widget, ArcMap) <- function(
   height = NULL,
   element_id = NULL
 ) {
-  if (rlang::is_empty(x@layers)) {
-    cli::cli_abort("{.arg x} has no layers to render.")
-  }
-
   call <- rlang::caller_env()
   layers <- lapply(seq_along(x@layers), function(i) {
     map_feature_layer(x@layers[[i]], i, call)

@@ -15,3 +15,9 @@
 ^pkgdown$
 ^\.github$
 ^LICENSE\.md$
+^CLAUDE\.md$
+^README\.qmd$
+^dev-docs$
+^jarl\.toml$
+^\.pre-commit-config\.yaml$
+^\.gitsv$

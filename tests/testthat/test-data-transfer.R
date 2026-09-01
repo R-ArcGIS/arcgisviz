@@ -7,6 +7,14 @@ test_df <- function() {
   data.frame(category = c("a", "b", "c"), value = c(1, 5, 3))
 }
 
+grouped_df <- function() {
+  data.frame(
+    category = c("a", "a", "b", "b"),
+    grp = c("x", "y", "x", "y"),
+    value = c(1, 2, 3, 4)
+  )
+}
+
 test_that("as_feature_layer() produces the IFeatureLayer shape createModel reads", {
   lyr <- as_feature_layer(test_df())
 
@@ -906,5 +914,210 @@ test_that("position is refused by the chart types that cannot stack", {
   expect_error(
     arc_histogram(test_df(), value) |> set_position("stack"),
     "Only .* charts stack"
+  )
+})
+
+test_that("the config carries a legend only where one was asked for", {
+  # Zc() (chunks/index3.js:654) gates the legend on the chart having entries,
+  # so R sends nothing and lets the client's own rule stand.
+  plain <- s7x::as_vector(arc_col(test_df(), category, value)@webchart)
+  expect_null(plain$legend)
+
+  # A series names itself in the legend, so an ungrouped one is named after
+  # what it plots rather than "series1".
+  expect_identical(plain$series[[1]]$name, "value")
+
+  split <- arc_bar(grouped_df(), category) |>
+    set_color(grp) |>
+    set_legend(visible = FALSE)
+  expect_false(s7x::as_vector(split@webchart)$legend$visible)
+})
+
+test_that("asking for a legend the client will not draw is an error", {
+  # Zc() returns false for one bar series, so `visible` would be read and
+  # then ignored (customElement.js:12080).
+  expect_error(
+    s7x::as_vector(
+      (arc_col(test_df(), category, value) |>
+        set_legend(visible = TRUE))@webchart
+    ),
+    "has none"
+  )
+
+  # Heat is one of the two types that always has a legend - the gradient
+  # itself (tf(), customElement.js:11062).
+  heat <- arc_heat(test_df(), category, value) |> set_legend(visible = TRUE)
+  expect_true(s7x::as_vector(heat@webchart)$legend$visible)
+
+  grouped <- arc_bar(grouped_df(), category) |>
+    set_color(grp) |>
+    set_legend(visible = TRUE)
+  expect_true(s7x::as_vector(grouped@webchart)$legend$visible)
+})
+
+test_that("set_legend() layers repeated calls and titles the legend", {
+  chart <- arc_bar(grouped_df(), category) |>
+    set_color(grp) |>
+    set_legend(position = "bottom") |>
+    set_legend(title = "Key")
+
+  legend <- s7x::as_vector(chart@webchart)$legend
+  expect_identical(legend$position, "bottom")
+  # The client's own text setter leaves `visible` alone (P(),
+  # chunks/data-labels-visibility.js:25), so the title says so itself.
+  expect_identical(legend$title$content$text, "Key")
+  expect_true(legend$title$visible)
+
+  expect_error(set_legend(chart, position = "sideways"), "must be one of")
+  expect_error(set_legend(chart, visible = "yes"), "must be")
+  expect_error(set_legend(chart, title = 1), "must be a single string")
+})
+
+test_that("a pie sends no axes and reads its subtype off the query", {
+  # tt() (chunks/index.js:765) is the one default config with no `axes` key,
+  # and deepMerge maps over the array, so sending a pair would add one.
+  counted <- s7x::as_vector(arc_pie(test_df(), category)@webchart)
+  expect_null(counted$axes)
+
+  # ya() (index2.js:589): grouped statistics is PieFromCategory.
+  query <- counted$series[[1]]$query
+  expect_identical(as.character(query$groupByFieldsForStatistics), "category")
+  expect_identical(counted$series[[1]]$y, "COUNT_OBJECT_ID_0")
+
+  # ...and an absent outStatistics is PieNoAggregation, which needs the
+  # explicit null that deletes the model's own default query.
+  plotted <- s7x::as_vector(arc_pie(test_df(), category, value)@webchart)
+  expect_identical(plotted$series[[1]]$query, json_null)
+  expect_identical(plotted$series[[1]]$y, "value")
+})
+
+test_that("set_pie() turns the pie into a doughnut and picks its labels", {
+  series <- s7x::as_vector(
+    arc_pie(
+      test_df(),
+      category,
+      hole = 60,
+      labels = c("category", "percent"),
+      inside = TRUE
+    )@webchart
+  )$series[[1]]
+
+  expect_identical(series$innerRadius, 60)
+  expect_true(series$dataLabelsInside)
+  # Naming one part turns the others off, so all three travel.
+  expect_true(series$displayCategoryOnDataLabel)
+  expect_false(series$displayNumericValueOnDataLabel)
+  expect_true(series$displayPercentageOnDataLabel)
+
+  expect_error(set_pie(arc_col(test_df(), category, value)), "only applies")
+  expect_error(arc_pie(test_df(), category, labels = "nope"), "must be one of")
+})
+
+test_that("a gauge reduces the layer to one value on `x`", {
+  cfg <- s7x::as_vector(arc_gauge(test_df(), value, stat = "mean")@webchart)
+
+  # ce() (chunks/index.js:463) builds exactly one axis.
+  expect_length(cfg$axes, 1)
+  expect_identical(cfg$axes[[1]]$title$content$text, "mean(value)")
+
+  # u() (gauge-model.js:70) reads the value off `x`, which under aggregation
+  # has to name the statistic's output field.
+  series <- cfg$series[[1]]
+  expect_identical(series$x, "AVG_VALUE_0")
+  expect_identical(
+    series$query$outStatistics[[1]]$outStatisticFieldName,
+    "AVG_VALUE_0"
+  )
+  # ue() groups by nothing - a group-by would return a row per group.
+  expect_null(series$query$groupByFieldsForStatistics)
+  expect_null(series$y)
+})
+
+test_that("set_gauge() reads one row verbatim and styles the dial", {
+  cfg <- s7x::as_vector(
+    arc_gauge(
+      test_df(),
+      value,
+      feature = 2,
+      hole = 30,
+      angles = c(-180, 180),
+      needle = FALSE
+    )@webchart
+  )
+
+  expect_identical(cfg$subType, "featureGauge")
+  expect_identical(cfg$innerRadius, 30)
+  expect_identical(cfg$startAngle, -180)
+  expect_identical(cfg$endAngle, 180)
+  # R counts rows from one, the spec indexes features from zero.
+  expect_identical(cfg$series[[1]]$featureIndex, 1)
+  expect_identical(cfg$series[[1]]$x, "value")
+  expect_identical(cfg$series[[1]]$query, json_null)
+  expect_false(cfg$axes[[1]]$needle$visible)
+
+  expect_error(arc_gauge(test_df(), value, feature = 0), "counting from 1")
+  expect_error(arc_gauge(test_df(), value, angles = 90), "two numbers")
+  # One reading has no marks for a scale to vary.
+  expect_error(
+    s7x::as_vector(
+      (arc_gauge(test_df(), value) |> set_color(category))@webchart
+    ),
+    "does not apply to gauge"
+  )
+})
+
+test_that("a radar chart is a line chart on a circular axis", {
+  cfg <- s7x::as_vector(arc_radar(test_df(), category, value)@webchart)
+
+  expect_identical(cfg$series[[1]]$type, "radarSeries")
+  expect_length(cfg$axes, 2)
+  # k() (index2.js:601) routes radar through ga(), so an unaggregated one
+  # still needs the null that deletes the default count query.
+  expect_identical(cfg$series[[1]]$query, json_null)
+
+  # ...and it splits the way a line does.
+  split <- arc_radar(grouped_df(), category, value) |>
+    set_stat("mean") |>
+    set_color(grp)
+  series <- s7x::as_vector(split@webchart)$series
+  expect_length(series, 2)
+  expect_identical(
+    vapply(series, function(s) s$query$where, character(1)),
+    c("grp='x'", "grp='y'")
+  )
+
+  # Only bar and line stack (web-chart.d.ts:1307).
+  expect_error(
+    set_position(arc_radar(test_df(), category, value)),
+    "does not apply"
+  )
+})
+
+test_that("a radar's axes go untitled so the title stays off the plot", {
+  # k() (chunks/index.js:253) centres an axis title inside its own axis,
+  # which on a circular one is the middle of the chart.
+  axes <- s7x::as_vector(arc_radar(test_df(), category, value)@webchart)$axes
+  for (axis in axes) {
+    expect_false(axis$title$visible)
+    expect_identical(axis$title$content$text, "")
+  }
+
+  # The series still names itself for the legend.
+  series <- s7x::as_vector(
+    arc_radar(test_df(), category, value)@webchart
+  )$series
+  expect_identical(series[[1]]$name, "value")
+
+  # set_labs() still wins, and no other type is affected.
+  titled <- arc_radar(test_df(), category, value) |> set_labs(y = "Mass")
+  expect_identical(
+    s7x::as_vector(titled@webchart)$axes[[2]]$title$content$text,
+    "Mass"
+  )
+  expect_identical(
+    s7x::as_vector(arc_line(test_df(), category, value)@webchart)$axes[[
+      1
+    ]]$title$content$text,
+    "category"
   )
 })

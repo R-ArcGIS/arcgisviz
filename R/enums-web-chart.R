@@ -148,3 +148,9 @@ WebChartCalendarDatePartsUnits <- s7x::new_enum(
     "quarterOfYear"
   )
 )
+
+#' @export
+WebChartRadarChartAxisLabelsOrientation <- s7x::new_enum(
+  "WebChartRadarChartAxisLabelsOrientation",
+  c("radial", "circular", "horizontal")
+)

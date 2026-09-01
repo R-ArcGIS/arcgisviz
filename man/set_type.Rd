@@ -10,7 +10,8 @@ set_type(chart, type)
 \item{chart}{Defines which chart to modify.}
 
 \item{type}{Defines which series the chart draws. One of \code{"bar"},
-\code{"scatter"}, \code{"line"}, \code{"histogram"}, \code{"boxplot"}, or \code{"heat"}.}
+\code{"scatter"}, \code{"line"}, \code{"histogram"}, \code{"boxplot"}, \code{"heat"}, \code{"pie"},
+\code{"radar"}, or \code{"gauge"}.}
 }
 \value{
 \code{chart}, with its series type set.

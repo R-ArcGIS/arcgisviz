@@ -316,8 +316,15 @@ test_that("a prebuilt layer already answers the aesthetic arguments", {
   expect_error(add_renderer(layer, "nope"), "ISimpleRenderer")
 })
 
+test_that("a basemap and its widgets render without any layers", {
+  widget <- as_widget(add_legend(arc_map("osm")))
+
+  expect_null(widget$x$layers)
+  expect_identical(widget$x$basemap, "osm")
+  expect_length(widget$x$widgets, 1L)
+})
+
 test_that("a map refuses what it cannot draw", {
-  expect_error(as_widget(arc_map()), "no layers")
   expect_error(arc_map("moon"), "must be one of")
   expect_error(set_basemap(arc_map(), "moon"), "must be one of")
   expect_error(set_view(arc_map(), center = 1), "two numbers")

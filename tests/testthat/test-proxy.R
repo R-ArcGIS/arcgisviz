@@ -85,17 +85,18 @@ test_that("object ids clear on an empty vector", {
   )
 })
 
-test_that("set_legend() writes model accessors", {
-  f <- fake_proxy()
-  set_legend(f$proxy, visible = TRUE, position = "bottom", title = "Key")
+test_that("set_legend() rides the config like every other setter", {
+  grouped <- data.frame(
+    category = c("a", "a", "b", "b"),
+    grp = c("x", "y", "x", "y")
+  )
+  f <- fake_proxy(arc_bar(grouped, category) |> set_color(grp))
+  arc_update(set_legend(f$proxy, visible = TRUE, position = "bottom"))
 
   msg <- f$session$sent()[[1]]$message
-  expect_identical(msg$method, "model")
-  expect_true(msg$payload$legendVisibility)
-  expect_identical(msg$payload$legendPosition, "bottom")
-  expect_identical(msg$payload$legendTitleText, "Key")
-
-  expect_error(set_legend(f$proxy, position = "sideways"), "must be one of")
+  expect_identical(msg$method, "config")
+  expect_true(msg$payload$config$legend$visible)
+  expect_identical(msg$payload$config$legend$position, "bottom")
 })
 
 test_that("the method wrappers send a call with their arguments", {

@@ -16,6 +16,7 @@ ArcProxy(
   size = list(),
   tooltip = character(0),
   axes = list(),
+  legend = list(),
   flipped = NA,
   position = NA_character_,
   series_opts = list(),

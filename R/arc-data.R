@@ -158,6 +158,11 @@ series_as_vector <- function(x, ...) {
 
 S7::method(as_vector, WebChartBarChartSeries) <- series_as_vector
 S7::method(as_vector, WebChartLineChartSeries) <- series_as_vector
+# Pie and gauge read the same query shape: ya() (index2.js:589) keys
+# PieNoAggregation off an absent outStatistics, and ue()
+# (chunks/gauge-model.js:47) writes one only while aggregating.
+S7::method(as_vector, WebChartPieChartSeries) <- series_as_vector
+S7::method(as_vector, WebChartGaugeSeries) <- series_as_vector
 
 # `additionalTooltipFields` is `string[]`, and the client both iterates it
 # and spreads it into the query's outFields (fu(), index2.js:7857) - a bare

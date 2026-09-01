@@ -4,9 +4,9 @@
 \name{arcgisviz-package}
 \alias{arcgisviz}
 \alias{arcgisviz-package}
-\title{arcgisviz: What the Package Does (One Line, Title Case)}
+\title{arcgisviz: Interactive Charts and Maps with the 'ArcGIS Maps SDK'}
 \description{
-What the package does (one paragraph).
+Build interactive charts and maps from data frames and simple feature objects using the 'ArcGIS Maps SDK for JavaScript'. Charts are described with a grammar of graphics style pipeline and render as htmlwidgets, so they work in the viewer, in 'Quarto' documents, and in 'shiny' applications. Data travels to the browser as a client side feature collection, so no feature service is required.
 }
 \seealso{
 Useful links:
@@ -16,11 +16,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com}
+\strong{Maintainer}: Josiah Parry \email{josiah.parry@gmail.com} (\href{https://orcid.org/0000-0001-9910-865X}{ORCID})
 
 Authors:
 \itemize{
-  \item First Last \email{first.last@example.com}
+  \item Josiah Parry \email{josiah.parry@gmail.com} (\href{https://orcid.org/0000-0001-9910-865X}{ORCID})
 }
 
 }

@@ -213,40 +213,6 @@ S7::method(set_selection, ArcProxy) <- function(proxy, object_ids, ...) {
   )
 }
 
-#' Control a rendered chart's legend
-#'
-#' @param proxy Defines which [arc_proxy()] to modify.
-#' @param visible default `NULL`. Defines whether the legend is shown.
-#' @param position default `NULL`. Defines where it sits, one of `"top"`,
-#'   `"bottom"`, `"leading"`, or `"trailing"`.
-#' @param title default `NULL`. Defines the legend title.
-#' @return `proxy`, invisibly.
-#' @examples
-#' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
-#'
-#' if (interactive()) {
-#'   arc_proxy("chart", arc_col(df, species, mass)) |>
-#'     set_legend(visible = TRUE, position = "bottom")
-#' }
-#' @export
-set_legend <- function(proxy, visible = NULL, position = NULL, title = NULL) {
-  check_proxy(proxy)
-  props <- list()
-  if (!rlang::is_null(visible)) {
-    props$legendVisibility <- isTRUE(visible)
-  }
-  if (!rlang::is_null(position)) {
-    props$legendPosition <- rlang::arg_match0(
-      position,
-      c("top", "bottom", "leading", "trailing")
-    )
-  }
-  if (!rlang::is_null(title)) {
-    props$legendTitleText <- title
-  }
-  proxy_send(proxy, "model", props)
-}
-
 #' Invoke a rendered chart's own methods
 #'
 #' Each of these calls a method on the `<arcgis-chart>` element directly.

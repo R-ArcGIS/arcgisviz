@@ -41,6 +41,9 @@ reference:
       - arc_histogram
       - arc_boxplot
       - arc_heat
+      - arc_pie
+      - arc_radar
+      - arc_gauge
       - ArcChart
 
   - title: Aesthetics
@@ -55,11 +58,14 @@ reference:
       - set_tooltip
 
   - title: Scales and orientation
-    desc: How the axes are scaled and which way the chart is drawn.
+    desc: >
+      How the axes are scaled, which way the chart is drawn, and how its
+      groups are keyed.
     contents:
       - set_axis
       - set_flipped
       - set_position
+      - set_legend
 
   - title: Maps
     desc: >
@@ -131,7 +137,6 @@ reference:
       - arc_draw_selection
       - arc_selected
       - arc_sf
-      - set_legend
       - set_layer
       - arc_goto
       - arc_refresh
@@ -144,12 +149,17 @@ reference:
       - WebChart
       - WebBoxPlot
       - WebHeatChart
+      - WebGaugeChart
+      - WebRadarChart
       - WebChartAxis
+      - WebChartGaugeAxis
+      - WebChartRadarChartAxis
       - WebChartAxisScrollBar
       - WebChartCursorCrosshair
       - WebChartDataFilters
       - WebChartGuide
       - WebChartLegend
+      - WebChartPieChartLegend
       - WebChartNullCategory
       - WebChartOverlay
       - WebChartText
@@ -173,6 +183,8 @@ reference:
       - WebChartHistogramSeries
       - WebChartBoxPlotSeries
       - WebChartHeatChartSeries
+      - WebChartPieChartSeries
+      - WebChartGaugeSeries
       - WebChartSeriesQuery
       - WebChartTemporalBinning
       - WebChartTemporalBinningOffset
@@ -200,6 +212,20 @@ reference:
       - IUniqueValueRenderer
       - IUniqueValueInfo
       - ILegendOptions
+
+  - title: Pie slices and gauge dials
+    desc: >
+      The parts only these two types have: a pie's slices and their ticks, a
+      gauge's needle and its progress bands.
+    contents:
+      - WebChartPieChartSlice
+      - WebChartPieChartGroupSlice
+      - WebChartPieChartTick
+      - WebChartNeedle
+      - WebChartGaugeAxisTick
+      - WebChartGaugeFixedProgressBands
+      - WebChartGaugeFixedProgressBandsBands
+      - ValueConversion
 
   - title: Symbols and colour
     desc: How individual marks are drawn.
@@ -233,6 +259,7 @@ reference:
       single property of the classes above.
     contents:
       - ModelTypes
+      - GaugeChartSubTypes
       - IFeatureLayerFeatureCollectionType
       - Basemaps
       - RESTUnits
@@ -251,6 +278,7 @@ reference:
       - WebChartLabelBehavior
       - WebChartLegendPositions
       - WebChartNullPolicyTypes
+      - WebChartRadarChartAxisLabelsOrientation
       - WebChartQuerySpatialRelationship
       - WebChartSortOrderKinds
       - WebChartStackedKinds

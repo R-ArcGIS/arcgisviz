@@ -97,7 +97,7 @@ New functions this needs:
 |---|---|---|
 | `arc_proxy()` | - | the handle |
 | `set_filter()` | element `runtimeDataFilters` | a `where` clause, applied client side. **The cheapest interaction there is**: no model rebuild, no data re-send |
-| `set_legend()` | model `legendVisibility` / `legendPosition` / `legendTitleText` | `WebChart$legend` is modeled but nothing sets it. Worth having on `ArcChart` too, not just the proxy |
+| `set_legend()` | `WebChart$legend`, flushed by `arc_update()` | an `ArcChart` setter, not a proxy method - the model's `legendVisibility`/`legendPosition`/`legendTitleText` accessors write the same `_config`, so one property covers both paths |
 | `set_selection()` | element `selectionData` | push a selection in, as `selectionOIDs` |
 | `set_data()` | `data` message | swap the data frame under a live chart |
 | `arc_refresh()` | `refresh({updateData, resetAxesBounds})` | |

@@ -1,10 +1,16 @@
 Package: arcgisviz
-Title: What the Package Does (One Line, Title Case)
+Title: Interactive Charts and Maps with the 'ArcGIS Maps SDK'
 Version: 0.2.0
 Authors@R:
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-License: Apache License (>= 2)
+    person("Josiah", "Parry", , "josiah.parry@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-9910-865X"))
+Description: Build interactive charts and maps from data frames and simple
+    feature objects using the 'ArcGIS Maps SDK for JavaScript'. Charts are
+    described with a grammar of graphics style pipeline and render as
+    htmlwidgets, so they work in the viewer, in 'Quarto' documents, and in
+    'shiny' applications. Data travels to the browser as a client side
+    feature collection, so no feature service is required.
+License: Apache License (>= 2) + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE, roclets = c("collate", "namespace", "s7x::enum_roclet"))
 Suggests:
@@ -31,6 +37,9 @@ Collate:
     'types-histogram.R'
     'types-box-plot.R'
     'types-heat-chart.R'
+    'types-pie-chart.R'
+    'types-gauge-chart.R'
+    'types-radar-chart.R'
     'arc-chart.R'
     'arc-data.R'
     'enums-widget.R'

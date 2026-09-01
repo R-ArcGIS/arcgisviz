@@ -1,4 +1,4 @@
-#' @include types-heat-chart.R
+#' @include types-radar-chart.R
 NULL
 
 # Public, user-facing chart-building API. Wraps the internal S7 type layer
@@ -41,6 +41,7 @@ ArcChart <- new_class(
     size = class_list,
     tooltip = S7::class_character,
     axes = class_list,
+    legend = class_list,
     flipped = s7x::class_boolean,
     position = s7x::class_string,
     series_opts = class_list,
@@ -129,6 +130,10 @@ chart_type_map <- list(
     aggregates = FALSE,
     has_y = TRUE,
     tooltip_keys = c("x", "y"),
+    # This type's legend is its colour gradient rather than a series list
+    # (tf(), components/arcgis-chart/customElement.js:11062), so it is worth
+    # drawing without a grouping.
+    legend_ramp = TRUE,
     # Without a category valueFormat on both axes the client reads the config
     # as a half-built calendar heat chart and renders a placeholder asking
     # for a date field (Io(), dist/chunks/index2.js:4144).
@@ -138,6 +143,63 @@ chart_type_map <- list(
     symbol_class = ISimpleFillSymbol,
     symbol_type = "esriSFS",
     symbol_style = SimpleFillSymbolStyle("esriSFSSolid")
+  ),
+  pie = list(
+    model_type = "pieChart",
+    series_type = "pieSeries",
+    series_class = WebChartPieChartSeries,
+    config_class = WebChart,
+    # ya() (dist/chunks/index2.js:589) reads the same query shape ga() does:
+    # no outStatistics is PieNoAggregation, grouped statistics is
+    # PieFromCategory. There is no split-by subtype.
+    aggregates = TRUE,
+    has_y = TRUE,
+    # A pie is all slices, so its legend is the only key to them.
+    legend_ramp = TRUE,
+    # tt() (dist/chunks/index.js:765) is the one default config with no
+    # `axes` key at all, so sending axes would add a pair it never had.
+    axis_count = 0L,
+    symbol_property = "fillSymbol",
+    symbol_class = ISimpleFillSymbol,
+    symbol_type = "esriSFS",
+    symbol_style = SimpleFillSymbolStyle("esriSFSSolid")
+  ),
+  gauge = list(
+    model_type = "gauge",
+    series_type = "gaugeSeries",
+    series_class = WebChartGaugeSeries,
+    config_class = WebGaugeChart,
+    aggregates = TRUE,
+    # The value rides `x`, and the single reading has no second dimension.
+    has_y = FALSE,
+    value_on_x = TRUE,
+    # ce() (dist/chunks/index.js:463) builds exactly one axis, the one
+    # carrying the needle.
+    axis_count = 1L,
+    axis_class = WebChartGaugeAxis,
+    symbol_class = ISimpleFillSymbol,
+    symbol_type = "esriSFS",
+    symbol_style = SimpleFillSymbolStyle("esriSFSSolid")
+  ),
+  radar = list(
+    model_type = "radarChart",
+    series_type = "radarSeries",
+    # The spec declares the radar series as WebChartLineChartSeries with a
+    # different `type` (web-chart.d.ts:1236), and k() (index2.js:601) routes
+    # it through the bar/line subtype detection, so it splits like one too.
+    series_class = WebChartLineChartSeries,
+    config_class = WebRadarChart,
+    aggregates = TRUE,
+    has_y = TRUE,
+    splits = TRUE,
+    tooltip_keys = c("series", "x"),
+    # An axis title is centred inside its own axis (k(), chunks/index.js:253),
+    # which on a circular one is the middle of the plot.
+    untitled_axes = TRUE,
+    symbol_property = "lineSymbol",
+    symbol_class = ISimpleLineSymbol,
+    symbol_type = "esriSLS",
+    symbol_style = SimpleLineSymbolStyle("esriSLSSolid")
   )
 )
 
@@ -189,7 +251,8 @@ arc_chart <- function(.data) {
 #'
 #' @param chart Defines which chart to modify.
 #' @param type Defines which series the chart draws. One of `"bar"`,
-#'   `"scatter"`, `"line"`, `"histogram"`, `"boxplot"`, or `"heat"`.
+#'   `"scatter"`, `"line"`, `"histogram"`, `"boxplot"`, `"heat"`, `"pie"`,
+#'   `"radar"`, or `"gauge"`.
 #' @return `chart`, with its series type set.
 #' @examples
 #' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
@@ -298,21 +361,26 @@ series_aggregation <- function(
   chart,
   stat,
   suffix = "0",
+  field = chart@y,
+  group = TRUE,
   call = rlang::caller_env()
 ) {
+  # A gauge aggregates the column `x` names, every other type the one `y`
+  # does, so the missing-mapping error has to blame the right setter.
+  mapper <- if (identical(field, chart@x)) "set_x" else "set_y"
   if (identical(stat, "count")) {
     on_field <- oid_field
   } else {
-    if (is.na(chart@y)) {
+    if (is.na(field)) {
       cli::cli_abort(
         c(
-          "{.fn set_y} is required when {.arg stat} is {.val {stat}}.",
-          "i" = "{.val count} is the only stat that needs no {.arg y}."
+          "{.fn {mapper}} is required when {.arg stat} is {.val {stat}}.",
+          "i" = "{.val count} is the only stat that needs no column."
         ),
         call = call
       )
     }
-    on_field <- chart@y
+    on_field <- field
   }
   # The suffix is only a key, never SQL, so a level name goes in verbatim.
   out_field <- paste0(
@@ -324,8 +392,10 @@ series_aggregation <- function(
   list(
     y = out_field,
     query = WebChartSeriesQuery(
+      # A gauge reduces the whole layer to one number, so it groups by
+      # nothing (ue(), dist/chunks/gauge-model.js:47).
       # I() keeps the spec's string[] - auto_unbox would emit a bare string.
-      groupByFieldsForStatistics = I(chart@x),
+      groupByFieldsForStatistics = if (group) I(chart@x) else character(),
       outStatistics = list(
         IStatisticDefinition(
           statisticType = IStatisticDefinitionStatisticType(stat_map[[stat]]),
@@ -457,14 +527,39 @@ axis_title <- function(text) {
 # `type` is required by the spec and also keeps the axis from compacting to
 # nothing: deepMerge maps over the source array, so a dropped axis would
 # shorten `axes` and delete one of the model's own.
-chart_axis <- function(text, opts) {
+chart_axis <- function(text, opts, class = WebChartAxis) {
   args <- opts
   args$type <- "chartAxis"
   title <- axis_title(text)
   if (!rlang::is_null(title)) {
     args$title <- title
   }
-  rlang::exec(WebChartAxis, !!!args)
+  rlang::exec(class, !!!args)
+}
+
+# deepMerge() maps over the source array (arcgisChart.js:24), so the count
+# has to match the model's own: two axes for most types, one for a gauge
+# (ce(), chunks/index.js:463), and none at all for a pie, whose default
+# config omits the key (tt(), chunks/index.js:765).
+chart_axes <- function(chart, spec, x_title, y_title) {
+  count <- if (rlang::is_null(spec$axis_count)) 2L else spec$axis_count
+  if (count == 0L) {
+    return(list())
+  }
+  class <- if (rlang::is_null(spec$axis_class)) {
+    WebChartAxis
+  } else {
+    spec$axis_class
+  }
+
+  # A gauge's one axis is the value scale, which set_axis("x") names.
+  axes <- list(
+    chart_axis(x_title, c(spec$axis_defaults, chart@axes$x), class)
+  )
+  if (count == 1L) {
+    return(axes)
+  }
+  c(axes, list(chart_axis(y_title, c(spec$axis_defaults, chart@axes$y), class)))
 }
 
 check_axis_flag <- function(value, arg, call = rlang::caller_env()) {
@@ -646,6 +741,117 @@ set_position <- function(chart, position = "dodge") {
   check_stacks(chart)
   chart@position <- rlang::arg_match0(position, names(position_map))
   chart
+}
+
+legend_positions <- c("right", "left", "top", "bottom")
+
+#' Position or hide a chart's legend
+#'
+#' Moves, titles, or removes the key naming a chart's groups. A legend needs
+#' something to name, so a chart only has one once [set_color()] has grouped
+#' it, and it is drawn by default from then on. A heat chart is the
+#' exception: its legend is the colour gradient, so it always has one.
+#'
+#' Asking for a legend on a chart that cannot show one is an error rather
+#' than a silent no-op - `visible = TRUE` cannot conjure a key out of a
+#' single series.
+#'
+#' @param chart Defines which chart to modify.
+#' @param visible default `NULL`. Defines whether the legend is drawn.
+#' @param position default `NULL`. Defines where it sits, one of `"right"`,
+#'   `"left"`, `"top"`, or `"bottom"`.
+#' @param title default `NULL`. Defines the text above the legend.
+#' @return `chart`, with its legend set.
+#' @examples
+#' df <- data.frame(
+#'   species = c("a", "a", "b"),
+#'   island = c("x", "y", "x")
+#' )
+#'
+#' arc_bar(df, species) |>
+#'   set_color(island) |>
+#'   set_legend(position = "bottom", title = "Island")
+#' @export
+set_legend <- function(
+  chart,
+  visible = NULL,
+  position = NULL,
+  title = NULL
+) {
+  if (!rlang::is_null(visible)) {
+    check_axis_flag(visible, "visible")
+  }
+  if (!rlang::is_null(position)) {
+    position <- rlang::arg_match0(position, legend_positions)
+  }
+  if (!rlang::is_null(title) && !rlang::is_string(title)) {
+    cli::cli_abort(c(
+      "{.arg title} must be a single string.",
+      "x" = "You supplied {.obj_type_friendly {title}}."
+    ))
+  }
+
+  chart@legend <- merge_opts(
+    chart@legend,
+    list(visible = visible, position = position, title = title)
+  )
+  chart
+}
+
+# Zc() (chunks/index3.js:654) decides whether a chart has anything to key -
+# heat and pie always do, bar/line/combo/box plot only past one series - and
+# gates the whole legend on it (customElement.js:12080). So the config never
+# carries more than what was actually asked for.
+chart_legend <- function(chart, split, spec, call = rlang::caller_env()) {
+  opts <- chart@legend
+  if (isTRUE(opts$visible)) {
+    check_legend(chart, split, spec, call = call)
+  }
+  if (rlang::is_empty(opts)) {
+    return(NULL)
+  }
+
+  WebChartLegend(
+    type = "chartLegend",
+    visible = if (rlang::is_null(opts$visible)) NA else opts$visible,
+    position = if (rlang::is_null(opts$position)) {
+      WebChartLegendPositions()
+    } else {
+      WebChartLegendPositions(opts$position)
+    },
+    title = legend_title(opts$title)
+  )
+}
+
+# The client refuses to draw a legend a chart has no entries for, so asking
+# for one would otherwise fail silently.
+check_legend <- function(chart, split, spec, call = rlang::caller_env()) {
+  if (isTRUE(spec$legend_ramp) || !rlang::is_null(split)) {
+    return(invisible(chart))
+  }
+  cli::cli_abort(
+    c(
+      "{.arg visible} needs a legend to show, and this chart has none.",
+      "x" = "A {chart@chart_type} chart with one series has nothing to key.",
+      "i" = "Group it with {.fn set_color} on a column other than
+             {.field {chart@x}}."
+    ),
+    call = call
+  )
+}
+
+# The default legend title is empty but visible, and the client's own text
+# setter leaves `visible` alone (P(), chunks/data-labels-visibility.js:25) -
+# so a title built here has to say so itself.
+legend_title <- function(text) {
+  if (rlang::is_null(text)) {
+    return(NULL)
+  }
+  WebChartText(
+    type = "chartText",
+    visible = TRUE,
+    content = WebChartTextSymbol(type = "esriTS", text = text)
+  )
 }
 
 # Only bar and line read stackedType. Every other type either has no second
@@ -1277,6 +1483,17 @@ color_renderer <- function(chart, spec, call = rlang::caller_env()) {
   if (rlang::is_empty(color)) {
     return(NULL)
   }
+  # A gauge draws one reading, so there are no marks for a scale to vary.
+  if (isTRUE(spec$value_on_x)) {
+    cli::cli_abort(
+      c(
+        "{.fn set_color} does not apply to {chart@chart_type} charts.",
+        "x" = "A {chart@chart_type} draws a single value, so there is nothing
+               to colour by."
+      ),
+      call = call
+    )
+  }
 
   values <- chart@data[[color$field]]
   if (is.numeric(values)) {
@@ -1333,31 +1550,52 @@ build_webchart <- function(chart) {
   stat <- if (is.na(chart@stat)) "identity" else chart@stat
   aggregating <- spec$aggregates && stat != "identity"
 
+  # A gauge reads its single value off `x`; everything else off `y`.
+  value_field <- if (isTRUE(spec$value_on_x)) chart@x else chart@y
+
   agg <- if (aggregating) {
-    series_aggregation(chart, stat)
+    series_aggregation(
+      chart,
+      stat,
+      field = value_field,
+      group = !isTRUE(spec$value_on_x)
+    )
   } else {
-    list(y = chart@y, query = NULL)
+    list(y = value_field, query = NULL)
   }
 
   y_label <- if (!aggregating) {
-    chart@y
+    value_field
   } else if (identical(stat, "count")) {
     "count"
   } else {
-    sprintf("%s(%s)", stat, chart@y)
+    sprintf("%s(%s)", stat, value_field)
   }
 
   labs <- chart@labs
   axis_lab <- function(lab, mapped) if (rlang::is_null(lab)) mapped else lab
+  # k()/B() (chunks/index.js:243, :222) centre an axis title inside its own
+  # axis, which on a circular one is the middle of the plot. A radar's spokes
+  # already carry the categories, so it goes untitled unless asked. "" blanks
+  # the client's own localized default rather than leaving it in place.
+  axis_lab_title <- function(lab, mapped) {
+    if (rlang::is_null(lab) && isTRUE(spec$untitled_axes)) {
+      ""
+    } else {
+      axis_lab(lab, mapped)
+    }
+  }
 
   # A split chart colours its series directly, so it needs no renderer.
   split <- chart_split(chart, spec)
   renderer <- if (rlang::is_null(split)) color_renderer(chart, spec)
 
+  # A series names itself in the legend, so an unsplit one is named after
+  # what it plots. split_series() renames each of its own after its level.
   series <- list(
     type = spec$series_type,
     id = "series1",
-    name = "series1",
+    name = axis_lab(labs$y, y_label),
     x = chart@x
   )
   # A histogram bins one field, so it has no `y` and derives its own
@@ -1365,6 +1603,11 @@ build_webchart <- function(chart) {
   # everything else keeps whichever one the client's defaults supply.
   if (isTRUE(spec$has_y)) {
     series$y <- agg$y
+  }
+  # u() (dist/chunks/gauge-model.js:70) reads the gauge's value off `x`, and
+  # under aggregation that has to name the statistic's output field.
+  if (isTRUE(spec$value_on_x)) {
+    series$x <- agg$y
   }
   if (isTRUE(spec$aggregates)) {
     series$query <- agg$query
@@ -1394,19 +1637,16 @@ build_webchart <- function(chart) {
     title = chart_titled(labs$title),
     subtitle = chart_titled(labs$subtitle),
     footer = chart_titled(labs$caption),
+    legend = chart_legend(chart, split, spec),
     chartRenderer = renderer,
     colorMatch = if (rlang::is_null(renderer)) NA else TRUE,
     rotated = chart@flipped,
     stackedType = chart_position(chart, split, spec),
-    axes = list(
-      chart_axis(
-        axis_lab(labs$x, chart@x),
-        c(spec$axis_defaults, chart@axes$x)
-      ),
-      chart_axis(
-        axis_lab(labs$y, y_label),
-        c(spec$axis_defaults, chart@axes$y)
-      )
+    axes = chart_axes(
+      chart,
+      spec,
+      axis_lab_title(labs$x, if (isTRUE(spec$value_on_x)) y_label else chart@x),
+      axis_lab_title(labs$y, y_label)
     ),
     series = series_list
   )
@@ -1474,6 +1714,13 @@ check_chart_type_is <- function(chart, type, call = rlang::caller_env()) {
     call = call
   )
 }
+
+# friendly label part -> WebChartPieChartSeries$display*OnDataLabel
+pie_label_map <- c(
+  category = "displayCategoryOnDataLabel",
+  value = "displayNumericValueOnDataLabel",
+  percent = "displayPercentageOnDataLabel"
+)
 
 # friendly transform -> WebChartDataTransformations
 histogram_transform_map <- c(
@@ -1696,4 +1943,208 @@ arc_line <- function(.data, x, y, position = NULL) {
     set_x({{ x }}) |>
     set_y({{ y }})
   chart_positioned(chart, position)
+}
+
+#' Radar chart
+#'
+#' Draws a line chart on a circular axis, so the first and last `x` values
+#' meet. Aggregates and groups exactly as [arc_line()] does.
+#'
+#' @inheritParams arc_col
+#' @return An `ArcChart`.
+#' @examples
+#' df <- data.frame(month = c("jan", "feb", "mar"), rain = c(1, 5, 3))
+#'
+#' arc_radar(df, month, rain)
+#' @export
+arc_radar <- function(.data, x, y) {
+  arc_chart(.data) |> set_type("radar") |> set_x({{ x }}) |> set_y({{ y }})
+}
+
+#' Pie chart
+#'
+#' Draws one slice per value of `x`, sized by how many rows fall into it. Use
+#' [set_stat()] for any other aggregation, or `y` for values you have already
+#' summarised.
+#'
+#' `set_pie()` reaches the same options later, for charts built with
+#' [set_type()] rather than this shortcut.
+#'
+#' @inheritParams arc_chart
+#' @param chart Defines which chart to modify.
+#' @param x Defines which column the slices are cut from.
+#' @param y default `NULL`. Defines which column sizes each slice. Omit it to
+#'   count rows instead.
+#' @param ... These dots are for future extensions and must be empty.
+#' @param hole default `NULL`. Defines the size of the hole in the middle as
+#'   a percentage of the radius, turning the pie into a doughnut.
+#' @param labels default `NULL`. Defines what each slice's label shows, any
+#'   of `"category"`, `"value"`, and `"percent"`.
+#' @param inside default `NULL`. Defines whether the labels sit inside the
+#'   slices.
+#' @return An `ArcChart`.
+#' @examples
+#' df <- data.frame(species = c("a", "a", "b"), mass = c(1, 5, 3))
+#'
+#' arc_pie(df, species, hole = 60)
+#' @export
+arc_pie <- function(
+  .data,
+  x,
+  y = NULL,
+  hole = NULL,
+  labels = NULL,
+  inside = NULL
+) {
+  y <- rlang::enquo(y)
+  chart <- arc_chart(.data) |> set_type("pie") |> set_x({{ x }})
+  chart <- if (rlang::quo_is_null(y)) {
+    set_stat(chart, "count")
+  } else {
+    set_y(chart, !!y)
+  }
+  set_pie(chart, hole = hole, labels = labels, inside = inside)
+}
+
+#' @rdname arc_pie
+#' @export
+set_pie <- function(chart, ..., hole = NULL, labels = NULL, inside = NULL) {
+  rlang::check_dots_empty()
+  check_chart_type_set(chart)
+  check_chart_type_is(chart, "pie")
+  check_axis_flag(inside, "inside")
+
+  opts <- list(innerRadius = hole, dataLabelsInside = inside)
+  if (!rlang::is_null(labels)) {
+    labels <- rlang::arg_match(labels, names(pie_label_map), multiple = TRUE)
+    # Naming one part means the others are off, so all three go over.
+    shown <- as.list(names(pie_label_map) %in% labels)
+    names(shown) <- unname(pie_label_map)
+    opts <- c(opts, shown)
+  }
+
+  chart@series_opts <- merge_opts(chart@series_opts, opts)
+  chart
+}
+
+#' Gauge
+#'
+#' Draws a single number on a dial. A gauge reads one value, so `x` names the
+#' column it comes from and [set_stat()] decides how the column is reduced to
+#' that value - or `feature` picks one row verbatim.
+#'
+#' `set_gauge()` reaches the same options later, for charts built with
+#' [set_type()] rather than this shortcut.
+#'
+#' @inheritParams arc_chart
+#' @param chart Defines which chart to modify.
+#' @param x Defines which numeric column the reading comes from.
+#' @param stat default `"mean"`. Defines how the column is reduced to one
+#'   value. See [set_stat()].
+#' @param ... These dots are for future extensions and must be empty.
+#' @param feature default `NULL`. Defines which row to read verbatim, by
+#'   position. Setting it overrides `stat`.
+#' @param hole default `NULL`. Defines the size of the hole in the middle as
+#'   a percentage of the radius.
+#' @param angles default `NULL`. Defines the dial's start and end angle in
+#'   degrees, as `c(start, end)`.
+#' @param needle default `NULL`. Defines whether the needle is drawn.
+#' @return An `ArcChart`.
+#' @examples
+#' df <- data.frame(mass = c(1, 5, 3))
+#'
+#' arc_gauge(df, mass, stat = "mean")
+#' @export
+arc_gauge <- function(
+  .data,
+  x,
+  stat = "mean",
+  feature = NULL,
+  hole = NULL,
+  angles = NULL,
+  needle = NULL
+) {
+  chart <- arc_chart(.data) |> set_type("gauge") |> set_x({{ x }})
+  if (rlang::is_null(feature)) {
+    chart <- set_stat(chart, stat)
+  }
+  set_gauge(
+    chart,
+    feature = feature,
+    hole = hole,
+    angles = angles,
+    needle = needle
+  )
+}
+
+#' @rdname arc_gauge
+#' @export
+set_gauge <- function(
+  chart,
+  ...,
+  feature = NULL,
+  hole = NULL,
+  angles = NULL,
+  needle = NULL
+) {
+  rlang::check_dots_empty()
+  check_chart_type_set(chart)
+  check_chart_type_is(chart, "gauge")
+  check_axis_flag(needle, "needle")
+  check_angles(angles)
+
+  config <- list(innerRadius = hole)
+  if (!rlang::is_null(angles)) {
+    config$startAngle <- angles[[1]]
+    config$endAngle <- angles[[2]]
+  }
+  if (!rlang::is_null(feature)) {
+    check_feature(feature)
+    # R counts rows from one, the spec indexes features from zero.
+    chart@series_opts <- merge_opts(
+      chart@series_opts,
+      list(featureIndex = as.double(feature) - 1)
+    )
+    chart@stat <- NA_character_
+    config$subType <- GaugeChartSubTypes("featureGauge")
+  }
+  if (!rlang::is_null(needle)) {
+    chart@axes$x <- merge_opts(
+      chart@axes$x,
+      list(needle = WebChartNeedle(type = "gaugeNeedle", visible = needle))
+    )
+  }
+
+  chart@config_opts <- merge_opts(chart@config_opts, config)
+  chart
+}
+
+check_feature <- function(feature, call = rlang::caller_env()) {
+  if (
+    (rlang::is_scalar_double(feature) || rlang::is_scalar_integer(feature)) &&
+      feature >= 1 &&
+      feature == round(feature)
+  ) {
+    return(invisible(feature))
+  }
+  cli::cli_abort(
+    c(
+      "{.arg feature} must be a single row number, counting from 1.",
+      "x" = "You supplied {.obj_type_friendly {feature}}."
+    ),
+    call = call
+  )
+}
+
+check_angles <- function(angles, call = rlang::caller_env()) {
+  if (rlang::is_null(angles) || (is.numeric(angles) && length(angles) == 2)) {
+    return(invisible(angles))
+  }
+  cli::cli_abort(
+    c(
+      "{.arg angles} must be two numbers, {.code c(start, end)}.",
+      "x" = "You supplied {.obj_type_friendly {angles}}."
+    ),
+    call = call
+  )
 }

@@ -165,3 +165,11 @@ IFeatureLayerFeatureCollectionType <- s7x::new_enum(
   "IFeatureLayerFeatureCollectionType",
   c("markup", "notes", "route")
 )
+
+# WebGaugeChart$subType (web-chart.d.ts:1365). A statistic gauge aggregates
+# the whole layer; a feature gauge reads one feature by index.
+#' @export
+GaugeChartSubTypes <- s7x::new_enum(
+  "GaugeChartSubTypes",
+  c("featureGauge", "statisticGauge")
+)
