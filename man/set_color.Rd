@@ -4,7 +4,7 @@
 \alias{set_color}
 \title{Map a column to colour}
 \usage{
-set_color(chart, color, palette = NULL)
+set_color(chart, color, palette = NULL, alpha = NULL)
 }
 \arguments{
 \item{chart}{Defines which chart to modify.}
@@ -15,6 +15,10 @@ heat charts.}
 \item{palette}{default \code{NULL}. Defines which colours to use, either the
 name of an Esri ramp such as \code{"Blue 3"} or a vector of R colours. \code{NULL}
 uses the ramp the ArcGIS SDK itself defaults to.}
+
+\item{alpha}{default \code{NULL}. Sets how opaque the marks are, from \code{0} for
+invisible to \code{1} for solid. Overrides whatever opacity the palette
+carries, on the marks and their outlines alike. \code{NULL} leaves them solid.}
 }
 \value{
 \code{chart}, with its colour set.

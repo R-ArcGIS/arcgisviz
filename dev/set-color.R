@@ -50,3 +50,47 @@ arc_chart(penguins) |>
 # a mapping you can see is a value you can read.
 arc_scatter(penguins, bill_len, bill_dep) |>
   set_color(species)
+
+# --- alpha: seeing through an overplotted scatter --------------------------
+# 344 penguins on two axes overlap heavily. At 0.4 the dense middle of each
+# cloud reads darker than its edges, which is the whole point of alpha.
+arc_scatter(penguins, bill_len, bill_dep) |>
+  set_color(species, alpha = 0.4)
+
+# The same chart at full opacity, for comparison. Overlapping points here
+# just cover each other up.
+arc_scatter(penguins, bill_len, bill_dep) |>
+  set_color(species)
+
+# --- alpha works on a gradient too -----------------------------------------
+arc_scatter(penguins, flipper_len, body_mass) |>
+  set_color(body_mass, palette = "Prairie Summer", alpha = 0.35)
+
+# --- alpha wins over the palette's own opacity -----------------------------
+# "#f5242480" is already half transparent; alpha = 1 overrides it, so these
+# come out solid.
+arc_scatter(penguins, bill_len, bill_dep) |>
+  set_color(body_mass, palette = c("#ffffff80", "#f5242480"), alpha = 1)
+
+# --- alpha on grouped bars -------------------------------------------------
+# Grouped series carry their colour on their own symbol rather than through a
+# renderer. Alpha reaches both paths, so the shading matches either way.
+arc_chart(penguins) |>
+  set_type("bar") |>
+  set_x(island) |>
+  set_y(body_mass) |>
+  set_stat("mean") |>
+  set_color(species, alpha = 0.6)
+
+# --- alpha on a heat chart -------------------------------------------------
+# A vector palette carries alpha into the gradient.
+arc_heat(penguins, species, island) |>
+  set_color(palette = c("white", "navy"), alpha = 0.5)
+
+# A *named* Esri ramp cannot: it travels to the browser by name and the
+# client generates the class breaks itself, so no colour leaves R with an
+# alpha channel to carry. This errors rather than quietly ignoring you.
+try(
+  arc_heat(penguins, species, island) |>
+    set_color(palette = "Heatmap 3", alpha = 0.5)
+)

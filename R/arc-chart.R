@@ -38,6 +38,7 @@ ArcChart <- new_class(
     stat = s7x::class_string,
     labs = class_list,
     color = class_list,
+    alpha = s7x::property_range(0, 1),
     size = class_list,
     tooltip = S7::class_character,
     axes = class_list,
@@ -1180,6 +1181,9 @@ tooltip_aliased <- function(layer, fields) {
 #' @param palette default `NULL`. Defines which colours to use, either the
 #'   name of an Esri ramp such as `"Blue 3"` or a vector of R colours. `NULL`
 #'   uses the ramp the ArcGIS SDK itself defaults to.
+#' @param alpha default `NULL`. Sets how opaque the marks are, from `0` for
+#'   invisible to `1` for solid. Overrides whatever opacity the palette
+#'   carries, on the marks and their outlines alike. `NULL` leaves them solid.
 #' @return `chart`, with its colour set.
 #' @examples
 #' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
@@ -1187,8 +1191,9 @@ tooltip_aliased <- function(layer, fields) {
 #' arc_col(df, species, mass) |>
 #'   set_color(mass, palette = "Red 1")
 #' @export
-set_color <- function(chart, color, palette = NULL) {
+set_color <- function(chart, color, palette = NULL, alpha = NULL) {
   check_chart_type_set(chart)
+  alpha <- check_alpha(alpha)
 
   # Heat cells are shaded by the series' own heat rules rather than by a
   # chartRenderer, and the value is the cell count, so there is no column to
@@ -1205,9 +1210,10 @@ set_color <- function(chart, color, palette = NULL) {
         call = rlang::caller_env()
       )
     }
+    chart@alpha <- alpha
     chart@series_opts <- merge_opts(
       chart@series_opts,
-      heat_color_rules(palette, call = rlang::caller_env())
+      heat_color_rules(palette, alpha, call = rlang::caller_env())
     )
     return(chart)
   }
@@ -1230,19 +1236,47 @@ set_color <- function(chart, color, palette = NULL) {
     palette_stops(palette, call = rlang::caller_env())
   }
 
+  chart@alpha <- alpha
   chart@color <- list(field = col, stops = stops)
   chart
 }
 
+check_alpha <- function(alpha, call = rlang::caller_env()) {
+  if (rlang::is_null(alpha)) {
+    return(NA_real_)
+  }
+  if (!rlang::is_scalar_double(alpha) && !rlang::is_scalar_integer(alpha)) {
+    cli::cli_abort(
+      c(
+        "{.arg alpha} must be a single number.",
+        "x" = "You supplied {.obj_type_friendly {alpha}}."
+      ),
+      call = call
+    )
+  }
+  if (is.na(alpha) || alpha < 0 || alpha > 1) {
+    cli::cli_abort(
+      c(
+        "{.arg alpha} must be between 0 and 1.",
+        "x" = "You supplied {.val {alpha}}."
+      ),
+      call = call
+    )
+  }
+  as.double(alpha)
+}
+
 # Mirrors the SDK's own class-break symbols (class-breaks.js:414).
-renderer_symbol <- function(spec, color = NULL, size = NULL) {
+renderer_symbol <- function(spec, color = NULL, size = NULL, alpha = NA_real_) {
   args <- list(
     type = spec$symbol_type,
     style = spec$symbol_style,
+    # The outline takes the mark's alpha too - an opaque ring around a
+    # translucent fill is exactly what overplotting needs to see through.
     outline = ISimpleLineSymbol(
       type = "esriSLS",
       style = SimpleLineSymbolStyle("esriSLSSolid"),
-      color = Color(r = 50, g = 50, b = 50, a = 255),
+      color = Color(r = 50, g = 50, b = 50, a = alpha_channel(alpha)),
       width = 0.5
     )
   )
@@ -1262,7 +1296,15 @@ renderer_symbol <- function(spec, color = NULL, size = NULL) {
 
 # The client interpolates between stops (index2.js:1612), so the ramp's own
 # stops go over untouched, spread across the column's range.
-continuous_renderer <- function(field, values, stops, spec, call, size = NULL) {
+continuous_renderer <- function(
+  field,
+  values,
+  stops,
+  spec,
+  call,
+  size = NULL,
+  alpha = NA_real_
+) {
   rng <- range(values, na.rm = TRUE)
   if (!all(is.finite(rng))) {
     cli::cli_abort(
@@ -1277,12 +1319,18 @@ continuous_renderer <- function(field, values, stops, spec, call, size = NULL) {
   if (rlang::is_null(stops)) {
     stops <- palette_stops(esri_default_ramp)
   }
+  stops <- alpha_stops(stops, alpha)
 
   # A constant column can't span a gradient; colour it with the ramp's end.
   if (rng[[1]] == rng[[2]]) {
     return(ISimpleRenderer(
       type = "simple",
-      symbol = renderer_symbol(spec, rgba_color(stops[nrow(stops), ]), size)
+      symbol = renderer_symbol(
+        spec,
+        rgba_color(stops[nrow(stops), ]),
+        size,
+        alpha
+      )
     ))
   }
 
@@ -1290,7 +1338,7 @@ continuous_renderer <- function(field, values, stops, spec, call, size = NULL) {
   at <- as.double(seq(rng[[1]], rng[[2]], length.out = nrow(stops)))
   ISimpleRenderer(
     type = "simple",
-    symbol = renderer_symbol(spec, size = size),
+    symbol = renderer_symbol(spec, size = size, alpha = alpha),
     visualVariables = list(
       IColorVisualVariable(
         type = "colorInfo",
@@ -1372,7 +1420,11 @@ split_query <- function(query, field, level) {
 # from the config (web-chart.d.ts:1313), so nothing rides on a renderer
 # field matching the split. `name` is what the legend shows.
 split_series <- function(series, split, chart, spec, stat, aggregating) {
-  colors <- discrete_colors(chart@color$stops, length(split$levels))
+  colors <- discrete_colors(
+    chart@color$stops,
+    length(split$levels),
+    chart@alpha
+  )
   unname(Map(
     function(level, color, i) {
       # The where clauses never run: the client folds every series into one
@@ -1388,7 +1440,11 @@ split_series <- function(series, split, chart, spec, stat, aggregating) {
       series$id <- sprintf("series%d", i)
       series$name <- level
       series$query <- split_query(series$query, split$field, level)
-      series[[spec$symbol_property]] <- renderer_symbol(spec, color)
+      series[[spec$symbol_property]] <- renderer_symbol(
+        spec,
+        color,
+        alpha = chart@alpha
+      )
       rlang::exec(spec$series_class, !!!series)
     },
     split$levels,
@@ -1400,7 +1456,14 @@ split_series <- function(series, split, chart, spec, stat, aggregating) {
 # Under aggregation the query returns only the group-by field and the
 # statistics, so a derived code column never comes back - but the grouped
 # column itself does, and uniqueValue resolves against it (index2.js:1436).
-unique_value_renderer <- function(field, levels, colors, spec, size = NULL) {
+unique_value_renderer <- function(
+  field,
+  levels,
+  colors,
+  spec,
+  size = NULL,
+  alpha = NA_real_
+) {
   IUniqueValueRenderer(
     type = "uniqueValue",
     field1 = field,
@@ -1412,7 +1475,7 @@ unique_value_renderer <- function(field, levels, colors, spec, size = NULL) {
         IUniqueValueInfo(
           value = value,
           label = value,
-          symbol = renderer_symbol(spec, color, size)
+          symbol = renderer_symbol(spec, color, size, alpha)
         )
       },
       levels,
@@ -1439,7 +1502,7 @@ discrete_renderer <- function(field, values, stops, spec, call, chart) {
     )
   }
 
-  colors <- discrete_colors(stops, length(levels))
+  colors <- discrete_colors(stops, length(levels), chart@alpha)
 
   if (chart_aggregates(chart)) {
     if (!identical(field, chart@x)) {
@@ -1454,12 +1517,18 @@ discrete_renderer <- function(field, values, stops, spec, call, chart) {
         call = call
       )
     }
-    return(unique_value_renderer(field, levels, colors, spec))
+    return(unique_value_renderer(
+      field,
+      levels,
+      colors,
+      spec,
+      alpha = chart@alpha
+    ))
   }
 
   ISimpleRenderer(
     type = "simple",
-    symbol = renderer_symbol(spec),
+    symbol = renderer_symbol(spec, alpha = chart@alpha),
     visualVariables = list(
       IColorVisualVariable(
         type = "colorInfo",
@@ -1511,7 +1580,14 @@ color_renderer <- function(chart, spec, call = rlang::caller_env()) {
         call = call
       )
     }
-    return(continuous_renderer(color$field, values, color$stops, spec, call))
+    return(continuous_renderer(
+      color$field,
+      values,
+      color$stops,
+      spec,
+      call,
+      alpha = chart@alpha
+    ))
   }
   discrete_renderer(color$field, values, color$stops, spec, call, chart)
 }
@@ -1667,7 +1743,11 @@ merge_opts <- function(stored, opts) {
 # An Esri ramp travels by name so the client can build the class breaks with
 # its full stop list. Anything else collapses to the two colour gradient the
 # spec allows, first stop to last.
-heat_color_rules <- function(palette, call = rlang::caller_env()) {
+heat_color_rules <- function(
+  palette,
+  alpha = NA_real_,
+  call = rlang::caller_env()
+) {
   if (rlang::is_null(palette)) {
     cli::cli_abort(
       c(
@@ -1680,6 +1760,17 @@ heat_color_rules <- function(palette, call = rlang::caller_env()) {
   }
 
   if (rlang::is_string(palette) && palette %in% names(esri_color_ramps)) {
+    # A named ramp travels by name and the client generates the class breaks
+    # itself, so no colour leaves R with an alpha channel to carry.
+    if (!is.na(alpha)) {
+      cli::cli_abort(
+        c(
+          "{.arg alpha} does not apply to a named ramp on a heat chart.",
+          "i" = "Pass {.arg palette} as a vector of colours instead."
+        ),
+        call = call
+      )
+    }
     return(list(
       heatRulesType = WebChartHeatChartHeatRulesTypes("renderer"),
       classBreaksRules = WebChartHeatChartHeatClassBreaks(
@@ -1690,7 +1781,7 @@ heat_color_rules <- function(palette, call = rlang::caller_env()) {
     ))
   }
 
-  stops <- palette_stops(palette, call = call)
+  stops <- alpha_stops(palette_stops(palette, call = call), alpha)
   list(
     heatRulesType = WebChartHeatChartHeatRulesTypes("gradient"),
     gradientRules = WebChartHeatChartGradient(

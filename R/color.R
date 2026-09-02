@@ -93,13 +93,30 @@ palette_stops <- function(
   color_rgba(palette, arg = arg, call = call)
 }
 
+# 0-1 onto the spec's 0-255 alpha channel. NA leaves a colour opaque.
+alpha_channel <- function(alpha) {
+  if (is.na(alpha)) 255 else round(255 * alpha)
+}
+
+# Alpha overrides the stops rather than the resolved colours, so it reaches the
+# default ramps too - those are only picked once the renderer knows the
+# column's type.
+alpha_stops <- function(stops, alpha) {
+  if (is.na(alpha)) {
+    return(stops)
+  }
+  stops[, 4] <- alpha_channel(alpha)
+  stops
+}
+
 # n colours from resolved stops. Unset cycles the SDK's own series palette as
 # y() does (index.js:93); stops are interpolated linearly in RGB, which is what
 # the SDK does too (class-breaks.js:225).
-discrete_colors <- function(stops, n) {
+discrete_colors <- function(stops, n, alpha = NA_real_) {
   if (rlang::is_null(stops)) {
     rows <- (seq_len(n) - 1L) %% nrow(esri_series_palette) + 1L
-    return(lapply(rows, function(i) rgba_color(esri_series_palette[i, ])))
+    rgba <- alpha_stops(esri_series_palette[rows, , drop = FALSE], alpha)
+    return(lapply(seq_len(n), function(i) rgba_color(rgba[i, ])))
   }
 
   hex <- grDevices::rgb(
@@ -111,6 +128,7 @@ discrete_colors <- function(stops, n) {
   )
 
   at <- if (n == 1L) 0 else seq(0, 1, length.out = n)
-  rgba <- grDevices::colorRamp(hex, alpha = TRUE)(at)
-  lapply(seq_len(nrow(rgba)), function(i) rgba_color(round(rgba[i, ])))
+  rgba <- round(grDevices::colorRamp(hex, alpha = TRUE)(at))
+  rgba <- alpha_stops(rgba, alpha)
+  lapply(seq_len(nrow(rgba)), function(i) rgba_color(rgba[i, ]))
 }
