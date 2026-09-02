@@ -7,7 +7,7 @@ distinct value.
 ## Usage
 
 ``` r
-set_color(chart, color, palette = NULL)
+set_color(chart, color, palette = NULL, alpha = NULL)
 ```
 
 ## Arguments
@@ -26,6 +26,12 @@ set_color(chart, color, palette = NULL)
   default `NULL`. Defines which colours to use, either the name of an
   Esri ramp such as `"Blue 3"` or a vector of R colours. `NULL` uses the
   ramp the ArcGIS SDK itself defaults to.
+
+- alpha:
+
+  default `NULL`. Sets how opaque the marks are, from `0` for invisible
+  to `1` for solid. Overrides whatever opacity the palette carries, on
+  the marks and their outlines alike. `NULL` leaves them solid.
 
 ## Value
 

@@ -16,6 +16,7 @@ ArcProxy(
   stat = NA_character_,
   labs = list(),
   color = list(),
+  alpha = NA_real_,
   size = list(),
   tooltip = character(0),
   axes = list(),
