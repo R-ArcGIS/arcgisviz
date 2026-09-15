@@ -15,6 +15,9 @@ An object of class \code{IFontWeight}.
 \description{
 One of \code{"bold"}, \code{"bolder"}, \code{"lighter"}, \code{"normal"}, \code{NA}.
 }
+\examples{
+IFontWeight("bold")
+}
 \section{Additional properties}{
 
 \describe{

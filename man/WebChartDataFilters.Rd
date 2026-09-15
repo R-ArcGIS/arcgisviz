@@ -15,6 +15,32 @@ WebChartDataFilters(
   where = NA_character_
 )
 }
+\arguments{
+\item{distance}{Number.}
+
+\item{gdbVersion}{String.}
+
+\item{geometry}{Any value.}
+
+\item{objectIds}{List.}
+
+\item{spatialRelationship}{A \code{WebChartQuerySpatialRelationship} enum.}
+
+\item{timeExtent}{List.}
+
+\item{units}{A \code{RESTUnits} enum.}
+
+\item{where}{String.}
+}
+\value{
+An object of class \code{WebChartDataFilters}.
+}
 \description{
-WebChartDataFilters
+The filter a chart re-queries its own layer with. \code{\link[=set_filter]{set_filter()}} sends the
+same shape to a rendered chart.
+}
+\examples{
+WebChartDataFilters(where = "body_mass > 4000")
+
+WebChartDataFilters(objectIds = list(1L, 2L, 3L))
 }

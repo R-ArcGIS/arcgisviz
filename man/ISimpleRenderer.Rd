@@ -3,6 +3,24 @@
 \name{ISimpleRenderer}
 \alias{ISimpleRenderer}
 \title{ISimpleRenderer}
+\value{
+An object of class \code{ISimpleRenderer}.
+}
 \description{
-ISimpleRenderer
+One symbol for every feature, optionally varied by a visual variable.
+\code{type} is fixed by the class, so it is never restated at a call site.
+}
+\examples{
+ISimpleRenderer(
+  symbol = ISimpleFillSymbol(color = Color(r = 184, g = 40, b = 40, a = 1))
+)
+
+# With a continuous colour mapping over the top.
+ISimpleRenderer(
+  symbol = ISimpleMarkerSymbol(size = 8),
+  visualVariables = list(IColorVisualVariable(field = "body_mass"))
+)
+}
+\seealso{
+\code{\link[=new_renderer]{new_renderer()}}, which builds one from friendly names and colours.
 }

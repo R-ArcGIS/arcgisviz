@@ -3,7 +3,28 @@
 \name{IFeatureLayer}
 \alias{IFeatureLayer}
 \title{IFeatureLayer}
+\value{
+An object of class \code{IFeatureLayer}.
+}
 \description{
 A feature layer, either backed by a \code{featureCollection} stored in the web
 map or by a service \code{url}. Built by \code{\link[=as_feature_layer]{as_feature_layer()}}.
+}
+\examples{
+df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+
+as_feature_layer(df, name = "penguins")
+
+# Or by hand, when the pieces are already assembled.
+IFeatureLayer(
+  id = "counties",
+  name = "Counties",
+  layerType = "ArcGISFeatureLayer",
+  opacity = 0.8,
+  visibility = TRUE
+)
+}
+\seealso{
+\code{\link[=as_feature_layer]{as_feature_layer()}}, which builds one from a data frame or an
+\code{sf} object.
 }

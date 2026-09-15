@@ -15,6 +15,9 @@ An object of class \code{SimpleMarkerSymbolStyle}.
 \description{
 One of \code{"esriSMSCircle"}, \code{"esriSMSCross"}, \code{"esriSMSDiamond"}, \code{"esriSMSSquare"}, \code{"esriSMSTriangle"}, \code{"esriSMSX"}, \code{NA}.
 }
+\examples{
+SimpleMarkerSymbolStyle("esriSMSCircle")
+}
 \section{Additional properties}{
 
 \describe{

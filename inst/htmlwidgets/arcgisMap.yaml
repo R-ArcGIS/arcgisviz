@@ -1,14 +1,57 @@
-# arcgisMap.js is already attached as the `arcgisMap-binding` dependency by
-# htmlwidgets' inst/htmlwidgets/<name>.js convention. Listing it here too
-# loads the bundle a second time under a different dependency name.
+# The bundle is an ES module: it carries real `import` statements pointing at
+# js.arcgis.com, because the SDK is loaded from the CDN rather than bundled
+# (srcjs/config/externals.json). So it is declared here, with type="module",
+# rather than being named arcgisMap.js - htmlwidgets would turn that filename
+# into a "binding" dependency and emit it as a classic script, which throws on
+# an `import`. See webpack.common.js.
 #
-# This dependency still earns its place: htmlwidgets builds the binding one
-# with `all_files = FALSE`, so it copies the entry file alone. This one
-# defaults to TRUE and carries the async chunks with it, which is why
-# srcjs/modules/public-path.js points webpack's publicPath here. The name and
-# version below are part of that contract - see that file before editing.
+# The stylesheet is the CDN's own, matching the pinned 5.1 components.
 dependencies:
+  # The CDN components resolve their own @arcgis/core imports through the
+  # `$arcgis.import` hook, which otherwise only core.js (1.7MB of dojo)
+  # defines. This is that hook, pointing at the same pinned CDN.
+  - name: arcgis-esm-loader
+    version: 5.1.0
+    src: htmlwidgets
+    head: |
+      <script>
+      (function () {
+        var cdn = "https://js.arcgis.com/5.1/";
+        window.$arcgis || Object.defineProperty(window, "$arcgis", {
+          configurable: false, enumerable: true, writable: false, value: {}
+        });
+        if (window.$arcgis.import) return;
+        function one(name) {
+          var imports = (window.$arcgis.importMap || {}).imports;
+          if (imports && name in imports) return import(imports[name]);
+          if (/^(\.|\/|https?:)/.test(name)) return import(name);
+          return import(cdn + name + (/\.js$/.test(name) ? "" : ".js"))
+            .then(function (m) { return m.default === undefined ? m : m.default; });
+        }
+        Object.defineProperty(window.$arcgis, "import", {
+          configurable: false, enumerable: true, writable: false,
+          value: function (name) {
+            return Array.isArray(name) ? Promise.all(name.map(one)) : one(name);
+          }
+        });
+      })();
+      </script>
   - name: arcgisMap
     version: 1.0.0
     src: htmlwidgets
-    stylesheet: arcgisMap.css
+    script:
+      src: arcgisMap.module.js
+      type: module
+  # The components' own CSS only hydrates the elements. `.esri-ui-corner` and
+  # the Avenir Next faces live in @arcgis/core's theme, so without it the
+  # slotted widgets stack in document flow and everything falls back to serif.
+  - name: arcgis-core-theme
+    version: 5.1.0
+    src:
+      href: https://js.arcgis.com/5.1/@arcgis/core/assets/esri/themes/light
+    stylesheet: main.css
+  - name: arcgis-map-components-css
+    version: 5.1.0
+    src:
+      href: https://js.arcgis.com/5.1/map-components
+    stylesheet: main.css

@@ -16,6 +16,9 @@ An object of class \code{ModelTypes}.
 The \verb{@arcgis/charts-components} chart-type strings accepted by
 \code{createModel()}, e.g. \code{"barChart"}, \code{"lineChart"}, \code{"scatterplot"}.
 }
+\examples{
+ModelTypes("barChart")
+}
 \section{Additional properties}{
 
 \describe{

@@ -25,6 +25,61 @@ WebChartAxis(
   dateBaseInterval = NULL
 )
 }
+\arguments{
+\item{type}{String.}
+
+\item{visible}{Bool.}
+
+\item{isLogarithmic}{Bool.}
+
+\item{title}{\code{NULL} or a \code{WebChartText} object.}
+
+\item{valueFormat}{A \code{NumberFormatOptions} object or a \code{DateTimeFormatOptions} object or a \code{CategoryFormatOptions} object.}
+
+\item{minimum}{Number.}
+
+\item{maximum}{Number.}
+
+\item{grid}{\code{NULL} or a \code{ISimpleLineSymbol} object.}
+
+\item{guides}{List.}
+
+\item{lineSymbol}{\code{NULL} or a \code{ISimpleLineSymbol} object.}
+
+\item{labels}{A \code{WebChartText} object.}
+
+\item{scrollbar}{\code{NULL} or a \code{WebChartAxisScrollBar} object.}
+
+\item{displayZeroLine}{Bool.}
+
+\item{integerOnlyValues}{Bool.}
+
+\item{displayCursorTooltip}{Bool.}
+
+\item{buffer}{Bool.}
+
+\item{tickSpacing}{Number.}
+
+\item{dateBaseInterval}{\code{NULL} or a \code{TimeIntervalInfo} object.}
+}
+\value{
+An object of class \code{WebChartAxis}.
+}
 \description{
-WebChartAxis
+One of a chart's axes. \code{\link[=set_axis]{set_axis()}} builds these for you. Every axis must
+carry \code{type = "chartAxis"}, and the count has to match the chart type's -
+two for most, one for a gauge, none for a pie.
+}
+\examples{
+WebChartAxis(
+  type = "chartAxis",
+  minimum = 0,
+  maximum = 5000,
+  integerOnlyValues = TRUE,
+  title = WebChartText(
+    type = "chartText",
+    visible = TRUE,
+    content = WebChartTextSymbol(type = "esriTS", text = "Body mass (g)")
+  )
+)
 }

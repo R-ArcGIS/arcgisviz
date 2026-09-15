@@ -11,7 +11,14 @@ NULL
 library(S7)
 
 #' ValueConversion
+#'
+#' A linear rescaling applied to a gauge's reading before it is drawn.
+#'
 #' @name ValueConversion
+#' @return An object of class `ValueConversion`.
+#' @examples
+#' # Grams to kilograms.
+#' ValueConversion(factor = 0.001, offset = 0)
 #' @export
 ValueConversion := new_class(
   properties = list(
@@ -21,7 +28,11 @@ ValueConversion := new_class(
 )
 
 #' WebChartGaugeAxisTick
+#'
 #' @name WebChartGaugeAxisTick
+#' @return An object of class `WebChartGaugeAxisTick`.
+#' @examples
+#' WebChartGaugeAxisTick(type = "chartGaugeAxisTick", visible = TRUE)
 #' @export
 WebChartGaugeAxisTick := new_class(
   properties = list(
@@ -31,7 +42,20 @@ WebChartGaugeAxisTick := new_class(
 )
 
 #' WebChartNeedle
+#'
+#' The needle drawn over a gauge's fill. `set_gauge(needle = FALSE)` is the
+#' friendly way to turn it off.
+#'
 #' @name WebChartNeedle
+#' @return An object of class `WebChartNeedle`.
+#' @examples
+#' WebChartNeedle(
+#'   type = "chartGaugeNeedle",
+#'   visible = TRUE,
+#'   innerRadius = 20,
+#'   displayPin = TRUE,
+#'   symbol = ISimpleFillSymbol(color = Color(r = 51, g = 51, b = 51, a = 1))
+#' )
 #' @export
 WebChartNeedle := new_class(
   properties = list(
@@ -46,7 +70,17 @@ WebChartNeedle := new_class(
 )
 
 #' WebChartGaugeFixedProgressBandsBands
+#'
+#' The two symbols a gauge's progress bands are drawn with - the filled
+#' portion and the track behind it.
+#'
 #' @name WebChartGaugeFixedProgressBandsBands
+#' @return An object of class `WebChartGaugeFixedProgressBandsBands`.
+#' @examples
+#' WebChartGaugeFixedProgressBandsBands(
+#'   target = ISimpleFillSymbol(color = Color(r = 78, g = 121, b = 167, a = 1)),
+#'   base = ISimpleFillSymbol(color = Color(r = 230, g = 230, b = 230, a = 1))
+#' )
 #' @export
 WebChartGaugeFixedProgressBandsBands := new_class(
   properties = list(
@@ -56,7 +90,22 @@ WebChartGaugeFixedProgressBandsBands := new_class(
 )
 
 #' WebChartGaugeFixedProgressBands
+#'
+#' Modelled, but nothing in the public API sets it - progress bands replace
+#' the axis guides this package does not build either.
+#'
 #' @name WebChartGaugeFixedProgressBands
+#' @return An object of class `WebChartGaugeFixedProgressBands`.
+#' @examples
+#' WebChartGaugeFixedProgressBands(
+#'   type = "chartGaugeFixedProgressBands",
+#'   visible = TRUE,
+#'   bands = WebChartGaugeFixedProgressBandsBands(
+#'     target = ISimpleFillSymbol(
+#'       color = Color(r = 78, g = 121, b = 167, a = 1)
+#'     )
+#'   )
+#' )
 #' @export
 WebChartGaugeFixedProgressBands := new_class(
   properties = list(
@@ -71,7 +120,20 @@ WebChartGaugeFixedProgressBands := new_class(
 )
 
 #' WebChartGaugeAxis
+#'
+#' A [WebChartAxis()] carrying the needle. A gauge has exactly one axis, and
+#' [set_axis()]`("x")` is it.
+#'
 #' @name WebChartGaugeAxis
+#' @return An object of class `WebChartGaugeAxis`.
+#' @examples
+#' WebChartGaugeAxis(
+#'   type = "chartAxis",
+#'   minimum = 0,
+#'   maximum = 250,
+#'   needle = WebChartNeedle(visible = TRUE),
+#'   ticks = WebChartGaugeAxisTick(visible = TRUE)
+#' )
 #' @export
 WebChartGaugeAxis := new_class(
   WebChartAxis,
@@ -110,7 +172,22 @@ WebChartGaugeAxis := new_class(
 )
 
 #' WebChartGaugeSeries
+#'
+#' The gauge's series. Its value rides `x`, not `y`, and `featureIndex` picks
+#' a single row instead of aggregating - the spec indexes from zero where
+#' [set_gauge()]'s `feature` counts from one.
+#'
 #' @name WebChartGaugeSeries
+#' @return An object of class `WebChartGaugeSeries`.
+#' @examples
+#' WebChartGaugeSeries(
+#'   type = "gaugeSeries",
+#'   id = "series0",
+#'   x = "AVG_body_mass_0"
+#' )
+#'
+#' # Reading the first row verbatim rather than a statistic.
+#' WebChartGaugeSeries(type = "gaugeSeries", x = "body_mass", featureIndex = 0)
 #' @export
 WebChartGaugeSeries := new_class(
   properties = list(
@@ -150,7 +227,24 @@ WebChartGaugeSeries := new_class(
 )
 
 #' WebGaugeChart
+#'
+#' A [WebChart()] with the dial's own geometry. `subType` picks the source:
+#' `statisticGauge` reduces the whole layer, `featureGauge` reads one row.
+#'
 #' @name WebGaugeChart
+#' @return An object of class `WebGaugeChart`.
+#' @examples
+#' WebGaugeChart(
+#'   version = "18.1.0",
+#'   type = "gauge",
+#'   innerRadius = 70,
+#'   startAngle = -180,
+#'   endAngle = 0,
+#'   subType = GaugeChartSubTypes("statisticGauge")
+#' )
+#'
+#' # Built for you by the public API.
+#' arc_gauge(datasets::penguins, body_mass, stat = "mean")@webchart
 #' @export
 WebGaugeChart := new_class(
   WebChart,

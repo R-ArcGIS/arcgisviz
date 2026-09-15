@@ -20,10 +20,23 @@ ArcMapProxy(
 arc_map_proxy(output_id, session = shiny::getDefaultReactiveDomain())
 }
 \arguments{
-\item{output_id}{Defines which \code{\link[=arcgisMapOutput]{arcgisMapOutput()}} to update.}
+\item{layers}{List.}
 
-\item{session}{default \code{\link[shiny:getDefaultReactiveDomain]{shiny::getDefaultReactiveDomain()}}. Defines the
-Shiny session to send through.}
+\item{widgets}{List.}
+
+\item{basemap}{String.}
+
+\item{center}{Number or Number.}
+
+\item{zoom}{Number.}
+
+\item{extent}{List.}
+
+\item{highlight}{List.}
+
+\item{output_id}{String.}
+
+\item{session}{Any value.}
 }
 \value{
 An \code{ArcMapProxy}, which \code{\link[=add_layer]{add_layer()}} and the map \verb{set_*()}

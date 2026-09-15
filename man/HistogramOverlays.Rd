@@ -3,6 +3,17 @@
 \name{HistogramOverlays}
 \alias{HistogramOverlays}
 \title{HistogramOverlays}
+\value{
+An object of class \code{HistogramOverlays}.
+}
 \description{
-HistogramOverlays
+The four overlays a histogram supports. An overlay whose \code{created} is true
+is also what earns a histogram a legend.
+}
+\examples{
+HistogramOverlays(
+  type = "histogramOverlays",
+  mean = WebChartOverlay(created = TRUE, visible = TRUE),
+  median = WebChartOverlay(created = TRUE, visible = TRUE)
+)
 }

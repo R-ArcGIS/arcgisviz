@@ -3,6 +3,12 @@
 \name{WebChartGaugeAxisTick}
 \alias{WebChartGaugeAxisTick}
 \title{WebChartGaugeAxisTick}
+\value{
+An object of class \code{WebChartGaugeAxisTick}.
+}
 \description{
 WebChartGaugeAxisTick
+}
+\examples{
+WebChartGaugeAxisTick(type = "chartGaugeAxisTick", visible = TRUE)
 }

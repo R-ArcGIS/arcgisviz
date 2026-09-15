@@ -15,6 +15,9 @@ An object of class \code{IStatisticDefinitionStatisticParametersOrderBy}.
 \description{
 One of \code{"asc"}, \code{"desc"}, \code{NA}.
 }
+\examples{
+IStatisticDefinitionStatisticParametersOrderBy("asc")
+}
 \section{Additional properties}{
 
 \describe{

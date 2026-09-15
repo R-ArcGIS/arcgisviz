@@ -3,6 +3,17 @@
 \name{IColorStop}
 \alias{IColorStop}
 \title{IColorStop}
+\value{
+An object of class \code{IColorStop}.
+}
 \description{
-IColorStop
+One stop on a colour ramp: the value it sits at, and the colour there. The
+client interpolates between stops.
+}
+\examples{
+IColorStop(
+  value = 3000,
+  color = Color(r = 237, g = 248, b = 251, a = 1),
+  label = "Lightest"
+)
 }

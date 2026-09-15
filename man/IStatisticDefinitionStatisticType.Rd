@@ -15,6 +15,9 @@ An object of class \code{IStatisticDefinitionStatisticType}.
 \description{
 One of \code{"avg"}, \code{"centroid-aggregate"}, \code{"convex-hull-aggregate"}, \code{"count"}, \code{"envelope-aggregate"}, \code{"max"}, \code{"min"}, \code{"percentile-continuous"}, \code{"percentile-discrete"}, \code{"stddev"}, \code{"sum"}, \code{"var"}, \code{NA}.
 }
+\examples{
+IStatisticDefinitionStatisticType("avg")
+}
 \section{Additional properties}{
 
 \describe{

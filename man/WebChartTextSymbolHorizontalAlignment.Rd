@@ -15,6 +15,9 @@ An object of class \code{WebChartTextSymbolHorizontalAlignment}.
 \description{
 One of \code{"center"}, \code{"justify"}, \code{"left"}, \code{"right"}, \code{NA}.
 }
+\examples{
+WebChartTextSymbolHorizontalAlignment("center")
+}
 \section{Additional properties}{
 
 \describe{

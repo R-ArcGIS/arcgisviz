@@ -10,6 +10,23 @@ WebChartMultiAxesDataOrder(
   orderByY = NULL
 )
 }
+\arguments{
+\item{orderType}{String.}
+
+\item{orderByX}{\code{NULL} or String or a \code{WebChartSortOrderKinds} enum.}
+
+\item{orderByY}{\code{NULL} or String or a \code{WebChartSortOrderKinds} enum.}
+}
+\value{
+An object of class \code{WebChartMultiAxesDataOrder}.
+}
 \description{
 WebChartMultiAxesDataOrder
+}
+\examples{
+WebChartMultiAxesDataOrder(
+  orderType = "arcgis-charts-multi-axes",
+  orderByX = WebChartSortOrderKinds("ASC"),
+  orderByY = WebChartSortOrderKinds("DESC")
+)
 }

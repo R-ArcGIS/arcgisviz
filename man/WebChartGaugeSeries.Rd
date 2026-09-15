@@ -3,6 +3,21 @@
 \name{WebChartGaugeSeries}
 \alias{WebChartGaugeSeries}
 \title{WebChartGaugeSeries}
+\value{
+An object of class \code{WebChartGaugeSeries}.
+}
 \description{
-WebChartGaugeSeries
+The gauge's series. Its value rides \code{x}, not \code{y}, and \code{featureIndex} picks
+a single row instead of aggregating - the spec indexes from zero where
+\code{\link[=set_gauge]{set_gauge()}}'s \code{feature} counts from one.
+}
+\examples{
+WebChartGaugeSeries(
+  type = "gaugeSeries",
+  id = "series0",
+  x = "AVG_body_mass_0"
+)
+
+# Reading the first row verbatim rather than a statistic.
+WebChartGaugeSeries(type = "gaugeSeries", x = "body_mass", featureIndex = 0)
 }

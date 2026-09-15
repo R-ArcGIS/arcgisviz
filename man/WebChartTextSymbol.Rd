@@ -24,6 +24,52 @@ WebChartTextSymbol(
   yoffset = NA_character_
 )
 }
+\arguments{
+\item{type}{String.}
+
+\item{style}{String.}
+
+\item{text}{String.}
+
+\item{color}{\code{NULL} or a \code{Color} object.}
+
+\item{backgroundColor}{\code{NULL} or a \code{Color} object.}
+
+\item{borderLineSize}{Number.}
+
+\item{borderLineColor}{\code{NULL} or a \code{Color} object.}
+
+\item{haloSize}{Number.}
+
+\item{haloColor}{\code{NULL} or a \code{Color} object.}
+
+\item{verticalAlignment}{A \code{WebChartTextSymbolVerticalAlignment} enum.}
+
+\item{horizontalAlignment}{A \code{WebChartTextSymbolHorizontalAlignment} enum.}
+
+\item{rightToLeft}{Bool.}
+
+\item{kerning}{Bool.}
+
+\item{font}{\code{NULL} or a \code{IFont} object.}
+
+\item{angle}{Number.}
+
+\item{xoffset}{String or Number.}
+
+\item{yoffset}{String or Number.}
+}
+\value{
+An object of class \code{WebChartTextSymbol}.
+}
 \description{
 WebChartTextSymbol
+}
+\examples{
+WebChartTextSymbol(
+  type = "esriTS",
+  text = "Mean body mass (g)",
+  color = Color(r = 51, g = 51, b = 51, a = 1),
+  font = IFont(family = "Avenir Next", size = 12)
+)
 }

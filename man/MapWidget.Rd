@@ -3,7 +3,18 @@
 \name{MapWidget}
 \alias{MapWidget}
 \title{A widget on a map}
+\value{
+An object of class \code{MapWidget}.
+}
 \description{
 One \verb{<arcgis-*>} component and the properties set on it. Built by
 \code{\link[=add_widget]{add_widget()}}, not called directly.
+}
+\examples{
+# add_widget() and the add_*() shortcuts build these.
+map <- add_legend(arc_map(), position = "top-right", expand = TRUE)
+map@widgets[[1]]
+
+# Every component the registry reaches.
+map_widgets()
 }

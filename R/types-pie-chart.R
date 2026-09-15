@@ -11,7 +11,18 @@ NULL
 library(S7)
 
 #' WebChartPieChartLegend
+#'
+#' A pie's legend, which can also carry each slice's value and percentage.
+#' A pie always draws a legend - it is the only key to the slices.
+#'
 #' @name WebChartPieChartLegend
+#' @return An object of class `WebChartPieChartLegend`.
+#' @examples
+#' WebChartPieChartLegend(
+#'   type = "chartLegend",
+#'   displayCategory = TRUE,
+#'   displayPercentage = TRUE
+#' )
 #' @export
 WebChartPieChartLegend := new_class(
   WebChartLegend,
@@ -25,7 +36,18 @@ WebChartPieChartLegend := new_class(
 )
 
 #' WebChartPieChartTick
+#'
+#' The leader line joining a slice to its label when the label sits outside
+#' the pie.
+#'
 #' @name WebChartPieChartTick
+#' @return An object of class `WebChartPieChartTick`.
+#' @examples
+#' WebChartPieChartTick(
+#'   type = "chartPieChartTick",
+#'   visible = TRUE,
+#'   lineSymbol = ISimpleLineSymbol(width = 0.5)
+#' )
 #' @export
 WebChartPieChartTick := new_class(
   properties = list(
@@ -36,7 +58,20 @@ WebChartPieChartTick := new_class(
 )
 
 #' WebChartPieChartSlice
+#'
+#' Per-slice styling. Modelled, but nothing in the public API sets it -
+#' [set_color()] already does what this would.
+#'
 #' @name WebChartPieChartSlice
+#' @return An object of class `WebChartPieChartSlice`.
+#' @examples
+#' WebChartPieChartSlice(
+#'   sliceId = "Adelie",
+#'   label = "Adelie",
+#'   fillSymbol = ISimpleFillSymbol(
+#'     color = Color(r = 78, g = 121, b = 167, a = 1)
+#'   )
+#' )
 #' @export
 WebChartPieChartSlice := new_class(
   properties = list(
@@ -48,7 +83,15 @@ WebChartPieChartSlice := new_class(
 )
 
 #' WebChartPieChartGroupSlice
+#'
+#' Folds every slice under a percentage threshold into a single "Other". A
+#' [WebChartPieChartSlice()], so it styles itself the same way. Modelled and
+#' not yet reachable from the public API.
+#'
 #' @name WebChartPieChartGroupSlice
+#' @return An object of class `WebChartPieChartGroupSlice`.
+#' @examples
+#' WebChartPieChartGroupSlice(label = "Other", percentageThreshold = 5)
 #' @export
 WebChartPieChartGroupSlice := new_class(
   WebChartPieChartSlice,
@@ -59,7 +102,23 @@ WebChartPieChartGroupSlice := new_class(
 )
 
 #' WebChartPieChartSeries
+#'
+#' The pie's series. It reads the same query shape a bar chart's does, so
+#' [set_stat()] works unchanged - what differs is that a pie sends no axes at
+#' all, and carries the dial geometry (`innerRadius`, the angles) itself.
+#'
 #' @name WebChartPieChartSeries
+#' @return An object of class `WebChartPieChartSeries`.
+#' @examples
+#' WebChartPieChartSeries(
+#'   type = "pieSeries",
+#'   id = "series0",
+#'   x = "species",
+#'   y = "count_0",
+#'   innerRadius = 55,
+#'   displayCategoryOnDataLabel = TRUE,
+#'   displayPercentageOnDataLabel = TRUE
+#' )
 #' @export
 WebChartPieChartSeries := new_class(
   properties = list(

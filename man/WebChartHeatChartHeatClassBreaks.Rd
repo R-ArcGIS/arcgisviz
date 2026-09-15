@@ -3,6 +3,19 @@
 \name{WebChartHeatChartHeatClassBreaks}
 \alias{WebChartHeatChartHeatClassBreaks}
 \title{WebChartHeatChartHeatClassBreaks}
+\value{
+An object of class \code{WebChartHeatChartHeatClassBreaks}.
+}
 \description{
-WebChartHeatChartHeatClassBreaks
+Shades a heat chart's cells by classed breaks off a named Esri ramp, the
+branch \code{set_color(palette = "Heatmap 3")} takes.
+}
+\examples{
+WebChartHeatChartHeatClassBreaks(
+  breaksCount = 5,
+  classificationMethod = WebChartClassBreakTypes("equal-interval"),
+  colorRampInfo = WebChartHeatChartHeatClassBreaksColorRampInfo(
+    name = "Heatmap 3"
+  )
+)
 }

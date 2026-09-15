@@ -3,6 +3,16 @@
 \name{IUniqueValueInfo}
 \alias{IUniqueValueInfo}
 \title{IUniqueValueInfo}
+\value{
+An object of class \code{IUniqueValueInfo}.
+}
 \description{
-IUniqueValueInfo
+One level of a \code{\link[=IUniqueValueRenderer]{IUniqueValueRenderer()}} and the symbol drawn for it.
+}
+\examples{
+IUniqueValueInfo(
+  value = "Adelie",
+  label = "Adelie penguin",
+  symbol = ISimpleFillSymbol(color = Color(r = 78, g = 121, b = 167, a = 1))
+)
 }

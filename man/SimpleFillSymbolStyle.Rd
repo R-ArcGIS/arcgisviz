@@ -15,6 +15,9 @@ An object of class \code{SimpleFillSymbolStyle}.
 \description{
 One of \code{"esriSFSBackwardDiagonal"}, \code{"esriSFSCross"}, \code{"esriSFSDiagonalCross"}, \code{"esriSFSForwardDiagonal"}, \code{"esriSFSHorizontal"}, \code{"esriSFSNull"}, \code{"esriSFSSolid"}, \code{"esriSFSVertical"}, \code{NA}.
 }
+\examples{
+SimpleFillSymbolStyle("esriSFSBackwardDiagonal")
+}
 \section{Additional properties}{
 
 \describe{

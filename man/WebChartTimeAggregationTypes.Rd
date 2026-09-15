@@ -15,6 +15,9 @@ An object of class \code{WebChartTimeAggregationTypes}.
 \description{
 One of \code{"equalIntervalsFromEndTime"}, \code{"equalIntervalsFromStartTime"}, \code{NA}.
 }
+\examples{
+WebChartTimeAggregationTypes("equalIntervalsFromEndTime")
+}
 \section{Additional properties}{
 
 \describe{

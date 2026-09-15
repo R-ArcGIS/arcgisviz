@@ -27,6 +27,73 @@ WebChart(
   iLayer = NULL
 )
 }
+\arguments{
+\item{version}{String.}
+
+\item{type}{String.}
+
+\item{id}{String.}
+
+\item{dataFilters}{\code{NULL} or a \code{WebChartDataFilters} object.}
+
+\item{title}{\code{NULL} or a \code{WebChartText} object.}
+
+\item{subtitle}{\code{NULL} or a \code{WebChartText} object.}
+
+\item{footer}{\code{NULL} or a \code{WebChartText} object.}
+
+\item{background}{\code{NULL} or a \code{Color} object.}
+
+\item{cursorCrosshair}{\code{NULL} or a \code{WebChartCursorCrosshair} object.}
+
+\item{legend}{\code{NULL} or a \code{WebChartLegend} object.}
+
+\item{axes}{List.}
+
+\item{horizontalAxisLabelsBehavior}{A \code{WebChartLabelBehavior} enum.}
+
+\item{verticalAxisLabelsBehavior}{A \code{WebChartLabelBehavior} enum.}
+
+\item{series}{List.}
+
+\item{rotated}{Bool.}
+
+\item{stackedType}{A \code{WebChartStackedKinds} enum.}
+
+\item{colorMatch}{Bool.}
+
+\item{chartRenderer}{\code{NULL} or a \code{ISimpleRenderer} object or a \code{IUniqueValueRenderer} object.}
+
+\item{orderOptions}{\code{NULL} or a \code{WebChartOrderOptions} object.}
+
+\item{iLayer}{\code{NULL} or a \code{IFeatureLayer} object.}
+}
+\value{
+An object of class \code{WebChart}.
+}
 \description{
-WebChart
+The root of a chart's JSON config - the shape the ArcGIS Maps SDK's chart
+component reads. Every \code{arc_chart()} pipeline builds one of these, and
+\code{chart@webchart} is where it lands.
+}
+\details{
+Unset properties are dropped rather than sent as \code{null}, so a sparse config
+falls back to the browser's own defaults instead of overriding them.
+}
+\examples{
+# Built for you by the public API.
+arc_bar(datasets::penguins, species)@webchart
+
+# Or by hand.
+WebChart(
+  version = "18.1.0",
+  type = "barChart",
+  series = list(
+    WebChartBarChartSeries(type = "barSeries", x = "species", y = "count")
+  ),
+  axes = list(
+    WebChartAxis(type = "chartAxis"),
+    WebChartAxis(type = "chartAxis")
+  )
+)
 }

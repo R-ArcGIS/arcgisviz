@@ -15,6 +15,9 @@ An object of class \code{WebChartLabelBehavior}.
 \description{
 One of \code{"hide"}, \code{"rotate"}, \code{"stagger"}, \code{"wrap"}, \code{NA}.
 }
+\examples{
+WebChartLabelBehavior("hide")
+}
 \section{Additional properties}{
 
 \describe{

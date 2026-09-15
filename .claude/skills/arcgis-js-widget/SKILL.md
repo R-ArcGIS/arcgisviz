@@ -11,40 +11,55 @@ day-to-day changes.
 
 ## The one thing to know before touching anything
 
-`inst/htmlwidgets/arcgisChart.js` and `arcgisChart.css` are **generated
-output**, not source. The source is `srcjs/widgets/arcgisChart.js`. If you
-edit the generated files directly, your changes are silently lost the next
-time someone bundles.
+`inst/htmlwidgets/arcgisChart.module.js` is **generated output**, not source.
+The source is `srcjs/widgets/arcgisChart.js`. If you edit the generated file
+directly, your changes are silently lost the next time someone bundles.
 
-## The two dependencies, and why publicPath is set by hand
+## The SDK is on the CDN, and that shapes everything else
 
-Each widget reaches the page through **two** htmlDependency objects, and the
-difference between them is load-bearing:
+Every `@arcgis/*` import is a webpack **external** pointing at a pinned
+`https://js.arcgis.com/5.1/...` URL (`srcjs/config/externals.json`). So
+`inst/htmlwidgets/` holds exactly four files - two bundles, two `.yaml` -
+totalling 24KB. Bundling the SDK instead produced 1839 files and 106MB.
 
-| dependency | built by | `all_files` | contains |
-|---|---|---|---|
-| `<name>-binding-<pkg version>` | `htmlwidgets::getDependency()` | **FALSE** | `<name>.js` alone |
-| `<name>-1.0.0` | `inst/htmlwidgets/<name>.yaml` | TRUE (default) | the whole build - every chunk |
+Four things follow, and each one is a trap if you forget it:
 
-The **binding** one is what loads and runs the bundle, so webpack's automatic
-publicPath resolves async chunks against a directory holding one file, and
-every chunk 404s: no basemap, `MapView.loadAsyncDependencies` throws
-`ChunkLoadError`, no lazily imported component. `srcjs/modules/public-path.js`
-repoints publicPath at the yaml dependency's sibling directory, and **both
-entries import it first** - a chunk requested while another module is still
-evaluating would otherwise resolve against the wrong path.
+- **The entries are ES modules.** They carry literal
+  `import ... from "https://js.arcgis.com/..."`, so the build sets
+  `output.module`, `output.chunkFormat: "module"`,
+  `output.library.type: "module"` and `experiments.outputModule`.
+- **They are named `<name>.module.js`, never `<name>.js`.**
+  `htmlwidgets::getDependency()` turns `inst/htmlwidgets/<name>.js` into a
+  `<name>-binding-<pkgversion>` dependency and hardcodes its script tag with
+  no attributes - and an ES module loaded as a classic script dies with
+  "Cannot use import statement outside a module". Under any other filename no
+  binding dependency is built at all, and the yaml declares the script itself:
 
-Two traps around this, both already sprung once:
+  ```yaml
+  script:
+    src: arcgisChart.module.js
+    type: module
+  ```
 
-- **Do not add `script:` back to the yaml** to "fix" chunk loading. That
-  executes the bundle a second time under a second webpack runtime, which
-  gives two instances of `@arcgis/core`'s `Layer.js` and breaks layer views
-  with "Layer does not support creating a layer view".
-- The yaml's `name`/`version` are part of the publicPath contract. Change one
-  and you must change `srcjs/modules/public-path.js`.
+  That works because `getDependency()` does `do.call(htmlDependency, l)` on
+  each yaml entry, so a list becomes script attributes.
+- **`output.clean` (keeping `*.yaml`) is mandatory.** Webpack does not clean
+  its output directory, and dev and prod name chunks differently, so one
+  `just bundle-dev` once stranded 466 files nothing referenced again. The
+  `keep` matters: the `.yaml` files live in the output directory and are
+  source, not output.
+- **There is no publicPath problem any more** because there are no async
+  chunks. `srcjs/modules/public-path.js` is deleted. The map's hand-written
+  `import()` per component is deleted too - the CDN build ships its own lazy
+  element registry, so `await customElements.whenDefined(name)` is the
+  replacement, and `customElements.get(name)` is the "is this a real
+  component" check.
 
-Symptom to recognize: 404s under `lib/<name>-binding-<version>/*.js` while
-the same files exist under `lib/<name>-1.0.0/`.
+Two consequences worth stating out loud: **the widgets need network access to
+js.arcgis.com**, offline use would mean vendoring the SDK back in; and the CDN
+is **pinned to 5.1** to match the `.d.ts` the R types are hand-written
+against - tracking `latest` reintroduces exactly the spec drift that got
+`@arcgis/charts-model` removed.
 
 ## Build commands
 

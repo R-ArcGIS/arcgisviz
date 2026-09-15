@@ -3,6 +3,17 @@
 \name{WebChartPieChartTick}
 \alias{WebChartPieChartTick}
 \title{WebChartPieChartTick}
+\value{
+An object of class \code{WebChartPieChartTick}.
+}
 \description{
-WebChartPieChartTick
+The leader line joining a slice to its label when the label sits outside
+the pie.
+}
+\examples{
+WebChartPieChartTick(
+  type = "chartPieChartTick",
+  visible = TRUE,
+  lineSymbol = ISimpleLineSymbol(width = 0.5)
+)
 }

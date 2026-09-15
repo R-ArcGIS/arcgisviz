@@ -3,6 +3,19 @@
 \name{WebChartNeedle}
 \alias{WebChartNeedle}
 \title{WebChartNeedle}
+\value{
+An object of class \code{WebChartNeedle}.
+}
 \description{
-WebChartNeedle
+The needle drawn over a gauge's fill. \code{set_gauge(needle = FALSE)} is the
+friendly way to turn it off.
+}
+\examples{
+WebChartNeedle(
+  type = "chartGaugeNeedle",
+  visible = TRUE,
+  innerRadius = 20,
+  displayPin = TRUE,
+  symbol = ISimpleFillSymbol(color = Color(r = 51, g = 51, b = 51, a = 1))
+)
 }

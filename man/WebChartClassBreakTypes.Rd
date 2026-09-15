@@ -15,6 +15,9 @@ An object of class \code{WebChartClassBreakTypes}.
 \description{
 One of \code{"equal-interval"}, \code{"quantile"}, \code{"natural-breaks"}, \code{"manual"}, \code{NA}.
 }
+\examples{
+WebChartClassBreakTypes("equal-interval")
+}
 \section{Additional properties}{
 
 \describe{

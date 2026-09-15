@@ -15,6 +15,9 @@ An object of class \code{IntlNumberFormatOptionsCompactDisplay}.
 \description{
 One of \code{"long"}, \code{"short"}, \code{NA}.
 }
+\examples{
+IntlNumberFormatOptionsCompactDisplay("long")
+}
 \section{Additional properties}{
 
 \describe{

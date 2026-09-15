@@ -15,6 +15,9 @@ An object of class \code{IntlDateTimeFormatOptionsTimeZoneName}.
 \description{
 One of \code{"long"}, \code{"longGeneric"}, \code{"longOffset"}, \code{"short"}, \code{"shortGeneric"}, \code{"shortOffset"}, \code{NA}.
 }
+\examples{
+IntlDateTimeFormatOptionsTimeZoneName("long")
+}
 \section{Additional properties}{
 
 \describe{

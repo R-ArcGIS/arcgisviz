@@ -15,6 +15,9 @@ An object of class \code{SimpleLineSymbolStyle}.
 \description{
 One of \code{"esriSLSDash"}, \code{"esriSLSDashDot"}, \code{"esriSLSDashDotDot"}, \code{"esriSLSDot"}, \code{"esriSLSNull"}, \code{"esriSLSSolid"}, \code{NA}.
 }
+\examples{
+SimpleLineSymbolStyle("esriSLSDash")
+}
 \section{Additional properties}{
 
 \describe{

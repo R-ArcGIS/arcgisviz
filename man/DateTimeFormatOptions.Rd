@@ -10,6 +10,25 @@ DateTimeFormatOptions(
   formatPerDateTimeUnit = NULL
 )
 }
+\arguments{
+\item{type}{String.}
+
+\item{intlOptions}{A \code{IntlDateTimeFormatOptions} object.}
+
+\item{formatPerDateTimeUnit}{\code{NULL} or a \code{WebChartDateTimeUnitFormatOptions} object.}
+}
+\value{
+An object of class \code{DateTimeFormatOptions}.
+}
 \description{
-DateTimeFormatOptions
+How a date axis or label formats its values.
+}
+\examples{
+DateTimeFormatOptions(
+  type = "date-time",
+  intlOptions = IntlDateTimeFormatOptions(
+    year = IntlDateTimeDigitStyle("numeric"),
+    month = IntlDateTimeFormatOptionsMonth("short")
+  )
+)
 }

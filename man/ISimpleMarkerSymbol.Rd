@@ -15,6 +15,36 @@ ISimpleMarkerSymbol(
   yoffset = NA_real_
 )
 }
+\arguments{
+\item{type}{String.}
+
+\item{style}{A \code{SimpleMarkerSymbolStyle} enum.}
+
+\item{color}{\code{NULL} or a \code{Color} object.}
+
+\item{size}{Number.}
+
+\item{outline}{\code{NULL} or a \code{ISimpleLineSymbol} object.}
+
+\item{angle}{Number.}
+
+\item{xoffset}{Number.}
+
+\item{yoffset}{Number.}
+}
+\value{
+An object of class \code{ISimpleMarkerSymbol}.
+}
 \description{
 ISimpleMarkerSymbol
+}
+\examples{
+ISimpleMarkerSymbol(
+  style = SimpleMarkerSymbolStyle("esriSMSCircle"),
+  color = Color(r = 70, g = 130, b = 180, a = 1),
+  size = 8
+)
+}
+\seealso{
+\code{\link[=new_symbol]{new_symbol()}}, which builds one from friendly names and colours.
 }

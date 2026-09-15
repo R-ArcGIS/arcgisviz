@@ -15,6 +15,9 @@ An object of class \code{IntlDateTimeFormatLength}.
 \description{
 One of \code{"full"}, \code{"long"}, \code{"medium"}, \code{"short"}, \code{NA}.
 }
+\examples{
+IntlDateTimeFormatLength("full")
+}
 \section{Additional properties}{
 
 \describe{

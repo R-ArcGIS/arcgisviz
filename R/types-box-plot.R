@@ -11,7 +11,23 @@ NULL
 library(S7)
 
 #' WebChartBoxPlotSeries
+#'
+#' The box plot's series. `y` is a character *vector* here, not a single
+#' string - a box summarises its column into five numbers.
+#'
 #' @name WebChartBoxPlotSeries
+#' @return An object of class `WebChartBoxPlotSeries`.
+#' @examples
+#' WebChartBoxPlotSeries(
+#'   type = "boxPlotSeries",
+#'   id = "series0",
+#'   name = "body_mass",
+#'   x = "species",
+#'   y = "body_mass",
+#'   fillSymbol = ISimpleFillSymbol(
+#'     color = Color(r = 78, g = 121, b = 167, a = 1)
+#'   )
+#' )
 #' @export
 WebChartBoxPlotSeries := new_class(
   properties = list(
@@ -47,7 +63,22 @@ WebChartBoxPlotSeries := new_class(
 )
 
 #' WebBoxPlot
+#'
+#' A [WebChart()] with the three settings only a box plot has. Subclassing is
+#' what lets it inherit the `as_vector()` method that drops unset properties.
+#'
 #' @name WebBoxPlot
+#' @return An object of class `WebBoxPlot`.
+#' @examples
+#' WebBoxPlot(
+#'   version = "18.1.0",
+#'   type = "boxPlot",
+#'   showOutliers = FALSE,
+#'   standardizeValues = TRUE
+#' )
+#'
+#' # Built for you by the public API.
+#' arc_boxplot(datasets::penguins, species, body_mass)@webchart
 #' @export
 WebBoxPlot := new_class(
   WebChart,

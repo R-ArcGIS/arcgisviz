@@ -15,6 +15,9 @@ An object of class \code{GaugeChartSubTypes}.
 \description{
 One of \code{"featureGauge"}, \code{"statisticGauge"}, \code{NA}.
 }
+\examples{
+GaugeChartSubTypes("featureGauge")
+}
 \section{Additional properties}{
 
 \describe{

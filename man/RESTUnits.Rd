@@ -15,6 +15,9 @@ An object of class \code{RESTUnits}.
 \description{
 One of \code{"feet"}, \code{"kilometers"}, \code{"meters"}, \code{"miles"}, \code{"nautical-miles"}, \code{"us-nautical-miles"}, \code{NA}.
 }
+\examples{
+RESTUnits("feet")
+}
 \section{Additional properties}{
 
 \describe{

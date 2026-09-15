@@ -1,12 +1,9 @@
-import "../modules/public-path.js";
 import "widgets";
-import { defineCustomElements as defineChartElements } from "@arcgis/charts-components/loader";
 import { createModel } from "@arcgis/charts-components";
 
-// R sends a sparse config; the model supplies the defaults (a WebChart
-// needs a full axes/labels/symbol tree or the engine throws "There are no
-// X axes on chart"). See srcjs/README.md.
-defineChartElements(window);
+// No defineCustomElements() call: the CDN build of charts-components carries
+// its own lazy element registry and defines <arcgis-chart> as a side effect
+// of this import. The npm `loader` entry is what needs defining by hand.
 
 // Arrays merge element-wise so a sparse series layers onto the default
 // series instead of replacing it. A null value deletes the key outright -
@@ -211,20 +208,21 @@ HTMLWidgets.widget({
     return {
       receiveMessage: async function (msg) {
         try {
+          var payload = JSON.parse(msg.payload);
           if (msg.method === "config") {
-            state.config = deepMerge(state.config, msg.payload.config);
+            state.config = deepMerge(state.config, payload.config);
             await build(
               state.iLayer,
               state.config,
               state.chartType,
-              msg.payload.tooltip || null,
+              payload.tooltip || null,
             );
           } else if (msg.method === "element") {
-            Object.assign(chartEl, msg.payload);
+            Object.assign(chartEl, payload);
           } else if (msg.method === "model") {
-            Object.assign(chartEl.model, msg.payload);
+            Object.assign(chartEl.model, payload);
           } else if (msg.method === "call") {
-            await chartEl[msg.payload.method].apply(chartEl, msg.payload.args);
+            await chartEl[payload.method].apply(chartEl, payload.args);
           }
         } catch (err) {
           console.error("arcgisChart proxy:", err);

@@ -15,6 +15,9 @@ An object of class \code{IntlNumberFormatOptionsCurrencyDisplay}.
 \description{
 One of \code{"code"}, \code{"name"}, \code{"narrowSymbol"}, \code{"symbol"}, \code{NA}.
 }
+\examples{
+IntlNumberFormatOptionsCurrencyDisplay("code")
+}
 \section{Additional properties}{
 
 \describe{

@@ -12,6 +12,23 @@ WebChartAxisScrollBar(
   margin = NA_real_
 )
 }
+\arguments{
+\item{visible}{Bool.}
+
+\item{width}{Number.}
+
+\item{color}{\code{NULL} or a \code{Color} object.}
+
+\item{gripSize}{Number.}
+
+\item{margin}{Number.}
+}
+\value{
+An object of class \code{WebChartAxisScrollBar}.
+}
 \description{
 WebChartAxisScrollBar
+}
+\examples{
+WebChartAxisScrollBar(visible = TRUE, width = 12, gripSize = 6)
 }

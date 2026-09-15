@@ -10,6 +10,22 @@ WebChartDirectionalDataOrder(
   preferLabel = NA
 )
 }
+\arguments{
+\item{orderType}{A \code{WebChartDirectionalDataOrderOrderType} enum.}
+
+\item{orderBy}{A \code{WebChartSortOrderKinds} enum.}
+
+\item{preferLabel}{Bool.}
+}
+\value{
+An object of class \code{WebChartDirectionalDataOrder}.
+}
 \description{
 WebChartDirectionalDataOrder
+}
+\examples{
+WebChartDirectionalDataOrder(
+  orderType = WebChartDirectionalDataOrderOrderType("arcgis-charts-y-value"),
+  orderBy = WebChartSortOrderKinds("DESC")
+)
 }

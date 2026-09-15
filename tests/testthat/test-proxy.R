@@ -20,6 +20,22 @@ fake_proxy <- function(chart = arc_col(test_df(), category, value)) {
   list(proxy = proxy, session = session)
 }
 
+# The browser parses the payload string, so that is what these assert on.
+# Arrays stay lists: simplifying them to a data frame would hide the shape
+# the client actually reads.
+sent_payload <- function(session, i = 1) {
+  yyjsonr::read_json_str(
+    session$sent()[[i]]$message$payload,
+    opts = yyjsonr::opts_read_json(arr_of_objs_to_df = FALSE)
+  )
+}
+
+# Reading the payload back simplifies a one-element array to a scalar, which
+# is exactly the distinction some of these tests are about.
+sent_json <- function(session, i = 1) {
+  session$sent()[[i]]$message$payload
+}
+
 test_that("a proxy inherits ArcChart, so every set_*() works on it", {
   p <- fake_proxy()$proxy
 
@@ -41,31 +57,35 @@ test_that("arc_update() sends the rebuilt config and nothing else", {
   expect_identical(msg$type, "arcgisviz-chart")
   expect_identical(msg$message$method, "config")
   expect_identical(msg$message$id, "chart")
-  expect_identical(msg$message$payload$config$title$content$text, "Hi")
+
+  payload <- sent_payload(f$session)
+  expect_identical(payload$config$title$content$text, "Hi")
 
   # The layer is never resent; that is the whole point of a proxy.
-  expect_null(msg$message$payload$iLayer)
+  expect_null(payload$iLayer)
 })
 
 test_that("set_filter() goes to the element, not the model", {
   f <- fake_proxy()
   set_filter(f$proxy, "value > 2")
 
-  msg <- f$session$sent()[[1]]$message
-  expect_identical(msg$method, "element")
-  expect_identical(msg$payload$runtimeDataFilters$where, "value > 2")
+  expect_identical(f$session$sent()[[1]]$message$method, "element")
+  expect_identical(
+    sent_payload(f$session)$runtimeDataFilters$where,
+    "value > 2"
+  )
 
   expect_error(set_filter(f$proxy, where = 1), "single SQL clause")
 })
 
-test_that("a blank filter keeps the key so Shiny sends a JSON null", {
-  # Shiny drops an absent key but serializes a NULL-valued one to null, and
-  # null is what clears a filter client-side.
+test_that("a blank filter keeps the key so the JSON carries a null", {
+  # An absent key leaves a filter alone, a null clears it, so the key has to
+  # survive serialization.
   for (blank in list(NULL, NA, NA_character_, "")) {
     f <- fake_proxy()
     set_filter(f$proxy, blank)
 
-    filters <- f$session$sent()[[1]]$message$payload$runtimeDataFilters
+    filters <- sent_payload(f$session)$runtimeDataFilters
     expect_named(filters, c("where", "objectIds"))
     expect_null(filters$where)
   }
@@ -75,14 +95,12 @@ test_that("object ids clear on an empty vector", {
   f <- fake_proxy()
   set_filter(f$proxy, object_ids = c(1, 2))
   expect_identical(
-    f$session$sent()[[1]]$message$payload$runtimeDataFilters$objectIds,
-    list(1L, 2L)
+    sent_payload(f$session, 1)$runtimeDataFilters$objectIds,
+    c(1L, 2L)
   )
 
   set_filter(f$proxy, object_ids = integer())
-  expect_null(
-    f$session$sent()[[2]]$message$payload$runtimeDataFilters$objectIds
-  )
+  expect_null(sent_payload(f$session, 2)$runtimeDataFilters$objectIds)
 })
 
 test_that("set_legend() rides the config like every other setter", {
@@ -93,10 +111,11 @@ test_that("set_legend() rides the config like every other setter", {
   f <- fake_proxy(arc_bar(grouped, category) |> set_color(grp))
   arc_update(set_legend(f$proxy, visible = TRUE, position = "bottom"))
 
-  msg <- f$session$sent()[[1]]$message
-  expect_identical(msg$method, "config")
-  expect_true(msg$payload$config$legend$visible)
-  expect_identical(msg$payload$config$legend$position, "bottom")
+  expect_identical(f$session$sent()[[1]]$message$method, "config")
+
+  legend <- sent_payload(f$session)$config$legend
+  expect_true(legend$visible)
+  expect_identical(legend$position, "bottom")
 })
 
 test_that("the method wrappers send a call with their arguments", {
@@ -105,21 +124,19 @@ test_that("the method wrappers send a call with their arguments", {
   arc_export_image(f$proxy, "svg")
   set_selection(f$proxy, c(1, 2))
 
-  sent <- f$session$sent()
-  expect_identical(sent[[1]]$message$payload$method, "resetZoom")
-  expect_identical(sent[[2]]$message$payload$method, "exportAsImage")
-  expect_identical(sent[[2]]$message$payload$args, list("svg"))
+  expect_identical(sent_payload(f$session, 1)$method, "resetZoom")
+  expect_identical(sent_payload(f$session, 2)$method, "exportAsImage")
+
+  # the client hands `args` to .apply(), so it must stay an array
+  expect_match(sent_json(f$session, 2), '"args":["svg"]', fixed = TRUE)
 
   # An empty selection is a clear, not an empty selection payload.
   expect_identical(
-    sent[[3]]$message$payload$selectionData$selectionOIDs,
-    list(1L, 2L)
+    sent_payload(f$session, 3)$selectionData$selectionOIDs,
+    c(1L, 2L)
   )
   set_selection(f$proxy, integer())
-  expect_identical(
-    f$session$sent()[[4]]$message$payload$method,
-    "clearSelection"
-  )
+  expect_identical(sent_payload(f$session, 4)$method, "clearSelection")
 
   expect_error(arc_export_image(f$proxy, "gif"), "must be one of")
 })

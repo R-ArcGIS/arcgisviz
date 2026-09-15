@@ -24,6 +24,51 @@ IntlNumberFormatOptions(
   currencySign = IntlNumberFormatOptionsCurrencySign()
 )
 }
+\arguments{
+\item{localeMatcher}{A \code{IntlLocaleMatcher} enum.}
+
+\item{style}{A \code{IntlNumberFormatOptionsStyle} enum.}
+
+\item{currency}{String.}
+
+\item{currencyDisplay}{A \code{IntlNumberFormatOptionsCurrencyDisplay} enum.}
+
+\item{useGrouping}{Bool.}
+
+\item{minimumIntegerDigits}{Number.}
+
+\item{minimumFractionDigits}{Number.}
+
+\item{maximumFractionDigits}{Number.}
+
+\item{minimumSignificantDigits}{Number.}
+
+\item{maximumSignificantDigits}{Number.}
+
+\item{numberingSystem}{String.}
+
+\item{compactDisplay}{A \code{IntlNumberFormatOptionsCompactDisplay} enum.}
+
+\item{notation}{A \code{IntlNumberFormatOptionsNotation} enum.}
+
+\item{signDisplay}{A \code{IntlNumberFormatOptionsSignDisplay} enum.}
+
+\item{unit}{String.}
+
+\item{unitDisplay}{A \code{IntlFormatWidth} enum.}
+
+\item{currencySign}{A \code{IntlNumberFormatOptionsCurrencySign} enum.}
+}
+\value{
+An object of class \code{IntlNumberFormatOptions}.
+}
 \description{
-IntlNumberFormatOptions
+Mirrors JavaScript's own \code{Intl.NumberFormat} options object.
+}
+\examples{
+IntlNumberFormatOptions(
+  style = IntlNumberFormatOptionsStyle("decimal"),
+  useGrouping = TRUE,
+  maximumFractionDigits = 1
+)
 }

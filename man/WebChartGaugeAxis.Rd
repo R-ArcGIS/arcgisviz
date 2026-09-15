@@ -3,6 +3,19 @@
 \name{WebChartGaugeAxis}
 \alias{WebChartGaugeAxis}
 \title{WebChartGaugeAxis}
+\value{
+An object of class \code{WebChartGaugeAxis}.
+}
 \description{
-WebChartGaugeAxis
+A \code{\link[=WebChartAxis]{WebChartAxis()}} carrying the needle. A gauge has exactly one axis, and
+\code{\link[=set_axis]{set_axis()}}\code{("x")} is it.
+}
+\examples{
+WebChartGaugeAxis(
+  type = "chartAxis",
+  minimum = 0,
+  maximum = 250,
+  needle = WebChartNeedle(visible = TRUE),
+  ticks = WebChartGaugeAxisTick(visible = TRUE)
+)
 }

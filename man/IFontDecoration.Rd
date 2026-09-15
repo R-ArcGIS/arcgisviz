@@ -15,6 +15,9 @@ An object of class \code{IFontDecoration}.
 \description{
 One of \code{"line-through"}, \code{"none"}, \code{"underline"}, \code{NA}.
 }
+\examples{
+IFontDecoration("line-through")
+}
 \section{Additional properties}{
 
 \describe{

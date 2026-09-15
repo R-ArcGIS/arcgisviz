@@ -15,6 +15,9 @@ An object of class \code{IntlNumberFormatOptionsSignDisplay}.
 \description{
 One of \code{"always"}, \code{"auto"}, \code{"exceptZero"}, \code{"never"}, \code{NA}.
 }
+\examples{
+IntlNumberFormatOptionsSignDisplay("always")
+}
 \section{Additional properties}{
 
 \describe{

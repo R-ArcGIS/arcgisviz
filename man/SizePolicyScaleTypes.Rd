@@ -15,6 +15,9 @@ An object of class \code{SizePolicyScaleTypes}.
 \description{
 One of \code{"linear"}, \code{"logarithmic"}, \code{NA}.
 }
+\examples{
+SizePolicyScaleTypes("linear")
+}
 \section{Additional properties}{
 
 \describe{

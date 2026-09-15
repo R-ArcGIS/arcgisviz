@@ -3,6 +3,26 @@
 \name{WebChartHeatChartSeries}
 \alias{WebChartHeatChartSeries}
 \title{WebChartHeatChartSeries}
+\value{
+An object of class \code{WebChartHeatChartSeries}.
+}
 \description{
-WebChartHeatChartSeries
+The heat chart's series. Cells are shaded by their own \code{gradientRules} or
+\code{classBreaksRules} rather than by the chart's renderer, and the value is
+the cell count - which is why \code{set_color()} takes \code{palette} alone here.
+}
+\examples{
+WebChartHeatChartSeries(
+  type = "heatSeries",
+  id = "series0",
+  x = "species",
+  y = "island",
+  heatRulesType = WebChartHeatChartHeatRulesTypes("gradient"),
+  gradientRules = WebChartHeatChartGradient(
+    colorList = list(
+      Color(r = 255, g = 255, b = 255, a = 1),
+      Color(r = 0, g = 0, b = 128, a = 1)
+    )
+  )
+)
 }

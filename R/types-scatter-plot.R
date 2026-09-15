@@ -20,7 +20,22 @@ NULL
 library(S7)
 
 #' WebChartOverlay
+#'
+#' One overlay drawn over a chart's marks, such as a trend line. `created`
+#' being true is also what gives a scatterplot or histogram a legend.
+#'
 #' @name WebChartOverlay
+#' @return An object of class `WebChartOverlay`.
+#' @examples
+#' WebChartOverlay(
+#'   type = "chartOverlay",
+#'   created = TRUE,
+#'   visible = TRUE,
+#'   symbol = ISimpleLineSymbol(
+#'     style = SimpleLineSymbolStyle("esriSLSDash"),
+#'     width = 1
+#'   )
+#' )
 #' @export
 WebChartOverlay <- new_class(
   "WebChartOverlay",
@@ -33,7 +48,16 @@ WebChartOverlay <- new_class(
 )
 
 #' ScatterplotOverlays
+#'
+#' The overlays a scatterplot supports - a trend line, and nothing else.
+#'
 #' @name ScatterplotOverlays
+#' @return An object of class `ScatterplotOverlays`.
+#' @examples
+#' ScatterplotOverlays(
+#'   type = "scatterPlotOverlays",
+#'   trendLine = WebChartOverlay(created = TRUE, visible = TRUE)
+#' )
 #' @export
 ScatterplotOverlays <- new_class(
   "ScatterplotOverlays",
@@ -44,7 +68,20 @@ ScatterplotOverlays <- new_class(
 )
 
 #' SizePolicy
+#'
+#' Scales marker area by a numeric column. Declared on the scatterplot series
+#' alone, which is why [set_size()] works on no other chart type.
+#'
 #' @name SizePolicy
+#' @return An object of class `SizePolicy`.
+#' @examples
+#' SizePolicy(
+#'   type = "sizeScale",
+#'   field = "body_mass",
+#'   scaleType = SizePolicyScaleTypes("linear"),
+#'   minSize = 4,
+#'   maxSize = 18
+#' )
 #' @export
 SizePolicy <- new_class(
   "SizePolicy",
@@ -58,7 +95,24 @@ SizePolicy <- new_class(
 )
 
 #' WebChartScatterplotSeries
+#'
+#' The scatterplot's series. It is the only one in the spec that can name
+#' extra tooltip fields (`additionalTooltipFields`) or size its markers by a
+#' column (`sizePolicy`), which is why [set_size()] and the native tooltip
+#' path are scatter-only.
+#'
 #' @name WebChartScatterplotSeries
+#' @return An object of class `WebChartScatterplotSeries`.
+#' @examples
+#' WebChartScatterplotSeries(
+#'   type = "scatterSeries",
+#'   id = "series0",
+#'   name = "bill_dep",
+#'   x = "bill_len",
+#'   y = "bill_dep",
+#'   additionalTooltipFields = c("island", "body_mass"),
+#'   sizePolicy = SizePolicy(type = "sizeScale", field = "body_mass")
+#' )
 #' @export
 WebChartScatterplotSeries <- new_class(
   "WebChartScatterplotSeries",

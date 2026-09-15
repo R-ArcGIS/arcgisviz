@@ -29,10 +29,41 @@ ArcProxy(
 arc_proxy(output_id, chart, session = shiny::getDefaultReactiveDomain())
 }
 \arguments{
-\item{output_id}{Defines which \code{\link[=arcgisChartOutput]{arcgisChartOutput()}} to update.}
+\item{data}{Any value.}
 
-\item{session}{default \code{\link[shiny:getDefaultReactiveDomain]{shiny::getDefaultReactiveDomain()}}. Defines the
-Shiny session to send through.}
+\item{chart_type}{String.}
+
+\item{x}{String.}
+
+\item{y}{String.}
+
+\item{stat}{String.}
+
+\item{labs}{List.}
+
+\item{color}{List.}
+
+\item{alpha}{Number.}
+
+\item{size}{List.}
+
+\item{tooltip}{String.}
+
+\item{axes}{List.}
+
+\item{legend}{List.}
+
+\item{flipped}{Bool.}
+
+\item{position}{String.}
+
+\item{series_opts}{List.}
+
+\item{config_opts}{List.}
+
+\item{output_id}{String.}
+
+\item{session}{Any value.}
 
 \item{chart}{Defines the chart currently rendered there, so that the
 \verb{set_*()} functions can validate against the same data.}

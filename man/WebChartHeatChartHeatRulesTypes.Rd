@@ -15,6 +15,9 @@ An object of class \code{WebChartHeatChartHeatRulesTypes}.
 \description{
 One of \code{"gradient"}, \code{"renderer"}, \code{NA}.
 }
+\examples{
+WebChartHeatChartHeatRulesTypes("gradient")
+}
 \section{Additional properties}{
 
 \describe{

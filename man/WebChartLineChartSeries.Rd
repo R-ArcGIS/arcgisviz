@@ -33,6 +33,79 @@ WebChartLineChartSeries(
   temporalBinning = NULL
 )
 }
+\arguments{
+\item{type}{String.}
+
+\item{y}{String.}
+
+\item{lineSymbol}{\code{NULL} or a \code{ISimpleLineSymbol} object.}
+
+\item{lineSmoothed}{Bool.}
+
+\item{showArea}{Bool.}
+
+\item{markerVisible}{Bool.}
+
+\item{markerSymbol}{\code{NULL} or a \code{ISimpleMarkerSymbol} object.}
+
+\item{areaColor}{\code{NULL} or a \code{Color} object.}
+
+\item{stackNegativeValuesToBaseline}{Bool.}
+
+\item{connectLines}{Bool.}
+
+\item{nullCategory}{\code{NULL} or a \code{WebChartNullCategory} object.}
+
+\item{id}{String.}
+
+\item{visible}{Bool.}
+
+\item{dataTooltipVisible}{Bool.}
+
+\item{dataTooltipReverseColor}{Bool.}
+
+\item{dataTooltipValueFormat}{\code{NULL} or a \code{NumberFormatOptions} object.}
+
+\item{dataTooltipPercentFormat}{\code{NULL} or a \code{NumberFormatOptions} object.}
+
+\item{dataTooltipDateFormat}{\code{NULL} or a \code{DateTimeFormatOptions} object.}
+
+\item{dataTooltipFontSize}{Number.}
+
+\item{name}{String.}
+
+\item{query}{\code{NULL} or a \code{WebChartSeriesQuery} object.}
+
+\item{x}{String.}
+
+\item{dataLabels}{\code{NULL} or a \code{WebChartText} object.}
+
+\item{assignToSecondValueAxis}{Bool.}
+
+\item{binTemporalData}{Bool.}
+
+\item{temporalBinning}{\code{NULL} or a \code{WebChartTemporalBinning} object.}
+}
+\value{
+An object of class \code{WebChartLineChartSeries}.
+}
 \description{
-WebChartLineChartSeries
+One series of a line chart. A radar chart reuses this class outright - the
+spec declares its series as this interface with a different \code{type}.
+}
+\examples{
+WebChartLineChartSeries(
+  type = "lineSeries",
+  id = "series0",
+  name = "mean(body_mass)",
+  x = "year",
+  y = "AVG_body_mass_0",
+  lineSymbol = ISimpleLineSymbol(
+    color = Color(r = 78, g = 121, b = 167, a = 1),
+    width = 2
+  )
+)
+
+# The same class, as a radar series.
+WebChartLineChartSeries(type = "radarSeries", x = "species", y = "count")
 }

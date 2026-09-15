@@ -22,7 +22,27 @@ NULL
 library(S7)
 
 #' WebChartLineChartSeries
+#'
+#' One series of a line chart. A radar chart reuses this class outright - the
+#' spec declares its series as this interface with a different `type`.
+#'
 #' @name WebChartLineChartSeries
+#' @return An object of class `WebChartLineChartSeries`.
+#' @examples
+#' WebChartLineChartSeries(
+#'   type = "lineSeries",
+#'   id = "series0",
+#'   name = "mean(body_mass)",
+#'   x = "year",
+#'   y = "AVG_body_mass_0",
+#'   lineSymbol = ISimpleLineSymbol(
+#'     color = Color(r = 78, g = 121, b = 167, a = 1),
+#'     width = 2
+#'   )
+#' )
+#'
+#' # The same class, as a radar series.
+#' WebChartLineChartSeries(type = "radarSeries", x = "species", y = "count")
 #' @export
 WebChartLineChartSeries <- new_class(
   "WebChartLineChartSeries",

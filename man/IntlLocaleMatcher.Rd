@@ -15,6 +15,9 @@ An object of class \code{IntlLocaleMatcher}.
 \description{
 One of \code{"best fit"}, \code{"lookup"}, \code{NA}.
 }
+\examples{
+IntlLocaleMatcher("best fit")
+}
 \section{Additional properties}{
 
 \describe{

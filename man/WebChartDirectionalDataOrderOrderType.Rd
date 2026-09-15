@@ -15,6 +15,9 @@ An object of class \code{WebChartDirectionalDataOrderOrderType}.
 \description{
 One of \code{"arcgis-charts-category"}, \code{"arcgis-charts-mean"}, \code{"arcgis-charts-median"}, \code{"arcgis-charts-y-value"}, \code{NA}.
 }
+\examples{
+WebChartDirectionalDataOrderOrderType("arcgis-charts-category")
+}
 \section{Additional properties}{
 
 \describe{

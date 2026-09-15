@@ -13,7 +13,16 @@ NULL
 library(S7)
 
 #' IStatisticDefinitionStatisticParameters
+#'
+#' Extra arguments for the statistics that take them - the percentile ones.
+#'
 #' @name IStatisticDefinitionStatisticParameters
+#' @return An object of class `IStatisticDefinitionStatisticParameters`.
+#' @examples
+#' IStatisticDefinitionStatisticParameters(
+#'   value = 0.9,
+#'   orderBy = IStatisticDefinitionStatisticParametersOrderBy("asc")
+#' )
 #' @export
 IStatisticDefinitionStatisticParameters <- new_class(
   "IStatisticDefinitionStatisticParameters",
@@ -24,7 +33,19 @@ IStatisticDefinitionStatisticParameters <- new_class(
 )
 
 #' IStatisticDefinition
+#'
+#' One aggregation in a series query: which statistic, on which column, and
+#' what to call the result. [set_stat()] builds these for you, and under
+#' aggregation the series' `y` must name the `outStatisticFieldName`.
+#'
 #' @name IStatisticDefinition
+#' @return An object of class `IStatisticDefinition`.
+#' @examples
+#' IStatisticDefinition(
+#'   statisticType = IStatisticDefinitionStatisticType("avg"),
+#'   onStatisticField = "body_mass",
+#'   outStatisticFieldName = "AVG_body_mass_0"
+#' )
 #' @export
 IStatisticDefinition <- new_class(
   "IStatisticDefinition",
@@ -41,7 +62,28 @@ IStatisticDefinition <- new_class(
 )
 
 #' WebChartSeriesQuery
+#'
+#' The query a series runs against its layer. Its *shape* is what decides the
+#' chart subtype client-side: no `outStatistics` plots values as they are, and
+#' `groupByFieldsForStatistics` alongside them aggregates.
+#'
 #' @name WebChartSeriesQuery
+#' @return An object of class `WebChartSeriesQuery`.
+#' @examples
+#' # Aggregating: mean body mass per species.
+#' WebChartSeriesQuery(
+#'   groupByFieldsForStatistics = "species",
+#'   outStatistics = list(
+#'     IStatisticDefinition(
+#'       statisticType = IStatisticDefinitionStatisticType("avg"),
+#'       onStatisticField = "body_mass",
+#'       outStatisticFieldName = "AVG_body_mass_0"
+#'     )
+#'   )
+#' )
+#'
+#' # Not aggregating: one mark per row, filtered.
+#' WebChartSeriesQuery(where = "island = 'Biscoe'")
 #' @export
 WebChartSeriesQuery <- new_class(
   "WebChartSeriesQuery",

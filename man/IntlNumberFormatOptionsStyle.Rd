@@ -15,6 +15,9 @@ An object of class \code{IntlNumberFormatOptionsStyle}.
 \description{
 One of \code{"currency"}, \code{"decimal"}, \code{"percent"}, \code{"unit"}, \code{NA}.
 }
+\examples{
+IntlNumberFormatOptionsStyle("currency")
+}
 \section{Additional properties}{
 
 \describe{

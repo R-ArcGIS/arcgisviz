@@ -79,7 +79,7 @@ test_that("a layer added through a proxy travels as an IFeatureLayer", {
   expect_identical(layer$layerType, "ArcGISFeatureLayer")
 
   # fields must stay an array of objects; the browser maps Field.fromJSON.
-  # jsonlite would have sent it columnar, which is why map_send() serializes.
+  # Shiny would have sent it columnar, which is why proxy_send() serializes.
   fields <- layer$featureCollection$layers[[1]]$layerDefinition$fields
   expect_true(rlang::is_list(fields))
   expect_named(

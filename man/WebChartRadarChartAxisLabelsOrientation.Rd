@@ -15,6 +15,9 @@ An object of class \code{WebChartRadarChartAxisLabelsOrientation}.
 \description{
 One of \code{"radial"}, \code{"circular"}, \code{"horizontal"}, \code{NA}.
 }
+\examples{
+WebChartRadarChartAxisLabelsOrientation("radial")
+}
 \section{Additional properties}{
 
 \describe{

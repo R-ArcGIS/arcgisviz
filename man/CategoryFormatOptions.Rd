@@ -6,6 +6,17 @@
 \usage{
 CategoryFormatOptions(type = NA_character_, characterLimit = NA_real_)
 }
+\arguments{
+\item{type}{String.}
+
+\item{characterLimit}{Number.}
+}
+\value{
+An object of class \code{CategoryFormatOptions}.
+}
 \description{
 CategoryFormatOptions
+}
+\examples{
+CategoryFormatOptions(type = "category", characterLimit = 20)
 }

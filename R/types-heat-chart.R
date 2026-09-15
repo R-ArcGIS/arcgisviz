@@ -11,7 +11,19 @@ NULL
 library(S7)
 
 #' WebChartCalendarDatePartsBinning
+#'
+#' Bins a date column by a part of the calendar rather than by an interval -
+#' every Monday together, every January together. Modelled, but nothing in
+#' the public API sets it: a heat series with this takes the client's calendar
+#' branch instead of the matrix one.
+#'
 #' @name WebChartCalendarDatePartsBinning
+#' @return An object of class `WebChartCalendarDatePartsBinning`.
+#' @examples
+#' WebChartCalendarDatePartsBinning(
+#'   type = "calendarDatePartsBinning",
+#'   unit = WebChartCalendarDatePartsUnits("dayOfWeek")
+#' )
 #' @export
 WebChartCalendarDatePartsBinning := new_class(
   properties = list(
@@ -29,7 +41,19 @@ WebChartCalendarDatePartsBinning := new_class(
 )
 
 #' WebChartHeatChartGradient
+#'
+#' The two-colour gradient a heat chart shades its cells with. This is what
+#' `set_color(palette = )` builds for anything that is not a named Esri ramp.
+#'
 #' @name WebChartHeatChartGradient
+#' @return An object of class `WebChartHeatChartGradient`.
+#' @examples
+#' WebChartHeatChartGradient(
+#'   colorList = list(
+#'     Color(r = 255, g = 255, b = 255, a = 1),
+#'     Color(r = 0, g = 0, b = 128, a = 1)
+#'   )
+#' )
 #' @export
 WebChartHeatChartGradient := new_class(
   properties = list(
@@ -42,7 +66,18 @@ WebChartHeatChartGradient := new_class(
 )
 
 #' WebChartHeatChartHeatClassBreaksColorRampInfo
+#'
+#' Names an Esri colour ramp for the client to generate class breaks from.
+#' The ramp travels by *name*: no colours leave R, which is why a named ramp
+#' cannot carry an alpha channel.
+#'
 #' @name WebChartHeatChartHeatClassBreaksColorRampInfo
+#' @return An object of class `WebChartHeatChartHeatClassBreaksColorRampInfo`.
+#' @examples
+#' WebChartHeatChartHeatClassBreaksColorRampInfo(
+#'   name = "Heatmap 3",
+#'   flipped = FALSE
+#' )
 #' @export
 WebChartHeatChartHeatClassBreaksColorRampInfo := new_class(
   properties = list(
@@ -52,7 +87,20 @@ WebChartHeatChartHeatClassBreaksColorRampInfo := new_class(
 )
 
 #' WebChartHeatChartHeatClassBreaks
+#'
+#' Shades a heat chart's cells by classed breaks off a named Esri ramp, the
+#' branch `set_color(palette = "Heatmap 3")` takes.
+#'
 #' @name WebChartHeatChartHeatClassBreaks
+#' @return An object of class `WebChartHeatChartHeatClassBreaks`.
+#' @examples
+#' WebChartHeatChartHeatClassBreaks(
+#'   breaksCount = 5,
+#'   classificationMethod = WebChartClassBreakTypes("equal-interval"),
+#'   colorRampInfo = WebChartHeatChartHeatClassBreaksColorRampInfo(
+#'     name = "Heatmap 3"
+#'   )
+#' )
 #' @export
 WebChartHeatChartHeatClassBreaks := new_class(
   properties = list(
@@ -67,7 +115,16 @@ WebChartHeatChartHeatClassBreaks := new_class(
 )
 
 #' WebChartHeatChartEmptyCell
+#'
+#' How a cell with no rows in it is labelled and drawn.
+#'
 #' @name WebChartHeatChartEmptyCell
+#' @return An object of class `WebChartHeatChartEmptyCell`.
+#' @examples
+#' WebChartHeatChartEmptyCell(
+#'   text = "None",
+#'   symbol = ISimpleFillSymbol(color = Color(r = 245, g = 245, b = 245, a = 1))
+#' )
 #' @export
 WebChartHeatChartEmptyCell := new_class(
   properties = list(
@@ -77,7 +134,27 @@ WebChartHeatChartEmptyCell := new_class(
 )
 
 #' WebChartHeatChartSeries
+#'
+#' The heat chart's series. Cells are shaded by their own `gradientRules` or
+#' `classBreaksRules` rather than by the chart's renderer, and the value is
+#' the cell count - which is why `set_color()` takes `palette` alone here.
+#'
 #' @name WebChartHeatChartSeries
+#' @return An object of class `WebChartHeatChartSeries`.
+#' @examples
+#' WebChartHeatChartSeries(
+#'   type = "heatSeries",
+#'   id = "series0",
+#'   x = "species",
+#'   y = "island",
+#'   heatRulesType = WebChartHeatChartHeatRulesTypes("gradient"),
+#'   gradientRules = WebChartHeatChartGradient(
+#'     colorList = list(
+#'       Color(r = 255, g = 255, b = 255, a = 1),
+#'       Color(r = 0, g = 0, b = 128, a = 1)
+#'     )
+#'   )
+#' )
 #' @export
 WebChartHeatChartSeries := new_class(
   properties = list(
@@ -139,7 +216,21 @@ WebChartHeatChartSeries := new_class(
 )
 
 #' WebHeatChart
+#'
+#' A [WebChart()] with the settings only a heat chart has.
+#'
 #' @name WebHeatChart
+#' @return An object of class `WebHeatChart`.
+#' @examples
+#' WebHeatChart(
+#'   version = "18.1.0",
+#'   type = "heatChart",
+#'   hideEmptyRowsAndColumns = TRUE,
+#'   nullPolicy = WebChartNullPolicyTypes("zero")
+#' )
+#'
+#' # Built for you by the public API.
+#' arc_heat(datasets::penguins, species, island)@webchart
 #' @export
 WebHeatChart := new_class(
   WebChart,

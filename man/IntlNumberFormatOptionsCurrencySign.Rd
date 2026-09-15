@@ -15,6 +15,9 @@ An object of class \code{IntlNumberFormatOptionsCurrencySign}.
 \description{
 One of \code{"accounting"}, \code{"standard"}, \code{NA}.
 }
+\examples{
+IntlNumberFormatOptionsCurrencySign("accounting")
+}
 \section{Additional properties}{
 
 \describe{

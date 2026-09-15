@@ -11,6 +11,25 @@ WebChartCursorCrosshair(
   horizontalLineVisible = NA
 )
 }
+\arguments{
+\item{type}{String.}
+
+\item{style}{\code{NULL} or a \code{ISimpleLineSymbol} object.}
+
+\item{verticalLineVisible}{Bool.}
+
+\item{horizontalLineVisible}{Bool.}
+}
+\value{
+An object of class \code{WebChartCursorCrosshair}.
+}
 \description{
 WebChartCursorCrosshair
+}
+\examples{
+WebChartCursorCrosshair(
+  type = "chartCursorCrosshair",
+  verticalLineVisible = TRUE,
+  horizontalLineVisible = FALSE
+)
 }

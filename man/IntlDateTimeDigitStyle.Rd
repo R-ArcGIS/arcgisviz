@@ -15,6 +15,9 @@ An object of class \code{IntlDateTimeDigitStyle}.
 \description{
 One of \code{"2-digit"}, \code{"numeric"}, \code{NA}.
 }
+\examples{
+IntlDateTimeDigitStyle("2-digit")
+}
 \section{Additional properties}{
 
 \describe{

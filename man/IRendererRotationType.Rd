@@ -15,6 +15,9 @@ An object of class \code{IRendererRotationType}.
 \description{
 One of \code{"arithmetic"}, \code{"geographic"}, \code{NA}.
 }
+\examples{
+IRendererRotationType("arithmetic")
+}
 \section{Additional properties}{
 
 \describe{

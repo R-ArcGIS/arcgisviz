@@ -40,7 +40,23 @@ NULL
 library(S7)
 
 #' WebChartBarChartSeries
+#'
+#' One series of a bar chart. Built for you by the [arc_bar()] pipeline; a
+#' grouped chart gets one of these per level.
+#'
 #' @name WebChartBarChartSeries
+#' @return An object of class `WebChartBarChartSeries`.
+#' @examples
+#' WebChartBarChartSeries(
+#'   type = "barSeries",
+#'   id = "series0",
+#'   name = "mean(body_mass)",
+#'   x = "species",
+#'   y = "AVG_body_mass_0",
+#'   fillSymbol = ISimpleFillSymbol(
+#'     color = Color(r = 78, g = 121, b = 167, a = 1)
+#'   )
+#' )
 #' @export
 WebChartBarChartSeries <- new_class(
   "WebChartBarChartSeries",
@@ -90,7 +106,32 @@ WebChartBarChartSeries <- new_class(
 )
 
 #' WebChart
+#'
+#' The root of a chart's JSON config - the shape the ArcGIS Maps SDK's chart
+#' component reads. Every `arc_chart()` pipeline builds one of these, and
+#' `chart@webchart` is where it lands.
+#'
+#' Unset properties are dropped rather than sent as `null`, so a sparse config
+#' falls back to the browser's own defaults instead of overriding them.
+#'
 #' @name WebChart
+#' @return An object of class `WebChart`.
+#' @examples
+#' # Built for you by the public API.
+#' arc_bar(datasets::penguins, species)@webchart
+#'
+#' # Or by hand.
+#' WebChart(
+#'   version = "18.1.0",
+#'   type = "barChart",
+#'   series = list(
+#'     WebChartBarChartSeries(type = "barSeries", x = "species", y = "count")
+#'   ),
+#'   axes = list(
+#'     WebChartAxis(type = "chartAxis"),
+#'     WebChartAxis(type = "chartAxis")
+#'   )
+#' )
 #' @export
 WebChart <- new_class(
   "WebChart",

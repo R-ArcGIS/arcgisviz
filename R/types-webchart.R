@@ -27,7 +27,16 @@ NULL
 library(S7)
 
 #' WebChartTextSymbol
+#'
 #' @name WebChartTextSymbol
+#' @return An object of class `WebChartTextSymbol`.
+#' @examples
+#' WebChartTextSymbol(
+#'   type = "esriTS",
+#'   text = "Mean body mass (g)",
+#'   color = Color(r = 51, g = 51, b = 51, a = 1),
+#'   font = IFont(family = "Avenir Next", size = 12)
+#' )
 #' @export
 WebChartTextSymbol <- new_class(
   "WebChartTextSymbol",
@@ -53,7 +62,18 @@ WebChartTextSymbol <- new_class(
 )
 
 #' WebChartText
+#'
+#' A piece of chart text and whether it is drawn - the shape a title, subtitle,
+#' or axis label takes. [set_labs()] builds these for you.
+#'
 #' @name WebChartText
+#' @return An object of class `WebChartText`.
+#' @examples
+#' WebChartText(
+#'   type = "chartText",
+#'   visible = TRUE,
+#'   content = WebChartTextSymbol(type = "esriTS", text = "Palmer penguins")
+#' )
 #' @export
 WebChartText <- new_class(
   "WebChartText",
@@ -65,7 +85,15 @@ WebChartText <- new_class(
 )
 
 #' WebChartCursorCrosshair
+#'
 #' @name WebChartCursorCrosshair
+#' @return An object of class `WebChartCursorCrosshair`.
+#' @examples
+#' WebChartCursorCrosshair(
+#'   type = "chartCursorCrosshair",
+#'   verticalLineVisible = TRUE,
+#'   horizontalLineVisible = FALSE
+#' )
 #' @export
 WebChartCursorCrosshair <- new_class(
   "WebChartCursorCrosshair",
@@ -78,7 +106,18 @@ WebChartCursorCrosshair <- new_class(
 )
 
 #' WebChartLegend
+#'
+#' The key naming a chart's series. [set_legend()] builds one for you, and
+#' knows which charts the client will actually draw a legend on.
+#'
 #' @name WebChartLegend
+#' @return An object of class `WebChartLegend`.
+#' @examples
+#' WebChartLegend(
+#'   type = "chartLegend",
+#'   visible = TRUE,
+#'   position = WebChartLegendPositions("bottom")
+#' )
 #' @export
 WebChartLegend <- new_class(
   "WebChartLegend",
@@ -94,7 +133,22 @@ WebChartLegend <- new_class(
 )
 
 #' WebChartGuide
+#'
+#' A reference line or band drawn across an axis.
+#'
 #' @name WebChartGuide
+#' @return An object of class `WebChartGuide`.
+#' @examples
+#' WebChartGuide(
+#'   type = "chartGuide",
+#'   start = 4000,
+#'   name = "Target",
+#'   style = ISimpleLineSymbol(
+#'     style = SimpleLineSymbolStyle("esriSLSDash"),
+#'     color = Color(r = 184, g = 40, b = 40, a = 1),
+#'     width = 1
+#'   )
+#' )
 #' @export
 WebChartGuide <- new_class(
   "WebChartGuide",
@@ -112,7 +166,25 @@ WebChartGuide <- new_class(
 )
 
 #' WebChartAxis
+#'
+#' One of a chart's axes. [set_axis()] builds these for you. Every axis must
+#' carry `type = "chartAxis"`, and the count has to match the chart type's -
+#' two for most, one for a gauge, none for a pie.
+#'
 #' @name WebChartAxis
+#' @return An object of class `WebChartAxis`.
+#' @examples
+#' WebChartAxis(
+#'   type = "chartAxis",
+#'   minimum = 0,
+#'   maximum = 5000,
+#'   integerOnlyValues = TRUE,
+#'   title = WebChartText(
+#'     type = "chartText",
+#'     visible = TRUE,
+#'     content = WebChartTextSymbol(type = "esriTS", text = "Body mass (g)")
+#'   )
+#' )
 #' @export
 WebChartAxis <- new_class(
   "WebChartAxis",
@@ -151,7 +223,14 @@ WebChartAxis <- new_class(
 )
 
 #' WebChartDirectionalDataOrder
+#'
 #' @name WebChartDirectionalDataOrder
+#' @return An object of class `WebChartDirectionalDataOrder`.
+#' @examples
+#' WebChartDirectionalDataOrder(
+#'   orderType = WebChartDirectionalDataOrderOrderType("arcgis-charts-y-value"),
+#'   orderBy = WebChartSortOrderKinds("DESC")
+#' )
 #' @export
 WebChartDirectionalDataOrder <- new_class(
   "WebChartDirectionalDataOrder",
@@ -163,7 +242,15 @@ WebChartDirectionalDataOrder <- new_class(
 )
 
 #' WebChartMultiAxesDataOrder
+#'
 #' @name WebChartMultiAxesDataOrder
+#' @return An object of class `WebChartMultiAxesDataOrder`.
+#' @examples
+#' WebChartMultiAxesDataOrder(
+#'   orderType = "arcgis-charts-multi-axes",
+#'   orderByX = WebChartSortOrderKinds("ASC"),
+#'   orderByY = WebChartSortOrderKinds("DESC")
+#' )
 #' @export
 WebChartMultiAxesDataOrder <- new_class(
   "WebChartMultiAxesDataOrder",
@@ -185,7 +272,16 @@ WebChartMultiAxesDataOrder <- new_class(
 )
 
 #' WebChartDataFilters
+#'
+#' The filter a chart re-queries its own layer with. [set_filter()] sends the
+#' same shape to a rendered chart.
+#'
 #' @name WebChartDataFilters
+#' @return An object of class `WebChartDataFilters`.
+#' @examples
+#' WebChartDataFilters(where = "body_mass > 4000")
+#'
+#' WebChartDataFilters(objectIds = list(1L, 2L, 3L))
 #' @export
 WebChartDataFilters <- new_class(
   "WebChartDataFilters",
@@ -202,7 +298,21 @@ WebChartDataFilters <- new_class(
 )
 
 #' WebChartOrderOptions
+#'
+#' How a chart's series and categories are sorted.
+#'
 #' @name WebChartOrderOptions
+#' @return An object of class `WebChartOrderOptions`.
+#' @examples
+#' WebChartOrderOptions(
+#'   series = WebChartOrderSeriesBy(orderBy = WebChartSortOrderKinds("ASC")),
+#'   data = WebChartDirectionalDataOrder(
+#'     orderType = WebChartDirectionalDataOrderOrderType(
+#'       "arcgis-charts-y-value"
+#'     ),
+#'     orderBy = WebChartSortOrderKinds("DESC")
+#'   )
+#' )
 #' @export
 WebChartOrderOptions <- new_class(
   "WebChartOrderOptions",

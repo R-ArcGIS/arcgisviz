@@ -15,6 +15,9 @@ An object of class \code{IFeatureLayerFeatureCollectionType}.
 \description{
 One of \code{"markup"}, \code{"notes"}, \code{"route"}, \code{NA}.
 }
+\examples{
+IFeatureLayerFeatureCollectionType("markup")
+}
 \section{Additional properties}{
 
 \describe{

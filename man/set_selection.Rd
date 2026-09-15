@@ -12,14 +12,7 @@ set_selection(proxy, object_ids, ...)
 \item{object_ids}{Defines which rows to select, by object id. An empty
 vector clears the selection.}
 
-\item{...}{Reserved for methods.}
-
-\item{layer}{default \code{NULL}. Defines which map layer to select in, by
-name. \code{NULL} selects in every layer. Maps only.}
-
-\item{mode}{default \code{"replace"}. Defines what these ids do to the current
-selection, one of \code{"replace"}, \code{"add"}, \code{"remove"}, or \code{"toggle"}. Maps
-only.}
+\item{...}{Passed to the \link{ArcProxy} or \link{ArcMapProxy} method.}
 }
 \value{
 \code{proxy}, invisibly.

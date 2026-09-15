@@ -3,6 +3,13 @@
 \name{ValueConversion}
 \alias{ValueConversion}
 \title{ValueConversion}
+\value{
+An object of class \code{ValueConversion}.
+}
 \description{
-ValueConversion
+A linear rescaling applied to a gauge's reading before it is drawn.
+}
+\examples{
+# Grams to kilograms.
+ValueConversion(factor = 0.001, offset = 0)
 }

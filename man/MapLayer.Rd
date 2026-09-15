@@ -3,7 +3,19 @@
 \name{MapLayer}
 \alias{MapLayer}
 \title{A layer on a map}
+\value{
+An object of class \code{MapLayer}.
+}
 \description{
 One feature collection layer and the aesthetics mapped onto it. Built by
 \code{\link[=add_layer]{add_layer()}}, not called directly.
+}
+\examples{
+\dontshow{if (rlang::is_installed("sf")) withAutoprint(\{ # examplesIf}
+nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
+
+# add_layer() builds one, which is how you should get one.
+map <- add_layer(arc_map(), nc, name = "Counties", opacity = 0.8)
+map@layers[[1]]
+\dontshow{\}) # examplesIf}
 }

@@ -3,6 +3,19 @@
 \name{WebChartHistogramSeries}
 \alias{WebChartHistogramSeries}
 \title{WebChartHistogramSeries}
+\value{
+An object of class \code{WebChartHistogramSeries}.
+}
 \description{
-WebChartHistogramSeries
+The histogram's series. Bins are computed in the browser, which is why
+there is no \code{y} to map and why \code{\link[=set_tooltip]{set_tooltip()}} cannot key onto one.
+}
+\examples{
+WebChartHistogramSeries(
+  type = "histogramSeries",
+  id = "series0",
+  x = "body_mass",
+  binCount = 15,
+  dataTransformationType = WebChartDataTransformations("logarithmic")
+)
 }

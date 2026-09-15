@@ -12,6 +12,30 @@ SizePolicy(
   maxSize = NA_real_
 )
 }
+\arguments{
+\item{type}{String.}
+
+\item{scaleType}{A \code{SizePolicyScaleTypes} enum.}
+
+\item{field}{String.}
+
+\item{minSize}{Number.}
+
+\item{maxSize}{Number.}
+}
+\value{
+An object of class \code{SizePolicy}.
+}
 \description{
-SizePolicy
+Scales marker area by a numeric column. Declared on the scatterplot series
+alone, which is why \code{\link[=set_size]{set_size()}} works on no other chart type.
+}
+\examples{
+SizePolicy(
+  type = "sizeScale",
+  field = "body_mass",
+  scaleType = SizePolicyScaleTypes("linear"),
+  minSize = 4,
+  maxSize = 18
+)
 }

@@ -9,7 +9,21 @@ NULL
 library(S7)
 
 #' WebChartDateTimeUnitFormatOptions
+#'
+#' A different date format per time unit, so an axis that zooms from years to
+#' hours relabels itself as it goes.
+#'
 #' @name WebChartDateTimeUnitFormatOptions
+#' @return An object of class `WebChartDateTimeUnitFormatOptions`.
+#' @examples
+#' WebChartDateTimeUnitFormatOptions(
+#'   year = IntlDateTimeFormatOptions(
+#'     year = IntlDateTimeDigitStyle("numeric")
+#'   ),
+#'   month = IntlDateTimeFormatOptions(
+#'     month = IntlDateTimeFormatOptionsMonth("short")
+#'   )
+#' )
 #' @export
 WebChartDateTimeUnitFormatOptions <- new_class(
   "WebChartDateTimeUnitFormatOptions",
@@ -36,7 +50,19 @@ WebChartDateTimeUnitFormatOptions <- new_class(
 )
 
 #' NumberFormatOptions
+#'
+#' How a numeric axis or label formats its values.
+#'
 #' @name NumberFormatOptions
+#' @return An object of class `NumberFormatOptions`.
+#' @examples
+#' NumberFormatOptions(
+#'   type = "number",
+#'   intlOptions = IntlNumberFormatOptions(
+#'     useGrouping = TRUE,
+#'     maximumFractionDigits = 0
+#'   )
+#' )
 #' @export
 NumberFormatOptions <- new_class(
   "NumberFormatOptions",
@@ -47,7 +73,19 @@ NumberFormatOptions <- new_class(
 )
 
 #' DateTimeFormatOptions
+#'
+#' How a date axis or label formats its values.
+#'
 #' @name DateTimeFormatOptions
+#' @return An object of class `DateTimeFormatOptions`.
+#' @examples
+#' DateTimeFormatOptions(
+#'   type = "date-time",
+#'   intlOptions = IntlDateTimeFormatOptions(
+#'     year = IntlDateTimeDigitStyle("numeric"),
+#'     month = IntlDateTimeFormatOptionsMonth("short")
+#'   )
+#' )
 #' @export
 DateTimeFormatOptions <- new_class(
   "DateTimeFormatOptions",

@@ -3,6 +3,21 @@
 \name{WebBoxPlot}
 \alias{WebBoxPlot}
 \title{WebBoxPlot}
+\value{
+An object of class \code{WebBoxPlot}.
+}
 \description{
-WebBoxPlot
+A \code{\link[=WebChart]{WebChart()}} with the three settings only a box plot has. Subclassing is
+what lets it inherit the \code{as_vector()} method that drops unset properties.
+}
+\examples{
+WebBoxPlot(
+  version = "18.1.0",
+  type = "boxPlot",
+  showOutliers = FALSE,
+  standardizeValues = TRUE
+)
+
+# Built for you by the public API.
+arc_boxplot(datasets::penguins, species, body_mass)@webchart
 }

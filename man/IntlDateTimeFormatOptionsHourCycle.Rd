@@ -15,6 +15,9 @@ An object of class \code{IntlDateTimeFormatOptionsHourCycle}.
 \description{
 One of \code{"h11"}, \code{"h12"}, \code{"h23"}, \code{"h24"}, \code{NA}.
 }
+\examples{
+IntlDateTimeFormatOptionsHourCycle("h11")
+}
 \section{Additional properties}{
 
 \describe{

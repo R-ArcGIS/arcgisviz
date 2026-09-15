@@ -3,6 +3,18 @@
 \name{WebChartHeatChartGradient}
 \alias{WebChartHeatChartGradient}
 \title{WebChartHeatChartGradient}
+\value{
+An object of class \code{WebChartHeatChartGradient}.
+}
 \description{
-WebChartHeatChartGradient
+The two-colour gradient a heat chart shades its cells with. This is what
+\code{set_color(palette = )} builds for anything that is not a named Esri ramp.
+}
+\examples{
+WebChartHeatChartGradient(
+  colorList = list(
+    Color(r = 255, g = 255, b = 255, a = 1),
+    Color(r = 0, g = 0, b = 128, a = 1)
+  )
+)
 }

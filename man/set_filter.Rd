@@ -9,16 +9,7 @@ set_filter(proxy, ...)
 \arguments{
 \item{proxy}{Defines which \code{\link[=arc_proxy]{arc_proxy()}} or \code{\link[=arc_map_proxy]{arc_map_proxy()}} to filter.}
 
-\item{...}{Reserved for methods.}
-
-\item{where}{default \code{NULL}. Defines a SQL where clause, such as
-\code{"species = 'Adelie'"}. \code{NULL}, \code{NA}, or \code{""} clear it.}
-
-\item{object_ids}{default \code{NULL}. Defines which rows to keep, by object id.
-\code{NULL} or an empty vector clears them. Charts only.}
-
-\item{layer}{default \code{NULL}. Defines which map layer to filter, by name.
-\code{NULL} filters every layer. Maps only.}
+\item{...}{Passed to the \link{ArcProxy} or \link{ArcMapProxy} method.}
 }
 \value{
 \code{proxy}, invisibly.

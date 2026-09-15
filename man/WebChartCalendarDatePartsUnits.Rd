@@ -15,6 +15,9 @@ An object of class \code{WebChartCalendarDatePartsUnits}.
 \description{
 One of \code{"dayOfMonth"}, \code{"dayOfWeek"}, \code{"dayOfYear"}, \code{"hourOfDay"}, \code{"monthOfYear"}, \code{"minuteOfDay"}, \code{"weekOfYear"}, \code{"quarterOfYear"}, \code{NA}.
 }
+\examples{
+WebChartCalendarDatePartsUnits("dayOfMonth")
+}
 \section{Additional properties}{
 
 \describe{

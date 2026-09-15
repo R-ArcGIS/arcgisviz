@@ -11,6 +11,27 @@ IStatisticDefinition(
   outStatisticFieldName = NA_character_
 )
 }
+\arguments{
+\item{statisticType}{A \code{IStatisticDefinitionStatisticType} enum.}
+
+\item{statisticParameters}{\code{NULL} or a \code{IStatisticDefinitionStatisticParameters} object.}
+
+\item{onStatisticField}{String.}
+
+\item{outStatisticFieldName}{String.}
+}
+\value{
+An object of class \code{IStatisticDefinition}.
+}
 \description{
-IStatisticDefinition
+One aggregation in a series query: which statistic, on which column, and
+what to call the result. \code{\link[=set_stat]{set_stat()}} builds these for you, and under
+aggregation the series' \code{y} must name the \code{outStatisticFieldName}.
+}
+\examples{
+IStatisticDefinition(
+  statisticType = IStatisticDefinitionStatisticType("avg"),
+  onStatisticField = "body_mass",
+  outStatisticFieldName = "AVG_body_mass_0"
+)
 }

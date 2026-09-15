@@ -3,6 +3,17 @@
 \name{WebRadarChart}
 \alias{WebRadarChart}
 \title{WebRadarChart}
+\value{
+An object of class \code{WebRadarChart}.
+}
 \description{
-WebRadarChart
+A \code{\link[=WebChart]{WebChart()}} with no extra properties of its own. It exists so a radar
+chart is its own class, which is how it inherits the \code{as_vector()} method
+that drops unset properties.
+}
+\examples{
+WebRadarChart(version = "18.1.0", type = "radarChart")
+
+# Built for you by the public API.
+arc_radar(datasets::penguins, species, body_mass)@webchart
 }

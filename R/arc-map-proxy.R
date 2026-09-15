@@ -386,15 +386,8 @@ drop_null <- function(x) {
   x[!vapply(x, rlang::is_null, logical(1))]
 }
 
-# Shiny would serialize with jsonlite, which sends layerDefinition$fields
-# columnar and breaks Field.fromJSON. The client parses the string instead.
 map_send <- function(proxy, method, payload) {
-  proxy_send(
-    proxy,
-    method,
-    widget_json(drop_null(payload)),
-    handler = "arcgisviz-map"
-  )
+  proxy_send(proxy, method, drop_null(payload), handler = "arcgisviz-map")
 }
 
 S7::method(print, ArcMapProxy) <- function(x, ...) {

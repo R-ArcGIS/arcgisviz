@@ -15,6 +15,9 @@ An object of class \code{IntlNumberFormatOptionsNotation}.
 \description{
 One of \code{"compact"}, \code{"engineering"}, \code{"scientific"}, \code{"standard"}, \code{NA}.
 }
+\examples{
+IntlNumberFormatOptionsNotation("compact")
+}
 \section{Additional properties}{
 
 \describe{

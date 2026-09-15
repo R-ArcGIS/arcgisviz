@@ -3,6 +3,14 @@
 \name{WebChartPieChartGroupSlice}
 \alias{WebChartPieChartGroupSlice}
 \title{WebChartPieChartGroupSlice}
+\value{
+An object of class \code{WebChartPieChartGroupSlice}.
+}
 \description{
-WebChartPieChartGroupSlice
+Folds every slice under a percentage threshold into a single "Other". A
+\code{\link[=WebChartPieChartSlice]{WebChartPieChartSlice()}}, so it styles itself the same way. Modelled and
+not yet reachable from the public API.
+}
+\examples{
+WebChartPieChartGroupSlice(label = "Other", percentageThreshold = 5)
 }

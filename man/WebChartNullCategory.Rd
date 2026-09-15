@@ -6,6 +6,20 @@
 \usage{
 WebChartNullCategory(text = NA_character_, symbol = NULL)
 }
+\arguments{
+\item{text}{String.}
+
+\item{symbol}{\code{NULL} or a \code{ISimpleFillSymbol} object.}
+}
+\value{
+An object of class \code{WebChartNullCategory}.
+}
 \description{
-WebChartNullCategory
+How rows with a missing category are labelled and drawn.
+}
+\examples{
+WebChartNullCategory(
+  text = "Unknown",
+  symbol = ISimpleFillSymbol(color = Color(r = 200, g = 200, b = 200, a = 1))
+)
 }

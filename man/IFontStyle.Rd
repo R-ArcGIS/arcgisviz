@@ -15,6 +15,9 @@ An object of class \code{IFontStyle}.
 \description{
 One of \code{"italic"}, \code{"normal"}, \code{"oblique"}, \code{NA}.
 }
+\examples{
+IFontStyle("italic")
+}
 \section{Additional properties}{
 
 \describe{

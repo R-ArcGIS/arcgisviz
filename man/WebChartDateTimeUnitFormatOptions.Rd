@@ -13,6 +13,33 @@ WebChartDateTimeUnitFormatOptions(
   second = NULL
 )
 }
+\arguments{
+\item{year}{\code{NULL} or a \code{IntlDateTimeFormatOptions} object.}
+
+\item{month}{\code{NULL} or a \code{IntlDateTimeFormatOptions} object.}
+
+\item{day}{\code{NULL} or a \code{IntlDateTimeFormatOptions} object.}
+
+\item{hour}{\code{NULL} or a \code{IntlDateTimeFormatOptions} object.}
+
+\item{minute}{\code{NULL} or a \code{IntlDateTimeFormatOptions} object.}
+
+\item{second}{\code{NULL} or a \code{IntlDateTimeFormatOptions} object.}
+}
+\value{
+An object of class \code{WebChartDateTimeUnitFormatOptions}.
+}
 \description{
-WebChartDateTimeUnitFormatOptions
+A different date format per time unit, so an axis that zooms from years to
+hours relabels itself as it goes.
+}
+\examples{
+WebChartDateTimeUnitFormatOptions(
+  year = IntlDateTimeFormatOptions(
+    year = IntlDateTimeDigitStyle("numeric")
+  ),
+  month = IntlDateTimeFormatOptions(
+    month = IntlDateTimeFormatOptionsMonth("short")
+  )
+)
 }

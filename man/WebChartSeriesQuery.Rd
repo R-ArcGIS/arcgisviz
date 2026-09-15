@@ -13,6 +13,40 @@ WebChartSeriesQuery(
   fetchNullValues = NA
 )
 }
+\arguments{
+\item{outFields}{String.}
+
+\item{where}{String.}
+
+\item{groupByFieldsForStatistics}{String.}
+
+\item{outStatistics}{List.}
+
+\item{returnDistinctValues}{Bool.}
+
+\item{fetchNullValues}{Bool.}
+}
+\value{
+An object of class \code{WebChartSeriesQuery}.
+}
 \description{
-WebChartSeriesQuery
+The query a series runs against its layer. Its \emph{shape} is what decides the
+chart subtype client-side: no \code{outStatistics} plots values as they are, and
+\code{groupByFieldsForStatistics} alongside them aggregates.
+}
+\examples{
+# Aggregating: mean body mass per species.
+WebChartSeriesQuery(
+  groupByFieldsForStatistics = "species",
+  outStatistics = list(
+    IStatisticDefinition(
+      statisticType = IStatisticDefinitionStatisticType("avg"),
+      onStatisticField = "body_mass",
+      outStatisticFieldName = "AVG_body_mass_0"
+    )
+  )
+)
+
+# Not aggregating: one mark per row, filtered.
+WebChartSeriesQuery(where = "island = 'Biscoe'")
 }

@@ -9,7 +9,16 @@ NULL
 library(S7)
 
 #' WebChartNullCategory
+#'
+#' How rows with a missing category are labelled and drawn.
+#'
 #' @name WebChartNullCategory
+#' @return An object of class `WebChartNullCategory`.
+#' @examples
+#' WebChartNullCategory(
+#'   text = "Unknown",
+#'   symbol = ISimpleFillSymbol(color = Color(r = 200, g = 200, b = 200, a = 1))
+#' )
 #' @export
 WebChartNullCategory <- new_class(
   "WebChartNullCategory",
@@ -24,7 +33,17 @@ WebChartNullCategory <- new_class(
 # ParentType+propertyPath naming convention (see the arcgis-spec-types
 # skill).
 #' WebChartTemporalBinningOffset
+#'
+#' Shifts where temporal bins start - a fiscal year beginning in April rather
+#' than January, say.
+#'
 #' @name WebChartTemporalBinningOffset
+#' @return An object of class `WebChartTemporalBinningOffset`.
+#' @examples
+#' WebChartTemporalBinningOffset(
+#'   unit = WebChartTemporalBinningUnits("months"),
+#'   size = 3
+#' )
 #' @export
 WebChartTemporalBinningOffset <- new_class(
   "WebChartTemporalBinningOffset",
@@ -38,7 +57,18 @@ WebChartTemporalBinningOffset <- new_class(
 # WebChartTemporalBinningExtras (web-chart.d.ts) into one flat class, same
 # allOf-merge treatment the old JSON-Schema-derived classes got.
 #' WebChartTemporalBinning
+#'
+#' Groups a date column into intervals before plotting it.
+#'
 #' @name WebChartTemporalBinning
+#' @return An object of class `WebChartTemporalBinning`.
+#' @examples
+#' WebChartTemporalBinning(
+#'   unit = WebChartTemporalBinningUnits("months"),
+#'   size = 1,
+#'   trimIncompleteTimeInterval = TRUE,
+#'   nullPolicy = WebChartNullPolicyTypes("zero")
+#' )
 #' @export
 WebChartTemporalBinning <- new_class(
   "WebChartTemporalBinning",

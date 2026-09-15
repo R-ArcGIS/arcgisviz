@@ -11,6 +11,30 @@ ISimpleFillSymbol(
   outline = NULL
 )
 }
+\arguments{
+\item{type}{String.}
+
+\item{style}{A \code{SimpleFillSymbolStyle} enum.}
+
+\item{color}{\code{NULL} or a \code{Color} object.}
+
+\item{outline}{\code{NULL} or a \code{ISimpleLineSymbol} object.}
+}
+\value{
+An object of class \code{ISimpleFillSymbol}.
+}
 \description{
 ISimpleFillSymbol
+}
+\examples{
+ISimpleFillSymbol(
+  color = Color(r = 184, g = 40, b = 40, a = 1),
+  outline = ISimpleLineSymbol(
+    color = Color(r = 255, g = 255, b = 255, a = 1),
+    width = 0.5
+  )
+)
+}
+\seealso{
+\code{\link[=new_symbol]{new_symbol()}}, which builds one from friendly names and colours.
 }

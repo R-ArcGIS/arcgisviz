@@ -11,6 +11,30 @@ WebChartOverlay(
   symbol = NULL
 )
 }
+\arguments{
+\item{type}{String.}
+
+\item{created}{Bool.}
+
+\item{visible}{Bool.}
+
+\item{symbol}{\code{NULL} or a \code{ISimpleLineSymbol} object.}
+}
+\value{
+An object of class \code{WebChartOverlay}.
+}
 \description{
-WebChartOverlay
+One overlay drawn over a chart's marks, such as a trend line. \code{created}
+being true is also what gives a scatterplot or histogram a legend.
+}
+\examples{
+WebChartOverlay(
+  type = "chartOverlay",
+  created = TRUE,
+  visible = TRUE,
+  symbol = ISimpleLineSymbol(
+    style = SimpleLineSymbolStyle("esriSLSDash"),
+    width = 1
+  )
+)
 }

@@ -11,6 +11,28 @@ ISimpleLineSymbol(
   width = NA_real_
 )
 }
+\arguments{
+\item{type}{String.}
+
+\item{style}{A \code{SimpleLineSymbolStyle} enum.}
+
+\item{color}{\code{NULL} or a \code{Color} object.}
+
+\item{width}{Number.}
+}
+\value{
+An object of class \code{ISimpleLineSymbol}.
+}
 \description{
 ISimpleLineSymbol
+}
+\examples{
+ISimpleLineSymbol(
+  style = SimpleLineSymbolStyle("esriSLSDash"),
+  color = Color(r = 51, g = 51, b = 51, a = 1),
+  width = 1.5
+)
+}
+\seealso{
+\code{\link[=new_symbol]{new_symbol()}}, which builds one from friendly names and colours.
 }

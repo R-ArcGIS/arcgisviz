@@ -3,6 +3,23 @@
 \name{WebGaugeChart}
 \alias{WebGaugeChart}
 \title{WebGaugeChart}
+\value{
+An object of class \code{WebGaugeChart}.
+}
 \description{
-WebGaugeChart
+A \code{\link[=WebChart]{WebChart()}} with the dial's own geometry. \code{subType} picks the source:
+\code{statisticGauge} reduces the whole layer, \code{featureGauge} reads one row.
+}
+\examples{
+WebGaugeChart(
+  version = "18.1.0",
+  type = "gauge",
+  innerRadius = 70,
+  startAngle = -180,
+  endAngle = 0,
+  subType = GaugeChartSubTypes("statisticGauge")
+)
+
+# Built for you by the public API.
+arc_gauge(datasets::penguins, body_mass, stat = "mean")@webchart
 }

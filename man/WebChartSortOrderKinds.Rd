@@ -15,6 +15,9 @@ An object of class \code{WebChartSortOrderKinds}.
 \description{
 One of \code{"ASC"}, \code{"DESC"}, \code{NA}.
 }
+\examples{
+WebChartSortOrderKinds("ASC")
+}
 \section{Additional properties}{
 
 \describe{

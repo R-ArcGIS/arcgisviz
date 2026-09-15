@@ -9,6 +9,23 @@ NumberFormatOptions(
   intlOptions = IntlNumberFormatOptions()
 )
 }
+\arguments{
+\item{type}{String.}
+
+\item{intlOptions}{A \code{IntlNumberFormatOptions} object.}
+}
+\value{
+An object of class \code{NumberFormatOptions}.
+}
 \description{
-NumberFormatOptions
+How a numeric axis or label formats its values.
+}
+\examples{
+NumberFormatOptions(
+  type = "number",
+  intlOptions = IntlNumberFormatOptions(
+    useGrouping = TRUE,
+    maximumFractionDigits = 0
+  )
+)
 }

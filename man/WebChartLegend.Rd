@@ -14,6 +14,32 @@ WebChartLegend(
   roundMarkers = NA
 )
 }
+\arguments{
+\item{type}{String.}
+
+\item{visible}{Bool.}
+
+\item{title}{\code{NULL} or a \code{WebChartText} object.}
+
+\item{body}{\code{NULL} or a \code{WebChartTextSymbol} object.}
+
+\item{position}{A \code{WebChartLegendPositions} enum.}
+
+\item{maxHeight}{Number.}
+
+\item{roundMarkers}{Bool.}
+}
+\value{
+An object of class \code{WebChartLegend}.
+}
 \description{
-WebChartLegend
+The key naming a chart's series. \code{\link[=set_legend]{set_legend()}} builds one for you, and
+knows which charts the client will actually draw a legend on.
+}
+\examples{
+WebChartLegend(
+  type = "chartLegend",
+  visible = TRUE,
+  position = WebChartLegendPositions("bottom")
+)
 }

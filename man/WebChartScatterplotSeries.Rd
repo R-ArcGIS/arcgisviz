@@ -26,6 +26,62 @@ WebChartScatterplotSeries(
   assignToSecondValueAxis = NA
 )
 }
+\arguments{
+\item{type}{String.}
+
+\item{y}{String.}
+
+\item{markerSymbol}{\code{NULL} or a \code{ISimpleMarkerSymbol} object.}
+
+\item{overlays}{\code{NULL} or a \code{ScatterplotOverlays} object.}
+
+\item{sizePolicy}{\code{NULL} or a \code{SizePolicy} object.}
+
+\item{additionalTooltipFields}{String.}
+
+\item{id}{String.}
+
+\item{visible}{Bool.}
+
+\item{dataTooltipVisible}{Bool.}
+
+\item{dataTooltipReverseColor}{Bool.}
+
+\item{dataTooltipValueFormat}{\code{NULL} or a \code{NumberFormatOptions} object.}
+
+\item{dataTooltipPercentFormat}{\code{NULL} or a \code{NumberFormatOptions} object.}
+
+\item{dataTooltipDateFormat}{\code{NULL} or a \code{DateTimeFormatOptions} object.}
+
+\item{dataTooltipFontSize}{Number.}
+
+\item{name}{String.}
+
+\item{query}{\code{NULL} or a \code{WebChartSeriesQuery} object.}
+
+\item{x}{String.}
+
+\item{dataLabels}{\code{NULL} or a \code{WebChartText} object.}
+
+\item{assignToSecondValueAxis}{Bool.}
+}
+\value{
+An object of class \code{WebChartScatterplotSeries}.
+}
 \description{
-WebChartScatterplotSeries
+The scatterplot's series. It is the only one in the spec that can name
+extra tooltip fields (\code{additionalTooltipFields}) or size its markers by a
+column (\code{sizePolicy}), which is why \code{\link[=set_size]{set_size()}} and the native tooltip
+path are scatter-only.
+}
+\examples{
+WebChartScatterplotSeries(
+  type = "scatterSeries",
+  id = "series0",
+  name = "bill_dep",
+  x = "bill_len",
+  y = "bill_dep",
+  additionalTooltipFields = c("island", "body_mass"),
+  sizePolicy = SizePolicy(type = "sizeScale", field = "body_mass")
+)
 }

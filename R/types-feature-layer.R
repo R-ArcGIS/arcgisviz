@@ -17,6 +17,22 @@ library(S7)
 #' map or by a service `url`. Built by [as_feature_layer()].
 #'
 #' @name IFeatureLayer
+#' @return An object of class `IFeatureLayer`.
+#' @seealso [as_feature_layer()], which builds one from a data frame or an
+#'   `sf` object.
+#' @examples
+#' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
+#'
+#' as_feature_layer(df, name = "penguins")
+#'
+#' # Or by hand, when the pieces are already assembled.
+#' IFeatureLayer(
+#'   id = "counties",
+#'   name = "Counties",
+#'   layerType = "ArcGISFeatureLayer",
+#'   opacity = 0.8,
+#'   visibility = TRUE
+#' )
 #' @export
 IFeatureLayer := new_class(
   properties = list(

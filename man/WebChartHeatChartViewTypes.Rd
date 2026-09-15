@@ -15,6 +15,9 @@ An object of class \code{WebChartHeatChartViewTypes}.
 \description{
 One of \code{"SingleCalendarView"}, \code{"SequentialCalendarViews"}, \code{NA}.
 }
+\examples{
+WebChartHeatChartViewTypes("SingleCalendarView")
+}
 \section{Additional properties}{
 
 \describe{

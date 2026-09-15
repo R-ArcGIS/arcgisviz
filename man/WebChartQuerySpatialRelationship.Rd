@@ -15,6 +15,9 @@ An object of class \code{WebChartQuerySpatialRelationship}.
 \description{
 One of \code{"contains"}, \code{"crosses"}, \code{"disjoint"}, \code{"envelope-intersects"}, \code{"index-intersects"}, \code{"intersects"}, \code{"overlaps"}, \code{"relation"}, \code{"touches"}, \code{"within"}, \code{NA}.
 }
+\examples{
+WebChartQuerySpatialRelationship("contains")
+}
 \section{Additional properties}{
 
 \describe{

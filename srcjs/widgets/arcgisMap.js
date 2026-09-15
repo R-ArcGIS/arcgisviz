@@ -1,6 +1,7 @@
-import "../modules/public-path.js";
 import "widgets";
-import "@arcgis/map-components/components/arcgis-map";
+// Side-effect import: the CDN build registers every map component lazily, so
+// there is no per-component import to write and no chunk to ship.
+import "@arcgis/map-components";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer.js";
 import FeatureSet from "@arcgis/core/rest/support/FeatureSet.js";
 import Field from "@arcgis/core/layers/support/Field.js";
@@ -41,6 +42,10 @@ function featureLayer(layer) {
     objectIdField: def.objectIdField,
     geometryType: set.geometryType,
     spatialReference: set.spatialReference,
+    // A layer view loads only the fields the renderer asks for, so hitTest
+    // hands back graphics with no attributes for the tooltip to read. The
+    // features are already in memory, so "*" costs nothing.
+    outFields: ["*"],
   };
 
   assign(props, {
@@ -192,74 +197,6 @@ function shinyReporter(el) {
   };
 }
 
-// One import() per component, written out rather than built from the name:
-// a template literal makes webpack bundle all 179 of them. Each becomes its
-// own chunk, so a map pays only for the widgets it asks for.
-var COMPONENTS = {
-  "arcgis-basemap-gallery": function () {
-    return import("@arcgis/map-components/components/arcgis-basemap-gallery");
-  },
-  "arcgis-basemap-toggle": function () {
-    return import("@arcgis/map-components/components/arcgis-basemap-toggle");
-  },
-  "arcgis-bookmarks": function () {
-    return import("@arcgis/map-components/components/arcgis-bookmarks");
-  },
-  "arcgis-area-measurement-2d": function () {
-    return import(
-      "@arcgis/map-components/components/arcgis-area-measurement-2d"
-    );
-  },
-  "arcgis-compass": function () {
-    return import("@arcgis/map-components/components/arcgis-compass");
-  },
-  "arcgis-distance-measurement-2d": function () {
-    return import(
-      "@arcgis/map-components/components/arcgis-distance-measurement-2d"
-    );
-  },
-  "arcgis-editor": function () {
-    return import("@arcgis/map-components/components/arcgis-editor");
-  },
-  "arcgis-expand": function () {
-    return import("@arcgis/map-components/components/arcgis-expand");
-  },
-  "arcgis-coordinate-conversion": function () {
-    return import(
-      "@arcgis/map-components/components/arcgis-coordinate-conversion"
-    );
-  },
-  "arcgis-fullscreen": function () {
-    return import("@arcgis/map-components/components/arcgis-fullscreen");
-  },
-  "arcgis-home": function () {
-    return import("@arcgis/map-components/components/arcgis-home");
-  },
-  "arcgis-layer-list": function () {
-    return import("@arcgis/map-components/components/arcgis-layer-list");
-  },
-  "arcgis-legend": function () {
-    return import("@arcgis/map-components/components/arcgis-legend");
-  },
-  "arcgis-locate": function () {
-    return import("@arcgis/map-components/components/arcgis-locate");
-  },
-  "arcgis-scale-bar": function () {
-    return import("@arcgis/map-components/components/arcgis-scale-bar");
-  },
-  "arcgis-search": function () {
-    return import("@arcgis/map-components/components/arcgis-search");
-  },
-  "arcgis-sketch": function () {
-    return import("@arcgis/map-components/components/arcgis-sketch");
-  },
-  "arcgis-track": function () {
-    return import("@arcgis/map-components/components/arcgis-track");
-  },
-  "arcgis-zoom": function () {
-    return import("@arcgis/map-components/components/arcgis-zoom");
-  },
-};
 
 var ESRI_GEOMETRY = {
   point: "esriGeometryPoint",
@@ -483,9 +420,13 @@ HTMLWidgets.widget({
       var specs = Array.isArray(list) ? list : [];
       for (var i = 0; i < specs.length; i++) {
         var spec = specs[i];
-        var loader = COMPONENTS[spec.component];
-        if (!loader) throw new Error("unknown map widget: " + spec.component);
-        await loader();
+        // The CDN build defines every component up front and loads each
+        // implementation on connect, so this resolves immediately for a real
+        // component and hangs for a typo - hence the explicit check.
+        if (!customElements.get(spec.component)) {
+          throw new Error("unknown map widget: " + spec.component);
+        }
+        await customElements.whenDefined(spec.component);
 
         removeWidgets([spec.component]);
         var node = document.createElement(spec.component);
@@ -505,7 +446,7 @@ HTMLWidgets.widget({
     // slot. Expands sharing a corner share a group, so opening one closes the
     // other - Esri's own pattern (arcgis-expand/customElement.d.ts:126).
     async function expandWrapper(spec, node) {
-      await COMPONENTS["arcgis-expand"]();
+      await customElements.whenDefined("arcgis-expand");
       var wrapper = document.createElement("arcgis-expand");
       wrapper.group = spec.position;
       wrapper.appendChild(node);

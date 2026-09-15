@@ -3,6 +3,16 @@
 \name{WebChartGaugeFixedProgressBandsBands}
 \alias{WebChartGaugeFixedProgressBandsBands}
 \title{WebChartGaugeFixedProgressBandsBands}
+\value{
+An object of class \code{WebChartGaugeFixedProgressBandsBands}.
+}
 \description{
-WebChartGaugeFixedProgressBandsBands
+The two symbols a gauge's progress bands are drawn with - the filled
+portion and the track behind it.
+}
+\examples{
+WebChartGaugeFixedProgressBandsBands(
+  target = ISimpleFillSymbol(color = Color(r = 78, g = 121, b = 167, a = 1)),
+  base = ISimpleFillSymbol(color = Color(r = 230, g = 230, b = 230, a = 1))
+)
 }

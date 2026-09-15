@@ -3,6 +3,17 @@
 \name{WebChartPieChartLegend}
 \alias{WebChartPieChartLegend}
 \title{WebChartPieChartLegend}
+\value{
+An object of class \code{WebChartPieChartLegend}.
+}
 \description{
-WebChartPieChartLegend
+A pie's legend, which can also carry each slice's value and percentage.
+A pie always draws a legend - it is the only key to the slices.
+}
+\examples{
+WebChartPieChartLegend(
+  type = "chartLegend",
+  displayCategory = TRUE,
+  displayPercentage = TRUE
+)
 }

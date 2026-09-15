@@ -272,6 +272,14 @@ map_positions <- c(
 #' [add_widget()], not called directly.
 #'
 #' @name MapWidget
+#' @return An object of class `MapWidget`.
+#' @examples
+#' # add_widget() and the add_*() shortcuts build these.
+#' map <- add_legend(arc_map(), position = "top-right", expand = TRUE)
+#' map@widgets[[1]]
+#'
+#' # Every component the registry reaches.
+#' map_widgets()
 #' @export
 MapWidget := new_class(
   properties = list(

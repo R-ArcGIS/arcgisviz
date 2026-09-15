@@ -3,6 +3,18 @@
 \name{WebChartCalendarDatePartsBinning}
 \alias{WebChartCalendarDatePartsBinning}
 \title{WebChartCalendarDatePartsBinning}
+\value{
+An object of class \code{WebChartCalendarDatePartsBinning}.
+}
 \description{
-WebChartCalendarDatePartsBinning
+Bins a date column by a part of the calendar rather than by an interval -
+every Monday together, every January together. Modelled, but nothing in
+the public API sets it: a heat series with this takes the client's calendar
+branch instead of the matrix one.
+}
+\examples{
+WebChartCalendarDatePartsBinning(
+  type = "calendarDatePartsBinning",
+  unit = WebChartCalendarDatePartsUnits("dayOfWeek")
+)
 }

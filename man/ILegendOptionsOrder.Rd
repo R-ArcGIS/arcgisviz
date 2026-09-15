@@ -15,6 +15,9 @@ An object of class \code{ILegendOptionsOrder}.
 \description{
 One of \code{"ascendingValues"}, \code{"descendingValues"}, \code{NA}.
 }
+\examples{
+ILegendOptionsOrder("ascendingValues")
+}
 \section{Additional properties}{
 
 \describe{

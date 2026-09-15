@@ -102,13 +102,7 @@ S7::method(arc_update, ArcProxy) <- function(proxy, ...) {
 #' definition expression.
 #'
 #' @param proxy Defines which [arc_proxy()] or [arc_map_proxy()] to filter.
-#' @param ... Reserved for methods.
-#' @param where default `NULL`. Defines a SQL where clause, such as
-#'   `"species = 'Adelie'"`. `NULL`, `NA`, or `""` clear it.
-#' @param object_ids default `NULL`. Defines which rows to keep, by object id.
-#'   `NULL` or an empty vector clears them. Charts only.
-#' @param layer default `NULL`. Defines which map layer to filter, by name.
-#'   `NULL` filters every layer. Maps only.
+#' @param ... Passed to the [ArcProxy] or [ArcMapProxy] method.
 #' @return `proxy`, invisibly.
 #' @details
 #' Each call defines the complete filter state, because the element replaces
@@ -179,12 +173,7 @@ is_blank_filter <- function(x) {
 #' @param proxy Defines which [arc_proxy()] or [arc_map_proxy()] to select on.
 #' @param object_ids Defines which rows to select, by object id. An empty
 #'   vector clears the selection.
-#' @param ... Reserved for methods.
-#' @param layer default `NULL`. Defines which map layer to select in, by
-#'   name. `NULL` selects in every layer. Maps only.
-#' @param mode default `"replace"`. Defines what these ids do to the current
-#'   selection, one of `"replace"`, `"add"`, `"remove"`, or `"toggle"`. Maps
-#'   only.
+#' @param ... Passed to the [ArcProxy] or [ArcMapProxy] method.
 #' @return `proxy`, invisibly.
 #' @examples
 #' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
@@ -326,7 +315,11 @@ proxy_call <- function(proxy, method, args) {
 }
 
 proxy_send <- function(proxy, method, payload, handler = "arcgisviz-chart") {
-  msg <- list(id = proxy@output_id, method = method, payload = payload)
+  msg <- list(
+    id = proxy@output_id,
+    method = method,
+    payload = widget_json(payload)
+  )
   proxy@session$sendCustomMessage(handler, msg)
   invisible(proxy)
 }

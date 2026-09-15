@@ -17,6 +17,38 @@ WebChartTemporalBinning(
   nullPolicy = WebChartNullPolicyTypes()
 )
 }
+\arguments{
+\item{unit}{A \code{WebChartTemporalBinningUnits} enum.}
+
+\item{size}{Number.}
+
+\item{timeAggregationType}{A \code{WebChartTimeAggregationTypes} enum.}
+
+\item{trimIncompleteTimeInterval}{Bool.}
+
+\item{start}{Number.}
+
+\item{end}{Number.}
+
+\item{offset}{\code{NULL} or a \code{WebChartTemporalBinningOffset} object.}
+
+\item{outTimeZone}{String.}
+
+\item{firstDayOfWeek}{Number.}
+
+\item{nullPolicy}{A \code{WebChartNullPolicyTypes} enum.}
+}
+\value{
+An object of class \code{WebChartTemporalBinning}.
+}
 \description{
-WebChartTemporalBinning
+Groups a date column into intervals before plotting it.
+}
+\examples{
+WebChartTemporalBinning(
+  unit = WebChartTemporalBinningUnits("months"),
+  size = 1,
+  trimIncompleteTimeInterval = TRUE,
+  nullPolicy = WebChartNullPolicyTypes("zero")
+)
 }

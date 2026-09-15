@@ -23,6 +23,42 @@ ArcChart(
   config_opts = list()
 )
 }
+\arguments{
+\item{data}{Any value.}
+
+\item{chart_type}{String.}
+
+\item{x}{String.}
+
+\item{y}{String.}
+
+\item{stat}{String.}
+
+\item{labs}{List.}
+
+\item{color}{List.}
+
+\item{alpha}{Number.}
+
+\item{size}{List.}
+
+\item{tooltip}{String.}
+
+\item{axes}{List.}
+
+\item{legend}{List.}
+
+\item{flipped}{Bool.}
+
+\item{position}{String.}
+
+\item{series_opts}{List.}
+
+\item{config_opts}{List.}
+}
+\value{
+An object of class \code{ArcChart}.
+}
 \description{
 Holds a data frame and the mapping built up by the \verb{set_*()} functions.
 The \verb{@webchart} property is computed from that mapping rather than stored,

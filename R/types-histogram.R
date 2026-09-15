@@ -11,7 +11,18 @@ NULL
 library(S7)
 
 #' HistogramOverlays
+#'
+#' The four overlays a histogram supports. An overlay whose `created` is true
+#' is also what earns a histogram a legend.
+#'
 #' @name HistogramOverlays
+#' @return An object of class `HistogramOverlays`.
+#' @examples
+#' HistogramOverlays(
+#'   type = "histogramOverlays",
+#'   mean = WebChartOverlay(created = TRUE, visible = TRUE),
+#'   median = WebChartOverlay(created = TRUE, visible = TRUE)
+#' )
 #' @export
 HistogramOverlays := new_class(
   properties = list(
@@ -32,7 +43,20 @@ HistogramOverlays := new_class(
 )
 
 #' WebChartHistogramSeries
+#'
+#' The histogram's series. Bins are computed in the browser, which is why
+#' there is no `y` to map and why [set_tooltip()] cannot key onto one.
+#'
 #' @name WebChartHistogramSeries
+#' @return An object of class `WebChartHistogramSeries`.
+#' @examples
+#' WebChartHistogramSeries(
+#'   type = "histogramSeries",
+#'   id = "series0",
+#'   x = "body_mass",
+#'   binCount = 15,
+#'   dataTransformationType = WebChartDataTransformations("logarithmic")
+#' )
 #' @export
 WebChartHistogramSeries := new_class(
   properties = list(

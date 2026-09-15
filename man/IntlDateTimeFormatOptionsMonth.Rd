@@ -15,6 +15,9 @@ An object of class \code{IntlDateTimeFormatOptionsMonth}.
 \description{
 One of \code{"2-digit"}, \code{"long"}, \code{"narrow"}, \code{"numeric"}, \code{"short"}, \code{NA}.
 }
+\examples{
+IntlDateTimeFormatOptionsMonth("2-digit")
+}
 \section{Additional properties}{
 
 \describe{

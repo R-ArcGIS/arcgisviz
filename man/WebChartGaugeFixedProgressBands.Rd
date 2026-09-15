@@ -3,6 +3,21 @@
 \name{WebChartGaugeFixedProgressBands}
 \alias{WebChartGaugeFixedProgressBands}
 \title{WebChartGaugeFixedProgressBands}
+\value{
+An object of class \code{WebChartGaugeFixedProgressBands}.
+}
 \description{
-WebChartGaugeFixedProgressBands
+Modelled, but nothing in the public API sets it - progress bands replace
+the axis guides this package does not build either.
+}
+\examples{
+WebChartGaugeFixedProgressBands(
+  type = "chartGaugeFixedProgressBands",
+  visible = TRUE,
+  bands = WebChartGaugeFixedProgressBandsBands(
+    target = ISimpleFillSymbol(
+      color = Color(r = 78, g = 121, b = 167, a = 1)
+    )
+  )
+)
 }

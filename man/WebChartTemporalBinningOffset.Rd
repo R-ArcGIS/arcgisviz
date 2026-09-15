@@ -9,6 +9,21 @@ WebChartTemporalBinningOffset(
   size = NA_real_
 )
 }
+\arguments{
+\item{unit}{A \code{WebChartTemporalBinningUnits} enum.}
+
+\item{size}{Number.}
+}
+\value{
+An object of class \code{WebChartTemporalBinningOffset}.
+}
 \description{
-WebChartTemporalBinningOffset
+Shifts where temporal bins start - a fiscal year beginning in April rather
+than January, say.
+}
+\examples{
+WebChartTemporalBinningOffset(
+  unit = WebChartTemporalBinningUnits("months"),
+  size = 3
+)
 }

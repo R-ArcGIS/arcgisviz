@@ -6,6 +6,20 @@
 \usage{
 ScatterplotOverlays(type = NA_character_, trendLine = NULL)
 }
+\arguments{
+\item{type}{String.}
+
+\item{trendLine}{\code{NULL} or a \code{WebChartOverlay} object.}
+}
+\value{
+An object of class \code{ScatterplotOverlays}.
+}
 \description{
-ScatterplotOverlays
+The overlays a scatterplot supports - a trend line, and nothing else.
+}
+\examples{
+ScatterplotOverlays(
+  type = "scatterPlotOverlays",
+  trendLine = WebChartOverlay(created = TRUE, visible = TRUE)
+)
 }

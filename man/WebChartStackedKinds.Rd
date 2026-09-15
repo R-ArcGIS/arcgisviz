@@ -15,6 +15,9 @@ An object of class \code{WebChartStackedKinds}.
 \description{
 One of \code{"sideBySide"}, \code{"stacked"}, \code{"stacked100"}, \code{NA}.
 }
+\examples{
+WebChartStackedKinds("sideBySide")
+}
 \section{Additional properties}{
 
 \describe{

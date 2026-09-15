@@ -15,6 +15,9 @@ An object of class \code{WebChartDataTransformations}.
 \description{
 One of \code{"none"}, \code{"logarithmic"}, \code{"squareRoot"}, \code{NA}.
 }
+\examples{
+WebChartDataTransformations("none")
+}
 \section{Additional properties}{
 
 \describe{

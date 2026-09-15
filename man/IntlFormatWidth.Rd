@@ -15,6 +15,9 @@ An object of class \code{IntlFormatWidth}.
 \description{
 One of \code{"long"}, \code{"narrow"}, \code{"short"}, \code{NA}.
 }
+\examples{
+IntlFormatWidth("long")
+}
 \section{Additional properties}{
 
 \describe{

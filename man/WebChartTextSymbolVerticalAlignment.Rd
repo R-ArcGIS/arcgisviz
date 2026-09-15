@@ -15,6 +15,9 @@ An object of class \code{WebChartTextSymbolVerticalAlignment}.
 \description{
 One of \code{"baseline"}, \code{"bottom"}, \code{"middle"}, \code{"top"}, \code{NA}.
 }
+\examples{
+WebChartTextSymbolVerticalAlignment("baseline")
+}
 \section{Additional properties}{
 
 \describe{

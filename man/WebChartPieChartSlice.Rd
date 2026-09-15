@@ -3,6 +3,19 @@
 \name{WebChartPieChartSlice}
 \alias{WebChartPieChartSlice}
 \title{WebChartPieChartSlice}
+\value{
+An object of class \code{WebChartPieChartSlice}.
+}
 \description{
-WebChartPieChartSlice
+Per-slice styling. Modelled, but nothing in the public API sets it -
+\code{\link[=set_color]{set_color()}} already does what this would.
+}
+\examples{
+WebChartPieChartSlice(
+  sliceId = "Adelie",
+  label = "Adelie",
+  fillSymbol = ISimpleFillSymbol(
+    color = Color(r = 78, g = 121, b = 167, a = 1)
+  )
+)
 }

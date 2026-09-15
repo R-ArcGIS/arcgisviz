@@ -15,7 +15,7 @@ R data.frame / sf object
        R/arcgis-chart-widget.R - htmlwidgets::createWidget() wrapper
   -> htmlwidgets serializes x = list(iLayer=, chartType=, xField=, yField=)
        to JSON and embeds it in the page
-  -> srcjs/widgets/arcgisChart.js (bundled to inst/htmlwidgets/arcgisChart.js)
+  -> srcjs/widgets/arcgisChart.js (bundled to inst/htmlwidgets/arcgisChart.module.js)
        renderValue(x):
          const model = await createModel({ iLayer: x.iLayer, chartType: x.chartType })
          await model.setXAxisField(x.xField)
@@ -71,13 +71,24 @@ webpack.common.js     shared webpack config (reads srcjs/config/*.json)
 webpack.dev.js        development build (source maps)
 webpack.prod.js       production build (minified) - what `bun run production` uses
 inst/htmlwidgets/
-  arcgisChart.js       BUNDLED OUTPUT (generated - do not hand-edit)
-  arcgisChart.css      BUNDLED OUTPUT (generated - do not hand-edit)
-  arcgisChart.yaml     htmlwidgets dependency declaration (hand-written)
-  <hash>.js, <hash>.css  webpack's lazy-loaded vendor chunks (amCharts,
-                      pdfmake/xlsx export plugins, etc.) - generated
+  arcgisChart.module.js  BUNDLED OUTPUT (generated - do not hand-edit).
+                      An ES module: the SDK is imported from js.arcgis.com,
+                      not bundled. NOT named arcgisChart.js - see below.
+  arcgisChart.yaml     htmlwidgets dependency declaration (hand-written).
+                      Declares the script with type="module" and links the
+                      CDN's own main.css.
 R/arcgis-chart-widget.R  arcgis_chart(), arcgisChartOutput(), renderArcgisChart()
 ```
+
+There are no vendor chunks and no generated `.css`. Every `@arcgis/*` import
+is a webpack external pointing at a pinned `https://js.arcgis.com/5.1/` URL
+(`srcjs/config/externals.json`), so the whole directory is four files / 24KB
+where bundling the SDK produced 1839 files / 106MB.
+
+The `.module.js` suffix is load-bearing: `htmlwidgets::getDependency()` turns
+`inst/htmlwidgets/<name>.js` into a binding dependency and hardcodes its
+script tag with no attributes, which cannot load an ES module. Under any other
+filename no binding dependency is built and the yaml supplies the tag itself.
 
 This layout mirrors the [packer](https://github.com/JohnCoene/packer)
 package's `scaffold_widget()` conventions (same `srcjs/config/*.json` +
@@ -104,22 +115,32 @@ just watch       # bun run watch - webpack --config webpack.dev.js -d --watch
 ```
 
 Re-run `just bundle` (or `just bundle-dev` while iterating) any time
-`srcjs/widgets/arcgisChart.js` changes - `inst/htmlwidgets/arcgisChart.js`
-is generated output, not source, and won't update itself.
+`srcjs/widgets/arcgisChart.js` changes -
+`inst/htmlwidgets/arcgisChart.module.js` is generated output, not source, and
+won't update itself.
 
-The production bundle is large (~3MB main entry + several MB of
-lazy-loaded vendor chunks for amCharts4/5 and chart export functionality
-via `pdfmake`/`xlsx`/`canvg`). This is inherent to `@arcgis/charts-components`
-itself, not something introduced by this build setup.
+The bundles are small - 3.4KB for the chart, 11KB for the map - because they
+contain only this package's own code. `pdfmake`/`xlsx`/`canvg` and the
+amCharts engines are `@arcgis/charts-components`' own lazy chunks and are
+served from js.arcgis.com, so they cost nothing at install time and are
+fetched only if a reader actually opens the chart's export menu.
 
 ## Verifying changes
 
 There's no browser automation in this environment, so verification stops
 at: webpack build succeeds with no errors, and
-`htmlwidgets::saveWidget()` produces valid HTML that correctly references
-`arcgisChart.js`/`arcgisChart.css` and embeds the expected `x` payload
-(checked by hand once when this was set up - see git history around the
-initial scaffold commit). Actual rendering in a browser has not been
-visually confirmed and should be checked manually (e.g. open the
-`saveWidget()` output, or run inside Shiny/RStudio Viewer) before relying
-on this for anything beyond further development.
+`htmlwidgets::saveWidget()` produces valid HTML that references
+`arcgisChart.module.js` **with `type="module"`**, links the CDN stylesheet,
+and embeds the expected `x` payload.
+
+Since the move to the CDN, three things can only be confirmed in a real
+browser and have **not** been:
+
+1. The module script executes before htmlwidgets scans for bindings. Module
+   scripts are deferred, so `HTMLWidgets.widget()` registers later than it
+   did as a classic script - it should still land before `DOMContentLoaded`,
+   but that is reasoning, not evidence.
+2. `customElements.whenDefined()` resolves for every map widget, i.e. the CDN
+   build really does register all of them up front.
+3. The CDN's `main.css` covers what the previously-bundled `arcgisMap.css`
+   (50KB of component styling) covered.

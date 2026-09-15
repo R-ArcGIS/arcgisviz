@@ -57,19 +57,90 @@ just bundle       # rebuild the JS widget bundle (production, minified)
 just watch        # rebuild JS on every srcjs/ change
 ```
 
-**Both bundles set webpack's `publicPath` by hand**
-(`srcjs/modules/public-path.js`, imported first by each entry). htmlwidgets
-loads the bundle through the binding dependency it builds with
-`all_files = FALSE`, so that directory holds the entry file alone and every
-async chunk 404s against it; the chunks travel with the `.yaml` dependency
-instead. Adding `script:` back to a yaml is *not* the fix - that runs the
-bundle twice under two webpack runtimes. See the `arcgis-js-widget` skill.
+**The SDK is loaded from `js.arcgis.com`, not bundled.** Every `@arcgis/*`
+import is a webpack external pointing at a pinned CDN URL
+(`srcjs/config/externals.json`), so `inst/htmlwidgets/` holds **four files** -
+two entry bundles and two `.yaml` - and nothing else. It used to hold 1839
+files and 106MB of vendored SDK.
 
-## Every new feature needs a `dev/` example
+Three consequences, all load-bearing:
 
-Every user-facing feature gets a `dev/` example (one file per feature,
-`dev/set-labs.R`), rendered in the Viewer and using `datasets::penguins`.
-These become user-facing tutorials later, so write them to be read.
+- The entries carry real `import` statements, so they are **ES modules**
+  (`output.module`, `experiments.outputModule`) and must be loaded with
+  `type="module"`.
+- They are therefore named **`<name>.module.js`, not `<name>.js`**.
+  `htmlwidgets::getDependency()` turns `inst/htmlwidgets/<name>.js` into a
+  "binding" dependency whose script tag it hardcodes with no attributes, and
+  an ES module loaded as a classic script throws. Under any other name it
+  builds no binding dependency, and the `.yaml` declares the script itself
+  (`script: {src:, type: module}`) - which htmlwidgets supports because it
+  does `do.call(htmlDependency, l)` on each yaml entry.
+- There are **no async chunks left at all**, so `publicPath` no longer needs
+  setting and `srcjs/modules/public-path.js` is gone. The map's hand-written
+  per-component `import()` block went with it: the CDN build carries its own
+  lazy element registry, so `customElements.whenDefined()` replaces it.
+
+**That lazy registry needs `$arcgis.import`, and nothing else defines it.**
+Both `*-components/index.js` bootstraps resolve their own `@arcgis/core`
+dependencies through `$arcgis.import(name)`, falling back to a *bare*
+`import("@arcgis/core/" + name + ".js")` that no browser can resolve - so a
+map died at `viewOnReady()` with "Failed to resolve module specifier
+'@arcgis/core/applications/Components/reactiveUtils.js'". Esri defines that
+hook in `js.arcgis.com/5.1/core.js`, which is 1.7MB of the dojo AMD loader.
+Both `.yaml`s instead declare an `arcgis-esm-loader` dependency whose `head:`
+is a classic `<script>` defining it against the same pinned CDN.
+
+**A `@arcgis/core/*` module must come back default-*unwrapped*.** `core.js`
+rewrites those to AMD `esri/*`, whose module value is the class itself, and
+the ESM fallback spells it `m.default ?? m`; only `$arcgis.importMap.imports`
+entries (which charts-components registers for its own modules) stay raw
+namespaces. Hand back a namespace and the SDK fails deeper in, as
+`Ys.fromJSON is not a function`.
+
+Two ordering facts make it work: a dependency's
+`head` renders *after* its own `script` tag (`htmltools::renderDependencies`),
+so it is its own entry listed first; and an inline classic script runs during
+parsing, before any deferred module evaluates. A native `<script
+type="importmap">` would also resolve it, but must precede *every* module
+script on the page - `{calcite}` loads one of its own, so the ordering is not
+ours to guarantee.
+
+**A map also needs `@arcgis/core`'s theme stylesheet; a chart does not.**
+`map-components/main.css` only hydrates the elements - `.esri-ui-corner` and
+the Avenir Next faces are in
+`@arcgis/core/assets/esri/themes/light/main.css`, so without it the slotted
+widgets stack in document flow under the map and everything falls back to
+serif. `arcgisChart.yaml` deliberately omits it: amCharts draws its own text,
+and it is 350KB.
+
+`output.clean` (keeping `*.yaml`) is what stops a `bundle-dev` run leaving
+orphans behind - dev and prod name chunks differently, and one dev build once
+stranded 466 files that nothing referenced again.
+
+Offline use is now impossible without vendoring the SDK back in; the CDN is
+pinned to `5.1` to match the `.d.ts` the R types are written against.
+
+## Every new feature needs an `inst/examples/` example
+
+Every user-facing feature gets an example under `inst/examples/`, one file
+per feature, rendered in the Viewer and using `datasets::penguins` (charts)
+or sf's `nc.shp` (maps). **These ship with the package and are read as
+tutorials, so write them to be read**, and add a row to
+`inst/examples/README.md`.
+
+The layout is `charts/`, `maps/`, and `shiny/<name>/app.R` - a directory per
+app, so `shiny::runApp(system.file("examples/shiny/map-proxy", package =
+"arcgisviz"))` works. They start with `library(arcgisviz)`, never
+`devtools::load_all()`, and never reach into the package with `:::`.
+`just fmt`/`just lint` cover them alongside `R/`.
+
+Errors are worth demonstrating, but note **where** each one fires. A setter
+that validates its own arguments (`set_position()`, `set_size()`,
+`set_color()` on a gauge) errors inside `try()`. A check that runs in
+`build_webchart()` - `set_legend(visible = TRUE)`, `set_tooltip()`'s
+constant-within-a-mark rule, a numeric colour column under aggregation -
+does not fire until the chart is rendered, so those need `|> as_widget()`
+inside the `try()` or they escape it on auto-print.
 
 ## Three skills, load them for the relevant work
 
@@ -950,6 +1021,17 @@ before writing any of it.
   it double-listed. Deleting an exported function also needs its `man/*.Rd`
   removed by hand - `document()` won't, and `R CMD check` then fails with
   "listed as exports, but not present in namespace".
+
+## Never use jsonlite
+
+Not in `Imports`, not in `Suggests`, not as a `::` call.
+`yyjsonr::write_json_str()` writes and `yyjsonr::read_json_str()` reads.
+`RcppSimdJson::fparse()` is also fine for reading.
+
+Its defaults are wrong here: `dataframe = "columns"` breaks
+`layerDefinition$fields` on the client. Anything that lets those defaults back
+in is the same bug, including forwarding htmlwidgets' `TOJSON_ARGS` into
+`opts_write_json()`, which is why `widget_json()` discards them.
 
 ## Standing rule from global config
 

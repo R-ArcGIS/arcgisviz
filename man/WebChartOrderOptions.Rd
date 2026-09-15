@@ -6,6 +6,27 @@
 \usage{
 WebChartOrderOptions(series = NULL, data = NULL, orderByFields = character(0))
 }
+\arguments{
+\item{series}{\code{NULL} or a \code{WebChartOrderSeriesBy} object.}
+
+\item{data}{\code{NULL} or a \code{WebChartDirectionalDataOrder} object or a \code{WebChartMultiAxesDataOrder} object or a \code{WebChartPredefinedLabelsDataOrder} object.}
+
+\item{orderByFields}{String.}
+}
+\value{
+An object of class \code{WebChartOrderOptions}.
+}
 \description{
-WebChartOrderOptions
+How a chart's series and categories are sorted.
+}
+\examples{
+WebChartOrderOptions(
+  series = WebChartOrderSeriesBy(orderBy = WebChartSortOrderKinds("ASC")),
+  data = WebChartDirectionalDataOrder(
+    orderType = WebChartDirectionalDataOrderOrderType(
+      "arcgis-charts-y-value"
+    ),
+    orderBy = WebChartSortOrderKinds("DESC")
+  )
+)
 }

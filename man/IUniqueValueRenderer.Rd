@@ -3,6 +3,32 @@
 \name{IUniqueValueRenderer}
 \alias{IUniqueValueRenderer}
 \title{IUniqueValueRenderer}
+\value{
+An object of class \code{IUniqueValueRenderer}.
+}
 \description{
-IUniqueValueRenderer
+One symbol per distinct value of \code{field1}. This is what \code{\link[=set_color]{set_color()}}
+builds for a grouping column, and what a map uses for any non-numeric one.
+}
+\examples{
+IUniqueValueRenderer(
+  field1 = "species",
+  uniqueValueInfos = list(
+    IUniqueValueInfo(
+      value = "Adelie",
+      symbol = ISimpleFillSymbol(
+        color = Color(r = 78, g = 121, b = 167, a = 1)
+      )
+    ),
+    IUniqueValueInfo(
+      value = "Gentoo",
+      symbol = ISimpleFillSymbol(
+        color = Color(r = 242, g = 142, b = 43, a = 1)
+      )
+    )
+  )
+)
+}
+\seealso{
+\code{\link[=new_renderer]{new_renderer()}}, which builds one from friendly names and colours.
 }

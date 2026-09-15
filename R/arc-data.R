@@ -193,21 +193,14 @@ renderer_as_vector <- function(x, ...) {
 S7::method(as_vector, ISimpleRenderer) <- renderer_as_vector
 S7::method(as_vector, IUniqueValueRenderer) <- renderer_as_vector
 
-# Our serializer, installed via htmlwidgets' TOJSON_FUNC hook. Called with
-# the whole payload (x, evals, jsHooks), returns a JSON string. yyjsonr's
-# defaults are the right ones here; jsonlite's `dataframe = "columns"`
-# silently breaks `layerDefinition$fields`.
-#
-# This is the one place S7 becomes JSON. as_vector() recurses, so a config or
-# a layer travels as its class right up to here and every method registered
-# above fires on the way through.
+# `...` absorbs and discards the TOJSON_ARGS htmlwidgets forwards.
 widget_json <- function(x, ...) {
   yyjsonr::write_json_str(
     as_vector(x),
     opts = yyjsonr::opts_write_json(
       auto_unbox = TRUE,
       json_verbatim = TRUE,
-      ...
+      dataframe = "rows"
     )
   )
 }

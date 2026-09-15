@@ -3,6 +3,17 @@
 \name{WebChartHeatChartHeatClassBreaksColorRampInfo}
 \alias{WebChartHeatChartHeatClassBreaksColorRampInfo}
 \title{WebChartHeatChartHeatClassBreaksColorRampInfo}
+\value{
+An object of class \code{WebChartHeatChartHeatClassBreaksColorRampInfo}.
+}
 \description{
-WebChartHeatChartHeatClassBreaksColorRampInfo
+Names an Esri colour ramp for the client to generate class breaks from.
+The ramp travels by \emph{name}: no colours leave R, which is why a named ramp
+cannot carry an alpha channel.
+}
+\examples{
+WebChartHeatChartHeatClassBreaksColorRampInfo(
+  name = "Heatmap 3",
+  flipped = FALSE
+)
 }

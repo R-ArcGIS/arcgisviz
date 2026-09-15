@@ -3,6 +3,22 @@
 \name{WebChartPieChartSeries}
 \alias{WebChartPieChartSeries}
 \title{WebChartPieChartSeries}
+\value{
+An object of class \code{WebChartPieChartSeries}.
+}
 \description{
-WebChartPieChartSeries
+The pie's series. It reads the same query shape a bar chart's does, so
+\code{\link[=set_stat]{set_stat()}} works unchanged - what differs is that a pie sends no axes at
+all, and carries the dial geometry (\code{innerRadius}, the angles) itself.
+}
+\examples{
+WebChartPieChartSeries(
+  type = "pieSeries",
+  id = "series0",
+  x = "species",
+  y = "count_0",
+  innerRadius = 55,
+  displayCategoryOnDataLabel = TRUE,
+  displayPercentageOnDataLabel = TRUE
+)
 }

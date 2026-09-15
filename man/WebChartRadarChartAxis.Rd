@@ -3,6 +3,15 @@
 \name{WebChartRadarChartAxis}
 \alias{WebChartRadarChartAxis}
 \title{WebChartRadarChartAxis}
+\value{
+An object of class \code{WebChartRadarChartAxis}.
+}
 \description{
-WebChartRadarChartAxis
+A \code{\link[=WebChartAxis]{WebChartAxis()}} with the label orientation only a circular axis needs.
+}
+\examples{
+WebChartRadarChartAxis(
+  type = "chartAxis",
+  labelsOrientation = WebChartRadarChartAxisLabelsOrientation("circular")
+)
 }

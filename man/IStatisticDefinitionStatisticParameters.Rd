@@ -9,6 +9,20 @@ IStatisticDefinitionStatisticParameters(
   orderBy = IStatisticDefinitionStatisticParametersOrderBy()
 )
 }
+\arguments{
+\item{value}{Number.}
+
+\item{orderBy}{A \code{IStatisticDefinitionStatisticParametersOrderBy} enum.}
+}
+\value{
+An object of class \code{IStatisticDefinitionStatisticParameters}.
+}
 \description{
-IStatisticDefinitionStatisticParameters
+Extra arguments for the statistics that take them - the percentile ones.
+}
+\examples{
+IStatisticDefinitionStatisticParameters(
+  value = 0.9,
+  orderBy = IStatisticDefinitionStatisticParametersOrderBy("asc")
+)
 }

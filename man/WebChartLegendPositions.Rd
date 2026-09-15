@@ -15,6 +15,9 @@ An object of class \code{WebChartLegendPositions}.
 \description{
 One of \code{"bottom"}, \code{"left"}, \code{"right"}, \code{"top"}, \code{NA}.
 }
+\examples{
+WebChartLegendPositions("bottom")
+}
 \section{Additional properties}{
 
 \describe{

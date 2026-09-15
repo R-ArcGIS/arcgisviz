@@ -1,3 +1,14 @@
 {
-  "widgets": "HTMLWidgets"
+  "widgets": "global HTMLWidgets",
+  "@arcgis/charts-components": "module https://js.arcgis.com/5.1/charts-components/index.js",
+  "@arcgis/map-components": "module https://js.arcgis.com/5.1/map-components/index.js",
+  "@arcgis/core/layers/FeatureLayer.js": "module https://js.arcgis.com/5.1/@arcgis/core/layers/FeatureLayer.js",
+  "@arcgis/core/rest/support/FeatureSet.js": "module https://js.arcgis.com/5.1/@arcgis/core/rest/support/FeatureSet.js",
+  "@arcgis/core/layers/support/Field.js": "module https://js.arcgis.com/5.1/@arcgis/core/layers/support/Field.js",
+  "@arcgis/core/PopupTemplate.js": "module https://js.arcgis.com/5.1/@arcgis/core/PopupTemplate.js",
+  "@arcgis/core/renderers/support/jsonUtils.js": "module https://js.arcgis.com/5.1/@arcgis/core/renderers/support/jsonUtils.js",
+  "@arcgis/core/core/promiseUtils.js": "module https://js.arcgis.com/5.1/@arcgis/core/core/promiseUtils.js",
+  "@arcgis/core/core/reactiveUtils.js": "module https://js.arcgis.com/5.1/@arcgis/core/core/reactiveUtils.js",
+  "@arcgis/core/geometry/support/webMercatorUtils.js": "module https://js.arcgis.com/5.1/@arcgis/core/geometry/support/webMercatorUtils.js",
+  "@arcgis/core/views/selection/SelectionOperation.js": "module https://js.arcgis.com/5.1/@arcgis/core/views/selection/SelectionOperation.js"
 }

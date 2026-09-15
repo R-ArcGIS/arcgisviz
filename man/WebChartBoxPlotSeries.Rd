@@ -3,6 +3,22 @@
 \name{WebChartBoxPlotSeries}
 \alias{WebChartBoxPlotSeries}
 \title{WebChartBoxPlotSeries}
+\value{
+An object of class \code{WebChartBoxPlotSeries}.
+}
 \description{
-WebChartBoxPlotSeries
+The box plot's series. \code{y} is a character \emph{vector} here, not a single
+string - a box summarises its column into five numbers.
+}
+\examples{
+WebChartBoxPlotSeries(
+  type = "boxPlotSeries",
+  id = "series0",
+  name = "body_mass",
+  x = "species",
+  y = "body_mass",
+  fillSymbol = ISimpleFillSymbol(
+    color = Color(r = 78, g = 121, b = 167, a = 1)
+  )
+)
 }

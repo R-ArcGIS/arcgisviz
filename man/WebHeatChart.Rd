@@ -3,6 +3,20 @@
 \name{WebHeatChart}
 \alias{WebHeatChart}
 \title{WebHeatChart}
+\value{
+An object of class \code{WebHeatChart}.
+}
 \description{
-WebHeatChart
+A \code{\link[=WebChart]{WebChart()}} with the settings only a heat chart has.
+}
+\examples{
+WebHeatChart(
+  version = "18.1.0",
+  type = "heatChart",
+  hideEmptyRowsAndColumns = TRUE,
+  nullPolicy = WebChartNullPolicyTypes("zero")
+)
+
+# Built for you by the public API.
+arc_heat(datasets::penguins, species, island)@webchart
 }

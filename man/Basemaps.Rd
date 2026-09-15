@@ -16,6 +16,9 @@ An object of class \code{Basemaps}.
 The basemap ids \verb{<arcgis-map>} accepts, from \verb{@arcgis/core}'s own
 \code{basemapDefinitions.js}. The \verb{-3d} variants are built for scenes.
 }
+\examples{
+Basemaps("topo-vector")
+}
 \section{Additional properties}{
 
 \describe{

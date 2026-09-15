@@ -15,6 +15,9 @@ An object of class \code{WebChartTemporalBinningUnits}.
 \description{
 One of \code{"days"}, \code{"hours"}, \code{"minutes"}, \code{"months"}, \code{"quarters"}, \code{"seconds"}, \code{"weeks"}, \code{"years"}, \code{NA}.
 }
+\examples{
+WebChartTemporalBinningUnits("days")
+}
 \section{Additional properties}{
 
 \describe{

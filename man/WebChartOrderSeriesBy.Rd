@@ -6,6 +6,20 @@
 \usage{
 WebChartOrderSeriesBy(preferLabel = NA, orderBy = WebChartSortOrderKinds())
 }
+\arguments{
+\item{preferLabel}{Bool.}
+
+\item{orderBy}{A \code{WebChartSortOrderKinds} enum.}
+}
+\value{
+An object of class \code{WebChartOrderSeriesBy}.
+}
 \description{
 WebChartOrderSeriesBy
+}
+\examples{
+WebChartOrderSeriesBy(
+  preferLabel = TRUE,
+  orderBy = WebChartSortOrderKinds("DESC")
+)
 }

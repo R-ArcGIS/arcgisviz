@@ -3,7 +3,20 @@
 \name{ArcMap}
 \alias{ArcMap}
 \title{A map}
+\value{
+An object of class \code{ArcMap}.
+}
 \description{
 The object \code{\link[=arc_map]{arc_map()}} returns and every \verb{set_*()} and \code{\link[=add_layer]{add_layer()}} call
 takes and returns.
+}
+\examples{
+arc_map("gray-vector")
+
+# Every set_*() and add_*() returns the map, so it is one object being
+# filled in rather than a sequence of drawing commands.
+arc_map() |>
+  set_basemap("satellite") |>
+  set_view(center = c(-79, 35.5), zoom = 7) |>
+  add_legend(position = "bottom-left")
 }

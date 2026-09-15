@@ -10,6 +10,22 @@ WebChartPredefinedLabelsDataOrder(
   preferLabel = NA
 )
 }
+\arguments{
+\item{orderType}{String.}
+
+\item{orderBy}{String.}
+
+\item{preferLabel}{Bool.}
+}
+\value{
+An object of class \code{WebChartPredefinedLabelsDataOrder}.
+}
 \description{
 WebChartPredefinedLabelsDataOrder
+}
+\examples{
+WebChartPredefinedLabelsDataOrder(
+  orderType = "arcgis-charts-predefined-labels",
+  orderBy = c("Adelie", "Chinstrap", "Gentoo")
+)
 }

@@ -7,6 +7,7 @@ library(S7)
 #'
 #' @examples
 #' s7x::as_vector(Color(r = 70, g = 130, b = 180, a = 255))
+#' @return An object of class `Color`.
 #' @name Color
 #' @export
 Color <- new_class(

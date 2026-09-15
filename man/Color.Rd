@@ -6,6 +6,18 @@
 \usage{
 Color(r = NA_real_, g = NA_real_, b = NA_real_, a = NA_real_)
 }
+\arguments{
+\item{r}{Number.}
+
+\item{g}{Number.}
+
+\item{b}{Number.}
+
+\item{a}{Number.}
+}
+\value{
+An object of class \code{Color}.
+}
 \description{
 Holds a colour as separate \code{r}, \code{g}, \code{b}, and \code{a} components, each on a 0
 to 255 scale. Serialization converts it back to the tuple the spec uses.

@@ -18,6 +18,9 @@ library(S7)
 
 #' WebChartAxisScrollBar
 #' @name WebChartAxisScrollBar
+#' @return An object of class `WebChartAxisScrollBar`.
+#' @examples
+#' WebChartAxisScrollBar(visible = TRUE, width = 12, gripSize = 6)
 #' @export
 WebChartAxisScrollBar <- new_class(
   "WebChartAxisScrollBar",
@@ -31,7 +34,16 @@ WebChartAxisScrollBar <- new_class(
 )
 
 #' ISimpleLineSymbol
+#'
 #' @name ISimpleLineSymbol
+#' @return An object of class `ISimpleLineSymbol`.
+#' @seealso [new_symbol()], which builds one from friendly names and colours.
+#' @examples
+#' ISimpleLineSymbol(
+#'   style = SimpleLineSymbolStyle("esriSLSDash"),
+#'   color = Color(r = 51, g = 51, b = 51, a = 1),
+#'   width = 1.5
+#' )
 #' @export
 ISimpleLineSymbol <- new_class(
   "ISimpleLineSymbol",
@@ -44,7 +56,18 @@ ISimpleLineSymbol <- new_class(
 )
 
 #' ISimpleFillSymbol
+#'
 #' @name ISimpleFillSymbol
+#' @return An object of class `ISimpleFillSymbol`.
+#' @seealso [new_symbol()], which builds one from friendly names and colours.
+#' @examples
+#' ISimpleFillSymbol(
+#'   color = Color(r = 184, g = 40, b = 40, a = 1),
+#'   outline = ISimpleLineSymbol(
+#'     color = Color(r = 255, g = 255, b = 255, a = 1),
+#'     width = 0.5
+#'   )
+#' )
 #' @export
 ISimpleFillSymbol <- new_class(
   "ISimpleFillSymbol",
@@ -57,7 +80,16 @@ ISimpleFillSymbol <- new_class(
 )
 
 #' ISimpleMarkerSymbol
+#'
 #' @name ISimpleMarkerSymbol
+#' @return An object of class `ISimpleMarkerSymbol`.
+#' @seealso [new_symbol()], which builds one from friendly names and colours.
+#' @examples
+#' ISimpleMarkerSymbol(
+#'   style = SimpleMarkerSymbolStyle("esriSMSCircle"),
+#'   color = Color(r = 70, g = 130, b = 180, a = 1),
+#'   size = 8
+#' )
 #' @export
 ISimpleMarkerSymbol <- new_class(
   "ISimpleMarkerSymbol",
@@ -74,7 +106,11 @@ ISimpleMarkerSymbol <- new_class(
 )
 
 #' CategoryFormatOptions
+#'
 #' @name CategoryFormatOptions
+#' @return An object of class `CategoryFormatOptions`.
+#' @examples
+#' CategoryFormatOptions(type = "category", characterLimit = 20)
 #' @export
 CategoryFormatOptions <- new_class(
   "CategoryFormatOptions",
@@ -85,7 +121,14 @@ CategoryFormatOptions <- new_class(
 )
 
 #' WebChartOrderSeriesBy
+#'
 #' @name WebChartOrderSeriesBy
+#' @return An object of class `WebChartOrderSeriesBy`.
+#' @examples
+#' WebChartOrderSeriesBy(
+#'   preferLabel = TRUE,
+#'   orderBy = WebChartSortOrderKinds("DESC")
+#' )
 #' @export
 WebChartOrderSeriesBy <- new_class(
   "WebChartOrderSeriesBy",
@@ -96,7 +139,14 @@ WebChartOrderSeriesBy <- new_class(
 )
 
 #' WebChartPredefinedLabelsDataOrder
+#'
 #' @name WebChartPredefinedLabelsDataOrder
+#' @return An object of class `WebChartPredefinedLabelsDataOrder`.
+#' @examples
+#' WebChartPredefinedLabelsDataOrder(
+#'   orderType = "arcgis-charts-predefined-labels",
+#'   orderBy = c("Adelie", "Chinstrap", "Gentoo")
+#' )
 #' @export
 WebChartPredefinedLabelsDataOrder <- new_class(
   "WebChartPredefinedLabelsDataOrder",
@@ -108,7 +158,11 @@ WebChartPredefinedLabelsDataOrder <- new_class(
 )
 
 #' TimeIntervalInfo
+#'
 #' @name TimeIntervalInfo
+#' @return An object of class `TimeIntervalInfo`.
+#' @examples
+#' TimeIntervalInfo(unit = WebChartTemporalBinningUnits("months"), size = 3)
 #' @export
 TimeIntervalInfo <- new_class(
   "TimeIntervalInfo",
@@ -119,7 +173,16 @@ TimeIntervalInfo <- new_class(
 )
 
 #' IFont
+#'
 #' @name IFont
+#' @return An object of class `IFont`.
+#' @examples
+#' IFont(
+#'   family = "Avenir Next",
+#'   size = 12,
+#'   style = IFontStyle("normal"),
+#'   weight = IFontWeight("bold")
+#' )
 #' @export
 IFont <- new_class(
   "IFont",
@@ -133,7 +196,17 @@ IFont <- new_class(
 )
 
 #' IntlDateTimeFormatOptions
+#'
+#' Mirrors JavaScript's own `Intl.DateTimeFormat` options object.
+#'
 #' @name IntlDateTimeFormatOptions
+#' @return An object of class `IntlDateTimeFormatOptions`.
+#' @examples
+#' IntlDateTimeFormatOptions(
+#'   year = IntlDateTimeDigitStyle("numeric"),
+#'   month = IntlDateTimeFormatOptionsMonth("short"),
+#'   day = IntlDateTimeDigitStyle("2-digit")
+#' )
 #' @export
 IntlDateTimeFormatOptions <- new_class(
   "IntlDateTimeFormatOptions",
@@ -162,7 +235,17 @@ IntlDateTimeFormatOptions <- new_class(
 )
 
 #' IntlNumberFormatOptions
+#'
+#' Mirrors JavaScript's own `Intl.NumberFormat` options object.
+#'
 #' @name IntlNumberFormatOptions
+#' @return An object of class `IntlNumberFormatOptions`.
+#' @examples
+#' IntlNumberFormatOptions(
+#'   style = IntlNumberFormatOptionsStyle("decimal"),
+#'   useGrouping = TRUE,
+#'   maximumFractionDigits = 1
+#' )
 #' @export
 IntlNumberFormatOptions <- new_class(
   "IntlNumberFormatOptions",

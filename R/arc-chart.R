@@ -26,6 +26,7 @@ library(S7)
 #' df <- data.frame(species = c("a", "b", "c"), mass = c(1, 5, 3))
 #'
 #' arc_col(df, species, mass)@webchart
+#' @return An object of class `ArcChart`.
 #' @name ArcChart
 #' @export
 ArcChart <- new_class(
@@ -1351,9 +1352,14 @@ continuous_renderer <- function(
   )
 }
 
+# A factor's level order is the order the user asked for, so it is not resorted.
 color_levels <- function(values) {
-  out <- if (is.factor(values)) levels(values) else unique(as.character(values))
-  sort(out[!is.na(out)])
+  out <- if (is.factor(values)) {
+    levels(values)
+  } else {
+    sort(unique(as.character(values)))
+  }
+  out[!is.na(out)]
 }
 
 chart_aggregates <- function(chart) {

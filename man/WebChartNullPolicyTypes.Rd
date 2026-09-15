@@ -15,6 +15,9 @@ An object of class \code{WebChartNullPolicyTypes}.
 \description{
 One of \code{"interpolate"}, \code{"null"}, \code{"zero"}, \code{NA}.
 }
+\examples{
+WebChartNullPolicyTypes("interpolate")
+}
 \section{Additional properties}{
 
 \describe{

@@ -11,34 +11,7 @@ add_layer(map, .data, ...)
 
 \item{.data}{Defines which \code{sf} object supplies the features.}
 
-\item{...}{Passed between methods. Must be empty when \code{.data} is an
-\link{IFeatureLayer}, whose own properties already answer \code{color}, \code{palette},
-\code{size} and \code{tooltip}.}
-
-\item{color}{default \code{NULL}. Defines which column drives the symbol colour.
-A numeric column becomes a gradient, anything else one colour per value.}
-
-\item{palette}{default \code{NULL}. Defines the colour ramp, either an Esri ramp
-name from \code{\link[=esri_palettes]{esri_palettes()}} or a vector of R colours.}
-
-\item{size}{default \code{NULL}. Defines the marker size or line width in points.}
-
-\item{opacity}{default \code{NULL}. Defines the layer opacity, from \code{0} to \code{1}.}
-
-\item{name}{default \code{NULL}. Defines the layer name, which is also the handle
-\code{\link[=remove_layer]{remove_layer()}} and \code{\link[=set_layer]{set_layer()}} take. On an \code{\link[=arc_map_proxy]{arc_map_proxy()}} it is
-required, because that is what tells the browser which layer is meant.}
-
-\item{tooltip}{default \code{NULL}. Defines which columns are shown when a
-feature is hovered, as bare column names wrapped in \code{c()}. Name one to
-label it, as in \code{c(County = NAME)}.}
-
-\item{selectable}{default \code{NULL}. Defines whether clicking a feature adds it
-to the selection, which arrives in Shiny as \verb{input$<output_id>$selection}. See
-\code{\link[=set_selection]{set_selection()}}.}
-
-\item{visible}{default \code{NULL}. Defines whether the layer starts drawn.
-Only when \code{.data} is an \link{IFeatureLayer}.}
+\item{...}{Passed to the \link{ArcMap} or \link{IFeatureLayer} method.}
 }
 \value{
 \code{map}, with the layer appended.
@@ -60,5 +33,15 @@ and modifying it, usually with \code{\link[=add_renderer]{add_renderer()}}.
 }\if{html}{\out{</div>}}
 }
 \examples{
-set_basemap(arc_map(), "gray-vector")
+\dontshow{if (rlang::is_installed("sf")) withAutoprint(\{ # examplesIf}
+nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
+
+arc_map("gray-vector") |>
+  add_layer(nc, color = BIR74, palette = "Orange 5", name = "Counties")
+
+# A fixed colour needs no mapping, since a layer has one symbol either way.
+arc_map() |>
+  add_layer(nc, palette = "grey30", opacity = 0.6) |>
+  add_layer(sf::st_centroid(nc), color = SID74, size = 8)
+\dontshow{\}) # examplesIf}
 }

@@ -10,6 +10,24 @@ WebChartText(
   content = WebChartTextSymbol()
 )
 }
+\arguments{
+\item{type}{String.}
+
+\item{visible}{Bool.}
+
+\item{content}{A \code{WebChartTextSymbol} object.}
+}
+\value{
+An object of class \code{WebChartText}.
+}
 \description{
-WebChartText
+A piece of chart text and whether it is drawn - the shape a title, subtitle,
+or axis label takes. \code{\link[=set_labs]{set_labs()}} builds these for you.
+}
+\examples{
+WebChartText(
+  type = "chartText",
+  visible = TRUE,
+  content = WebChartTextSymbol(type = "esriTS", text = "Palmer penguins")
+)
 }

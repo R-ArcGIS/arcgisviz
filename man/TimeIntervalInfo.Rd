@@ -6,6 +6,17 @@
 \usage{
 TimeIntervalInfo(unit = WebChartTemporalBinningUnits(), size = NA_real_)
 }
+\arguments{
+\item{unit}{A \code{WebChartTemporalBinningUnits} enum.}
+
+\item{size}{Number.}
+}
+\value{
+An object of class \code{TimeIntervalInfo}.
+}
 \description{
 TimeIntervalInfo
+}
+\examples{
+TimeIntervalInfo(unit = WebChartTemporalBinningUnits("months"), size = 3)
 }

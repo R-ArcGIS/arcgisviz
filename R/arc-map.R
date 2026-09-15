@@ -38,13 +38,20 @@ geometry_symbol_map <- list(
 #' [add_layer()], not called directly.
 #'
 #' @name MapLayer
+#' @return An object of class `MapLayer`.
+#' @examplesIf rlang::is_installed("sf")
+#' nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
+#'
+#' # add_layer() builds one, which is how you should get one.
+#' map <- add_layer(arc_map(), nc, name = "Counties", opacity = 0.8)
+#' map@layers[[1]]
 #' @export
 MapLayer := new_class(
   properties = list(
     data = S7::class_any,
     name = s7x::class_string,
     color = S7::class_list,
-    size = s7x::class_float,
+    size = S7::class_list,
     opacity = s7x::class_float,
     visible = s7x::class_boolean,
     selectable = s7x::class_boolean,
@@ -58,6 +65,16 @@ MapLayer := new_class(
 #' takes and returns.
 #'
 #' @name ArcMap
+#' @return An object of class `ArcMap`.
+#' @examples
+#' arc_map("gray-vector")
+#'
+#' # Every set_*() and add_*() returns the map, so it is one object being
+#' # filled in rather than a sequence of drawing commands.
+#' arc_map() |>
+#'   set_basemap("satellite") |>
+#'   set_view(center = c(-79, 35.5), zoom = 7) |>
+#'   add_legend(position = "bottom-left")
 #' @export
 ArcMap := new_class(
   properties = list(
@@ -208,30 +225,14 @@ selectable_ids <- function(layers) {
 #' Add a layer to a map
 #'
 #' Draws a data frame or `sf` object as a client side feature layer. Colour
-#' takes a bare column name, the same as [set_color()] does on a chart.
+#' takes a bare column name, the same as [set_color()] does on a chart, and so
+#' does `size`: a bare column scales each marker by its value, one number
+#' sizes them all the same. `size_range` sets the smallest and largest, and
+#' the value rides the marker's *area*, so a skewed column stays readable.
 #'
 #' @param map Defines which map to modify.
 #' @param .data Defines which `sf` object supplies the features.
-#' @param color default `NULL`. Defines which column drives the symbol colour.
-#'   A numeric column becomes a gradient, anything else one colour per value.
-#' @param palette default `NULL`. Defines the colour ramp, either an Esri ramp
-#'   name from [esri_palettes()] or a vector of R colours.
-#' @param size default `NULL`. Defines the marker size or line width in points.
-#' @param opacity default `NULL`. Defines the layer opacity, from `0` to `1`.
-#' @param name default `NULL`. Defines the layer name, which is also the handle
-#'   [remove_layer()] and [set_layer()] take. On an [arc_map_proxy()] it is
-#'   required, because that is what tells the browser which layer is meant.
-#' @param tooltip default `NULL`. Defines which columns are shown when a
-#'   feature is hovered, as bare column names wrapped in `c()`. Name one to
-#'   label it, as in `c(County = NAME)`.
-#' @param selectable default `NULL`. Defines whether clicking a feature adds it
-#'   to the selection, which arrives in Shiny as `input$<output_id>$selection`. See
-#'   [set_selection()].
-#' @param visible default `NULL`. Defines whether the layer starts drawn.
-#'   Only when `.data` is an [IFeatureLayer].
-#' @param ... Passed between methods. Must be empty when `.data` is an
-#'   [IFeatureLayer], whose own properties already answer `color`, `palette`,
-#'   `size` and `tooltip`.
+#' @param ... Passed to the [ArcMap] or [IFeatureLayer] method.
 #' @return `map`, with the layer appended.
 #' @details
 #' `.data` is either a data frame to build a layer from, or an
@@ -245,8 +246,20 @@ selectable_ids <- function(layers) {
 #'   add_renderer(ISimpleRenderer(symbol = my_symbol)) |>
 #'   (\(lyr) add_layer(arc_map(), lyr))()
 #' ```
-#' @examples
-#' set_basemap(arc_map(), "gray-vector")
+#' @examplesIf rlang::is_installed("sf")
+#' nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
+#'
+#' arc_map("gray-vector") |>
+#'   add_layer(nc, color = BIR74, palette = "Orange 5", name = "Counties")
+#'
+#' # A fixed colour needs no mapping, since a layer has one symbol either way.
+#' arc_map() |>
+#'   add_layer(nc, palette = "grey30", opacity = 0.6) |>
+#'   add_layer(sf::st_centroid(nc), color = SID74, size = 8)
+#'
+#' # A bare column scales the markers instead, between size_range.
+#' arc_map() |>
+#'   add_layer(sf::st_centroid(nc), size = BIR74, size_range = c(4, 30))
 #' @export
 add_layer <- S7::new_generic(
   "add_layer",
@@ -260,6 +273,7 @@ S7::method(add_layer, list(ArcMap, S7::class_any)) <- function(
   color = NULL,
   palette = NULL,
   size = NULL,
+  size_range = NULL,
   opacity = NULL,
   name = NULL,
   tooltip = NULL,
@@ -272,7 +286,7 @@ S7::method(add_layer, list(ArcMap, S7::class_any)) <- function(
   layer <- MapLayer(
     data = .data,
     name = if (rlang::is_null(name)) NA_character_ else name,
-    size = if (rlang::is_null(size)) NA_real_ else as.double(size),
+    size = layer_size(rlang::enquo(size), .data, size_range, call),
     opacity = if (rlang::is_null(opacity)) NA_real_ else as.double(opacity),
     visible = TRUE,
     selectable = isTRUE(selectable),
@@ -324,7 +338,7 @@ S7::method(add_layer, list(ArcMap, IFeatureLayer)) <- function(
   layer <- MapLayer(
     data = .data,
     name = if (rlang::is_null(name)) NA_character_ else name,
-    size = NA_real_,
+    size = list(),
     opacity = if (rlang::is_null(opacity)) NA_real_ else as.double(opacity),
     visible = if (rlang::is_null(visible)) TRUE else visible,
     selectable = isTRUE(selectable),
@@ -528,28 +542,121 @@ check_map <- function(map, call = rlang::caller_env()) {
   invisible(map)
 }
 
+# `size` is either a bare column to scale by or one fixed number - the same
+# mapped/fixed pair `color` and `palette` are.
+layer_size <- function(size, data, range, call) {
+  if (rlang::quo_is_null(size)) {
+    return(list())
+  }
+  if (rlang::quo_is_symbol(size)) {
+    col <- rlang::as_string(rlang::quo_get_expr(size))
+    if (col %in% names(data)) {
+      if (!is.numeric(data[[col]])) {
+        cli::cli_abort(
+          c(
+            "{.arg size} must map a numeric column.",
+            "x" = "{.field {col}} is {.cls {class(data[[col]])}}."
+          ),
+          call = call
+        )
+      }
+      range <- check_size_range(range, call)
+      return(list(
+        field = col,
+        range = if (rlang::is_null(range)) c(6, 34) else range
+      ))
+    }
+  }
+  list(value = as.double(rlang::eval_tidy(size)))
+}
+
+# Symbol *area* carries the value, so the sizes interpolate on sqrt. A count
+# is almost always skewed, and on a linear ramp one city swamps the rest.
+size_stops <- function(rng, range, n = 5) {
+  at <- as.double(seq(rng[[1]], rng[[2]], length.out = n))
+  frac <- (at - rng[[1]]) / (rng[[2]] - rng[[1]])
+  unname(Map(
+    function(value, f) {
+      ISizeStop(
+        value = value,
+        size = range[[1]] + (range[[2]] - range[[1]]) * sqrt(f)
+      )
+    },
+    at,
+    frac
+  ))
+}
+
+size_visual_variable <- function(size, data, spec, call) {
+  if (rlang::is_null(size$field)) {
+    return(NULL)
+  }
+  if (identical(spec$symbol_type, "esriSFS")) {
+    cli::cli_abort(
+      c(
+        "{.arg size} must be one number on a polygon layer.",
+        "i" = "A filled polygon has no symbol size for a column to scale."
+      ),
+      call = call
+    )
+  }
+
+  rng <- range(data[[size$field]], na.rm = TRUE)
+  # A constant column spans nothing, so the symbol's own size stands.
+  if (!all(is.finite(rng)) || rng[[1]] == rng[[2]]) {
+    return(NULL)
+  }
+
+  ISizeVisualVariable(
+    type = "sizeInfo",
+    field = size$field,
+    stops = size_stops(rng, size$range),
+    legendOptions = ILegendOptions(title = size$field)
+  )
+}
+
+with_visual_variable <- function(renderer, vv) {
+  if (rlang::is_null(vv)) {
+    return(renderer)
+  }
+  renderer@visualVariables <- c(renderer@visualVariables, list(vv))
+  renderer
+}
+
 # A map renderer resolves per feature against the layer, so the uniqueValue
 # branch that charts can only use while aggregating is always available here.
 map_renderer <- function(layer, spec, call) {
   color <- layer@color
-  size <- if (is.na(layer@size)) NULL else layer@size
+  size <- layer@size
+  fixed <- if (rlang::is_null(size$value)) NULL else size$value
+  scaled <- size_visual_variable(size, layer@data, spec, call)
 
   if (rlang::is_null(color$field)) {
-    return(ISimpleRenderer(
-      type = "simple",
-      symbol = renderer_symbol(spec, discrete_colors(color$stops, 1)[[1]], size)
+    return(with_visual_variable(
+      ISimpleRenderer(
+        type = "simple",
+        symbol = renderer_symbol(
+          spec,
+          discrete_colors(color$stops, 1)[[1]],
+          fixed
+        )
+      ),
+      scaled
     ))
   }
 
   values <- layer@data[[color$field]]
   if (is.numeric(values)) {
-    return(continuous_renderer(
-      color$field,
-      values,
-      color$stops,
-      spec,
-      call,
-      size
+    return(with_visual_variable(
+      continuous_renderer(
+        color$field,
+        values,
+        color$stops,
+        spec,
+        call,
+        fixed
+      ),
+      scaled
     ))
   }
 
@@ -564,12 +671,15 @@ map_renderer <- function(layer, spec, call) {
     )
   }
 
-  unique_value_renderer(
-    color$field,
-    levels,
-    discrete_colors(color$stops, length(levels)),
-    spec,
-    size
+  with_visual_variable(
+    unique_value_renderer(
+      color$field,
+      levels,
+      discrete_colors(color$stops, length(levels)),
+      spec,
+      fixed
+    ),
+    scaled
   )
 }
 

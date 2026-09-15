@@ -56,6 +56,64 @@ test_that("colour picks the renderer from the column's type", {
   )
 })
 
+test_that("a size column rides a sizeInfo visual variable", {
+  renderer <- sent_renderer(add_layer(
+    arc_map(),
+    test_points(),
+    color = group,
+    size = value,
+    size_range = c(4, 20)
+  ))
+
+  # Both mappings travel on one renderer, so colour does not exclude size.
+  expect_identical(renderer$type, "uniqueValue")
+  expect_length(renderer$visualVariables, 1)
+
+  vv <- renderer$visualVariables[[1]]
+  expect_identical(vv$type, "sizeInfo")
+  expect_identical(vv$field, "value")
+
+  sizes <- vapply(vv$stops, function(s) s$size, numeric(1))
+  values <- vapply(vv$stops, function(s) s$value, numeric(1))
+  expect_identical(range(sizes), c(4, 20))
+  expect_identical(values, seq(1, 5, length.out = 5))
+
+  # Area, not radius, so the midpoint sits above the linear half-way size.
+  expect_gt(sizes[[3]], 12)
+})
+
+test_that("a fixed size stays on the symbol, with no visual variable", {
+  renderer <- sent_renderer(add_layer(arc_map(), test_points(), size = 12))
+
+  expect_identical(renderer$symbol$size, 12)
+  expect_length(renderer$visualVariables, 0)
+})
+
+test_that("a size column is refused where there is no marker to scale", {
+  skip_if_not_installed("sf")
+  nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
+
+  expect_error(
+    as_widget(add_layer(arc_map(), nc, size = BIR74)),
+    "one number on a polygon layer"
+  )
+  expect_error(
+    add_layer(arc_map(), test_points(), size = group),
+    "must map a numeric column"
+  )
+})
+
+test_that("a factor keeps its level order rather than being resorted", {
+  points <- test_points()
+  points$group <- factor(points$group, levels = c("b", "a"))
+  renderer <- sent_renderer(add_layer(arc_map(), points, color = group))
+
+  expect_identical(
+    vapply(renderer$uniqueValueInfos, function(i) i$value, character(1)),
+    c("b", "a")
+  )
+})
+
 test_that("palette without a column is the layer's own colour", {
   renderer <- sent_renderer(add_layer(
     arc_map(),

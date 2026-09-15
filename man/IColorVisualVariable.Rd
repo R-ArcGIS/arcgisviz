@@ -3,6 +3,20 @@
 \name{IColorVisualVariable}
 \alias{IColorVisualVariable}
 \title{IColorVisualVariable}
+\value{
+An object of class \code{IColorVisualVariable}.
+}
 \description{
-IColorVisualVariable
+A continuous colour mapping carried on a renderer. This is what
+\code{\link[=set_color]{set_color()}} builds for a numeric column.
+}
+\examples{
+IColorVisualVariable(
+  field = "body_mass",
+  stops = list(
+    IColorStop(value = 2700, color = Color(r = 237, g = 248, b = 251, a = 1)),
+    IColorStop(value = 6300, color = Color(r = 8, g = 81, b = 156, a = 1))
+  ),
+  legendOptions = ILegendOptions(title = "Body mass (g)")
+)
 }

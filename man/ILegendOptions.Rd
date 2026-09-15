@@ -3,7 +3,20 @@
 \name{ILegendOptions}
 \alias{ILegendOptions}
 \title{ILegendOptions}
+\value{
+An object of class \code{ILegendOptions}.
+}
 \description{
 How a renderer or visual variable describes itself in a legend. Note
 \code{showLegend} is unavailable under \code{IUniqueValueRenderer}, per the spec.
+}
+\examples{
+ILegendOptions(
+  title = "Body mass (g)",
+  showLegend = TRUE,
+  order = ILegendOptionsOrder("descendingValues")
+)
+}
+\seealso{
+\code{\link[=new_legend_options]{new_legend_options()}}, which builds one from friendly names.
 }

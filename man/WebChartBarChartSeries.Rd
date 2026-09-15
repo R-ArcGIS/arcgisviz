@@ -28,6 +28,65 @@ WebChartBarChartSeries(
   temporalBinning = NULL
 )
 }
+\arguments{
+\item{type}{String.}
+
+\item{y}{String.}
+
+\item{fillSymbol}{\code{NULL} or a \code{ISimpleFillSymbol} object.}
+
+\item{hideOversizedStackedLabels}{Bool.}
+
+\item{hideOversizedSideBySideLabels}{Bool.}
+
+\item{nullCategory}{\code{NULL} or a \code{WebChartNullCategory} object.}
+
+\item{id}{String.}
+
+\item{visible}{Bool.}
+
+\item{dataTooltipVisible}{Bool.}
+
+\item{dataTooltipReverseColor}{Bool.}
+
+\item{dataTooltipValueFormat}{\code{NULL} or a \code{NumberFormatOptions} object.}
+
+\item{dataTooltipPercentFormat}{\code{NULL} or a \code{NumberFormatOptions} object.}
+
+\item{dataTooltipDateFormat}{\code{NULL} or a \code{DateTimeFormatOptions} object.}
+
+\item{dataTooltipFontSize}{Number.}
+
+\item{name}{String.}
+
+\item{query}{\code{NULL} or a \code{WebChartSeriesQuery} object.}
+
+\item{x}{String.}
+
+\item{dataLabels}{\code{NULL} or a \code{WebChartText} object.}
+
+\item{assignToSecondValueAxis}{Bool.}
+
+\item{binTemporalData}{Bool.}
+
+\item{temporalBinning}{\code{NULL} or a \code{WebChartTemporalBinning} object.}
+}
+\value{
+An object of class \code{WebChartBarChartSeries}.
+}
 \description{
-WebChartBarChartSeries
+One series of a bar chart. Built for you by the \code{\link[=arc_bar]{arc_bar()}} pipeline; a
+grouped chart gets one of these per level.
+}
+\examples{
+WebChartBarChartSeries(
+  type = "barSeries",
+  id = "series0",
+  name = "mean(body_mass)",
+  x = "species",
+  y = "AVG_body_mass_0",
+  fillSymbol = ISimpleFillSymbol(
+    color = Color(r = 78, g = 121, b = 167, a = 1)
+  )
+)
 }

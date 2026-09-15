@@ -12,6 +12,28 @@ IFont(
   decoration = IFontDecoration()
 )
 }
+\arguments{
+\item{family}{String.}
+
+\item{size}{Number.}
+
+\item{style}{A \code{IFontStyle} enum.}
+
+\item{weight}{A \code{IFontWeight} enum.}
+
+\item{decoration}{A \code{IFontDecoration} enum.}
+}
+\value{
+An object of class \code{IFont}.
+}
 \description{
 IFont
+}
+\examples{
+IFont(
+  family = "Avenir Next",
+  size = 12,
+  style = IFontStyle("normal"),
+  weight = IFontWeight("bold")
+)
 }

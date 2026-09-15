@@ -3,6 +3,15 @@
 \name{WebChartHeatChartEmptyCell}
 \alias{WebChartHeatChartEmptyCell}
 \title{WebChartHeatChartEmptyCell}
+\value{
+An object of class \code{WebChartHeatChartEmptyCell}.
+}
 \description{
-WebChartHeatChartEmptyCell
+How a cell with no rows in it is labelled and drawn.
+}
+\examples{
+WebChartHeatChartEmptyCell(
+  text = "None",
+  symbol = ISimpleFillSymbol(color = Color(r = 245, g = 245, b = 245, a = 1))
+)
 }

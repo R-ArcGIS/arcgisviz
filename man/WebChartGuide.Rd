@@ -16,6 +16,40 @@ WebChartGuide(
   tooltipReverseColor = NA
 )
 }
+\arguments{
+\item{type}{String.}
+
+\item{start}{String or Number.}
+
+\item{end}{String or Number.}
+
+\item{style}{A \code{ISimpleLineSymbol} object or a \code{ISimpleFillSymbol} object.}
+
+\item{name}{String.}
+
+\item{label}{\code{NULL} or a \code{WebChartTextSymbol} object.}
+
+\item{visible}{Bool.}
+
+\item{above}{Bool.}
+
+\item{tooltipReverseColor}{Bool.}
+}
+\value{
+An object of class \code{WebChartGuide}.
+}
 \description{
-WebChartGuide
+A reference line or band drawn across an axis.
+}
+\examples{
+WebChartGuide(
+  type = "chartGuide",
+  start = 4000,
+  name = "Target",
+  style = ISimpleLineSymbol(
+    style = SimpleLineSymbolStyle("esriSLSDash"),
+    color = Color(r = 184, g = 40, b = 40, a = 1),
+    width = 1
+  )
+)
 }

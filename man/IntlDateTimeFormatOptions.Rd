@@ -27,6 +27,57 @@ IntlDateTimeFormatOptions(
   fractionalSecondDigits = NA_integer_
 )
 }
+\arguments{
+\item{localeMatcher}{A \code{IntlLocaleMatcher} enum.}
+
+\item{weekday}{A \code{IntlFormatWidth} enum.}
+
+\item{era}{A \code{IntlFormatWidth} enum.}
+
+\item{year}{A \code{IntlDateTimeDigitStyle} enum.}
+
+\item{month}{A \code{IntlDateTimeFormatOptionsMonth} enum.}
+
+\item{day}{A \code{IntlDateTimeDigitStyle} enum.}
+
+\item{hour}{A \code{IntlDateTimeDigitStyle} enum.}
+
+\item{minute}{A \code{IntlDateTimeDigitStyle} enum.}
+
+\item{second}{A \code{IntlDateTimeDigitStyle} enum.}
+
+\item{timeZoneName}{A \code{IntlDateTimeFormatOptionsTimeZoneName} enum.}
+
+\item{formatMatcher}{A \code{IntlDateTimeFormatOptionsFormatMatcher} enum.}
+
+\item{hour12}{Bool.}
+
+\item{timeZone}{String.}
+
+\item{calendar}{String.}
+
+\item{dayPeriod}{A \code{IntlFormatWidth} enum.}
+
+\item{numberingSystem}{String.}
+
+\item{dateStyle}{A \code{IntlDateTimeFormatLength} enum.}
+
+\item{timeStyle}{A \code{IntlDateTimeFormatLength} enum.}
+
+\item{hourCycle}{A \code{IntlDateTimeFormatOptionsHourCycle} enum.}
+
+\item{fractionalSecondDigits}{Number.}
+}
+\value{
+An object of class \code{IntlDateTimeFormatOptions}.
+}
 \description{
-IntlDateTimeFormatOptions
+Mirrors JavaScript's own \code{Intl.DateTimeFormat} options object.
+}
+\examples{
+IntlDateTimeFormatOptions(
+  year = IntlDateTimeDigitStyle("numeric"),
+  month = IntlDateTimeFormatOptionsMonth("short"),
+  day = IntlDateTimeDigitStyle("2-digit")
+)
 }

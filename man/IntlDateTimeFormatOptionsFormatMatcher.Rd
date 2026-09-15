@@ -15,6 +15,9 @@ An object of class \code{IntlDateTimeFormatOptionsFormatMatcher}.
 \description{
 One of \code{"basic"}, \code{"best fit"}, \code{NA}.
 }
+\examples{
+IntlDateTimeFormatOptionsFormatMatcher("basic")
+}
 \section{Additional properties}{
 
 \describe{
