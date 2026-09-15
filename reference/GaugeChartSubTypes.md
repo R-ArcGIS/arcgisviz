@@ -27,3 +27,13 @@ An object of class `GaugeChartSubTypes`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+GaugeChartSubTypes("featureGauge")
+#> <arcgisviz::GaugeChartSubTypes>
+#>  @ value   : chr "featureGauge"
+#>  @ variants: chr [1:2] "featureGauge" "statisticGauge"
+#>  @ allow_na: logi TRUE
+```

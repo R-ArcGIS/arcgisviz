@@ -27,3 +27,13 @@ An object of class `WebChartNullPolicyTypes`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+WebChartNullPolicyTypes("interpolate")
+#> <arcgisviz::WebChartNullPolicyTypes>
+#>  @ value   : chr "interpolate"
+#>  @ variants: chr [1:3] "interpolate" "null" "zero"
+#>  @ allow_na: logi TRUE
+```

@@ -27,3 +27,13 @@ An object of class `IntlNumberFormatOptionsStyle`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IntlNumberFormatOptionsStyle("currency")
+#> <arcgisviz::IntlNumberFormatOptionsStyle>
+#>  @ value   : chr "currency"
+#>  @ variants: chr [1:4] "currency" "decimal" "percent" "unit"
+#>  @ allow_na: logi TRUE
+```

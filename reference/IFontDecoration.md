@@ -27,3 +27,13 @@ An object of class `IFontDecoration`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IFontDecoration("line-through")
+#> <arcgisviz::IFontDecoration>
+#>  @ value   : chr "line-through"
+#>  @ variants: chr [1:3] "line-through" "none" "underline"
+#>  @ allow_na: logi TRUE
+```

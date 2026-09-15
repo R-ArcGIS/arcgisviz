@@ -27,3 +27,13 @@ An object of class `IFontStyle`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IFontStyle("italic")
+#> <arcgisviz::IFontStyle>
+#>  @ value   : chr "italic"
+#>  @ variants: chr [1:3] "italic" "normal" "oblique"
+#>  @ allow_na: logi TRUE
+```

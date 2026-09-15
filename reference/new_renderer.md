@@ -81,5 +81,6 @@ new_renderer("unique-value", field1 = "species")
 #>  @ defaultSymbol   : NULL
 #>  @ defaultLabel    : chr NA
 #>  @ uniqueValueInfos: list()
+#>  @ visualVariables : list()
 #>  @ legendOptions   : NULL
 ```

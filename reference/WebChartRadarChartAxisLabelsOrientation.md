@@ -27,3 +27,13 @@ An object of class `WebChartRadarChartAxisLabelsOrientation`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+WebChartRadarChartAxisLabelsOrientation("radial")
+#> <arcgisviz::WebChartRadarChartAxisLabelsOrientation>
+#>  @ value   : chr "radial"
+#>  @ variants: chr [1:3] "radial" "circular" "horizontal"
+#>  @ allow_na: logi TRUE
+```

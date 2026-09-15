@@ -63,50 +63,7 @@ takes a bare column name, the same as <code><a href="set_color.html">set_color()
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Passed between methods. Must be empty when <code>.data</code> is an
-<a href="IFeatureLayer.html">IFeatureLayer</a>, whose own properties already answer <code>color</code>, <code>palette</code>,
-<code>size</code> and <code>tooltip</code>.</p></dd>
-
-
-<dt id="arg-color">color<a class="anchor" aria-label="anchor" href="#arg-color"></a></dt>
-<dd><p>default <code>NULL</code>. Defines which column drives the symbol colour.
-A numeric column becomes a gradient, anything else one colour per value.</p></dd>
-
-
-<dt id="arg-palette">palette<a class="anchor" aria-label="anchor" href="#arg-palette"></a></dt>
-<dd><p>default <code>NULL</code>. Defines the colour ramp, either an Esri ramp
-name from <code><a href="esri_palettes.html">esri_palettes()</a></code> or a vector of R colours.</p></dd>
-
-
-<dt id="arg-size">size<a class="anchor" aria-label="anchor" href="#arg-size"></a></dt>
-<dd><p>default <code>NULL</code>. Defines the marker size or line width in points.</p></dd>
-
-
-<dt id="arg-opacity">opacity<a class="anchor" aria-label="anchor" href="#arg-opacity"></a></dt>
-<dd><p>default <code>NULL</code>. Defines the layer opacity, from <code>0</code> to <code>1</code>.</p></dd>
-
-
-<dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
-<dd><p>default <code>NULL</code>. Defines the layer name, which is also the handle
-<code><a href="set_layer.html">remove_layer()</a></code> and <code><a href="set_layer.html">set_layer()</a></code> take. On an <code><a href="ArcMapProxy.html">arc_map_proxy()</a></code> it is
-required, because that is what tells the browser which layer is meant.</p></dd>
-
-
-<dt id="arg-tooltip">tooltip<a class="anchor" aria-label="anchor" href="#arg-tooltip"></a></dt>
-<dd><p>default <code>NULL</code>. Defines which columns are shown when a
-feature is hovered, as bare column names wrapped in <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code>. Name one to
-label it, as in <code>c(County = NAME)</code>.</p></dd>
-
-
-<dt id="arg-selectable">selectable<a class="anchor" aria-label="anchor" href="#arg-selectable"></a></dt>
-<dd><p>default <code>NULL</code>. Defines whether clicking a feature adds it
-to the selection, which arrives in Shiny as <code>input$&lt;output_id&gt;$selection</code>. See
-<code><a href="set_selection.html">set_selection()</a></code>.</p></dd>
-
-
-<dt id="arg-visible">visible<a class="anchor" aria-label="anchor" href="#arg-visible"></a></dt>
-<dd><p>default <code>NULL</code>. Defines whether the layer starts drawn.
-Only when <code>.data</code> is an <a href="IFeatureLayer.html">IFeatureLayer</a>.</p></dd>
+<dd><p>Passed to the <a href="ArcMap.html">ArcMap</a> or <a href="IFeatureLayer.html">IFeatureLayer</a> method.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -127,7 +84,16 @@ and modifying it, usually with <code><a href="add_renderer.html">add_renderer()<
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="set_basemap.html">set_basemap</a></span><span class="op">(</span><span class="fu"><a href="arc_map.html">arc_map</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"gray-vector"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">nc</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"shape/nc.shp"</span>, package <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="arc_map.html">arc_map</a></span><span class="op">(</span><span class="st">"gray-vector"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">add_layer</span><span class="op">(</span><span class="va">nc</span>, color <span class="op">=</span> <span class="va">BIR74</span>, palette <span class="op">=</span> <span class="st">"Orange 5"</span>, name <span class="op">=</span> <span class="st">"Counties"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># A fixed colour needs no mapping, since a layer has one symbol either way.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="arc_map.html">arc_map</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">add_layer</span><span class="op">(</span><span class="va">nc</span>, palette <span class="op">=</span> <span class="st">"grey30"</span>, opacity <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">add_layer</span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_unary.html" class="external-link">st_centroid</a></span><span class="op">(</span><span class="va">nc</span><span class="op">)</span>, color <span class="op">=</span> <span class="va">SID74</span>, size <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>st_centroid assumes attributes are constant over geometries</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

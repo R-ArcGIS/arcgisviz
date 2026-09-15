@@ -34,17 +34,77 @@ arc_proxy(output_id, chart, session = shiny::getDefaultReactiveDomain())
 
 ## Arguments
 
+- data:
+
+  Any value.
+
+- chart_type:
+
+  String.
+
+- x:
+
+  String.
+
+- y:
+
+  String.
+
+- stat:
+
+  String.
+
+- labs:
+
+  List.
+
+- color:
+
+  List.
+
+- alpha:
+
+  Number.
+
+- size:
+
+  List.
+
+- tooltip:
+
+  String.
+
+- axes:
+
+  List.
+
+- legend:
+
+  List.
+
+- flipped:
+
+  Bool.
+
+- position:
+
+  String.
+
+- series_opts:
+
+  List.
+
+- config_opts:
+
+  List.
+
 - output_id:
 
-  Defines which
-  [`arcgisChartOutput()`](http://r.esri.com/arcgisviz/reference/arcgisChartOutput.md)
-  to update.
+  String.
 
 - session:
 
-  default
-  [`shiny::getDefaultReactiveDomain()`](https://rdrr.io/pkg/shiny/man/domains.html).
-  Defines the Shiny session to send through.
+  Any value.
 
 - chart:
 

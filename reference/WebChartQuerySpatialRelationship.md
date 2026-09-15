@@ -31,3 +31,13 @@ An object of class `WebChartQuerySpatialRelationship`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+WebChartQuerySpatialRelationship("contains")
+#> <arcgisviz::WebChartQuerySpatialRelationship>
+#>  @ value   : chr "contains"
+#>  @ variants: chr [1:10] "contains" "crosses" "disjoint" "envelope-intersects" ...
+#>  @ allow_na: logi TRUE
+```

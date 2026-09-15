@@ -29,3 +29,13 @@ An object of class `WebChartClassBreakTypes`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+WebChartClassBreakTypes("equal-interval")
+#> <arcgisviz::WebChartClassBreakTypes>
+#>  @ value   : chr "equal-interval"
+#>  @ variants: chr [1:4] "equal-interval" "quantile" "natural-breaks" "manual"
+#>  @ allow_na: logi TRUE
+```

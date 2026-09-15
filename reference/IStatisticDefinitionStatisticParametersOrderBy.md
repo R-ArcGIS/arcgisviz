@@ -27,3 +27,13 @@ An object of class `IStatisticDefinitionStatisticParametersOrderBy`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IStatisticDefinitionStatisticParametersOrderBy("asc")
+#> <arcgisviz::IStatisticDefinitionStatisticParametersOrderBy>
+#>  @ value   : chr "asc"
+#>  @ variants: chr [1:2] "asc" "desc"
+#>  @ allow_na: logi TRUE
+```

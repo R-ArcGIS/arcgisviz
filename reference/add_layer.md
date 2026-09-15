@@ -23,60 +23,10 @@ add_layer(map, .data, ...)
 
 - ...:
 
-  Passed between methods. Must be empty when `.data` is an
-  [IFeatureLayer](http://r.esri.com/arcgisviz/reference/IFeatureLayer.md),
-  whose own properties already answer `color`, `palette`, `size` and
-  `tooltip`.
-
-- color:
-
-  default `NULL`. Defines which column drives the symbol colour. A
-  numeric column becomes a gradient, anything else one colour per value.
-
-- palette:
-
-  default `NULL`. Defines the colour ramp, either an Esri ramp name from
-  [`esri_palettes()`](http://r.esri.com/arcgisviz/reference/esri_palettes.md)
-  or a vector of R colours.
-
-- size:
-
-  default `NULL`. Defines the marker size or line width in points.
-
-- opacity:
-
-  default `NULL`. Defines the layer opacity, from `0` to `1`.
-
-- name:
-
-  default `NULL`. Defines the layer name, which is also the handle
-  [`remove_layer()`](http://r.esri.com/arcgisviz/reference/set_layer.md)
-  and
-  [`set_layer()`](http://r.esri.com/arcgisviz/reference/set_layer.md)
-  take. On an
-  [`arc_map_proxy()`](http://r.esri.com/arcgisviz/reference/ArcMapProxy.md)
-  it is required, because that is what tells the browser which layer is
-  meant.
-
-- tooltip:
-
-  default `NULL`. Defines which columns are shown when a feature is
-  hovered, as bare column names wrapped in
-  [`c()`](https://rdrr.io/r/base/c.html). Name one to label it, as in
-  `c(County = NAME)`.
-
-- selectable:
-
-  default `NULL`. Defines whether clicking a feature adds it to the
-  selection, which arrives in Shiny as `input$<output_id>$selection`.
-  See
-  [`set_selection()`](http://r.esri.com/arcgisviz/reference/set_selection.md).
-
-- visible:
-
-  default `NULL`. Defines whether the layer starts drawn. Only when
-  `.data` is an
-  [IFeatureLayer](http://r.esri.com/arcgisviz/reference/IFeatureLayer.md).
+  Passed to the
+  [ArcMap](http://r.esri.com/arcgisviz/reference/ArcMap.md) or
+  [IFeatureLayer](http://r.esri.com/arcgisviz/reference/IFeatureLayer.md)
+  method.
 
 ## Value
 
@@ -99,5 +49,14 @@ it, usually with
 ## Examples
 
 ``` r
-set_basemap(arc_map(), "gray-vector")
+nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
+
+arc_map("gray-vector") |>
+  add_layer(nc, color = BIR74, palette = "Orange 5", name = "Counties")
+
+# A fixed colour needs no mapping, since a layer has one symbol either way.
+arc_map() |>
+  add_layer(nc, palette = "grey30", opacity = 0.6) |>
+  add_layer(sf::st_centroid(nc), color = SID74, size = 8)
+#> Warning: st_centroid assumes attributes are constant over geometries
 ```

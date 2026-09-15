@@ -30,3 +30,13 @@ An object of class `ModelTypes`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+ModelTypes("barChart")
+#> <arcgisviz::ModelTypes>
+#>  @ value   : chr "barChart"
+#>  @ variants: chr [1:10] "barChart" "lineChart" "comboBarLineChart" "boxPlot" ...
+#>  @ allow_na: logi TRUE
+```

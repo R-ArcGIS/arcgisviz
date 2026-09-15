@@ -27,3 +27,13 @@ An object of class `WebChartHeatChartHeatRulesTypes`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+WebChartHeatChartHeatRulesTypes("gradient")
+#> <arcgisviz::WebChartHeatChartHeatRulesTypes>
+#>  @ value   : chr "gradient"
+#>  @ variants: chr [1:2] "gradient" "renderer"
+#>  @ allow_na: logi TRUE
+```

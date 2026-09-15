@@ -27,6 +27,76 @@ ArcChart(
 )
 ```
 
+## Arguments
+
+- data:
+
+  Any value.
+
+- chart_type:
+
+  String.
+
+- x:
+
+  String.
+
+- y:
+
+  String.
+
+- stat:
+
+  String.
+
+- labs:
+
+  List.
+
+- color:
+
+  List.
+
+- alpha:
+
+  Number.
+
+- size:
+
+  List.
+
+- tooltip:
+
+  String.
+
+- axes:
+
+  List.
+
+- legend:
+
+  List.
+
+- flipped:
+
+  Bool.
+
+- position:
+
+  String.
+
+- series_opts:
+
+  List.
+
+- config_opts:
+
+  List.
+
+## Value
+
+An object of class `ArcChart`.
+
 ## Examples
 
 ``` r

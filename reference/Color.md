@@ -10,6 +10,28 @@ uses.
 Color(r = NA_real_, g = NA_real_, b = NA_real_, a = NA_real_)
 ```
 
+## Arguments
+
+- r:
+
+  Number.
+
+- g:
+
+  Number.
+
+- b:
+
+  Number.
+
+- a:
+
+  Number.
+
+## Value
+
+An object of class `Color`.
+
 ## Examples
 
 ``` r

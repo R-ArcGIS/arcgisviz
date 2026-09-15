@@ -27,3 +27,13 @@ An object of class `WebChartSortOrderKinds`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+WebChartSortOrderKinds("ASC")
+#> <arcgisviz::WebChartSortOrderKinds>
+#>  @ value   : chr "ASC"
+#>  @ variants: chr [1:2] "ASC" "DESC"
+#>  @ allow_na: logi TRUE
+```

@@ -28,18 +28,10 @@ set_selection(proxy, object_ids, ...)
 
 - ...:
 
-  Reserved for methods.
-
-- layer:
-
-  default `NULL`. Defines which map layer to select in, by name. `NULL`
-  selects in every layer. Maps only.
-
-- mode:
-
-  default `"replace"`. Defines what these ids do to the current
-  selection, one of `"replace"`, `"add"`, `"remove"`, or `"toggle"`.
-  Maps only.
+  Passed to the
+  [ArcProxy](http://r.esri.com/arcgisviz/reference/ArcProxy.md) or
+  [ArcMapProxy](http://r.esri.com/arcgisviz/reference/ArcMapProxy.md)
+  method.
 
 ## Value
 

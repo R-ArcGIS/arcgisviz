@@ -27,3 +27,13 @@ An object of class `IntlDateTimeFormatOptionsFormatMatcher`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IntlDateTimeFormatOptionsFormatMatcher("basic")
+#> <arcgisviz::IntlDateTimeFormatOptionsFormatMatcher>
+#>  @ value   : chr "basic"
+#>  @ variants: chr [1:2] "basic" "best fit"
+#>  @ allow_na: logi TRUE
+```

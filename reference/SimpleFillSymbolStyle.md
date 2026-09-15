@@ -33,3 +33,13 @@ An object of class `SimpleFillSymbolStyle`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+SimpleFillSymbolStyle("esriSFSBackwardDiagonal")
+#> <arcgisviz::SimpleFillSymbolStyle>
+#>  @ value   : chr "esriSFSBackwardDiagonal"
+#>  @ variants: chr [1:8] "esriSFSBackwardDiagonal" "esriSFSCross" ...
+#>  @ allow_na: logi TRUE
+```

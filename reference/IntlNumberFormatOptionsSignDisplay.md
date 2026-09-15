@@ -27,3 +27,13 @@ An object of class `IntlNumberFormatOptionsSignDisplay`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IntlNumberFormatOptionsSignDisplay("always")
+#> <arcgisviz::IntlNumberFormatOptionsSignDisplay>
+#>  @ value   : chr "always"
+#>  @ variants: chr [1:4] "always" "auto" "exceptZero" "never"
+#>  @ allow_na: logi TRUE
+```

@@ -47,8 +47,39 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">WebChartOrderSeriesBy</span><span class="op">(</span>preferLabel <span class="op">=</span> <span class="cn">NA</span>, orderBy <span class="op">=</span> <span class="fu"><a href="WebChartSortOrderKinds.html">WebChartSortOrderKinds</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
-  </main></div>
+
+<dl><dt id="arg-preferlabel">preferLabel<a class="anchor" aria-label="anchor" href="#arg-preferlabel"></a></dt>
+<dd><p>Bool.</p></dd>
+
+
+<dt id="arg-orderby">orderBy<a class="anchor" aria-label="anchor" href="#arg-orderby"></a></dt>
+<dd><p>A <code>WebChartSortOrderKinds</code> enum.</p></dd>
+
+</dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>An object of class <code>WebChartOrderSeriesBy</code>.</p>
+    </div>
+
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">WebChartOrderSeriesBy</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  preferLabel <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  orderBy <span class="op">=</span> <span class="fu"><a href="WebChartSortOrderKinds.html">WebChartSortOrderKinds</a></span><span class="op">(</span><span class="st">"DESC"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;arcgisviz::WebChartOrderSeriesBy&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ preferLabel: logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ orderBy    : &lt;arcgisviz::WebChartSortOrderKinds&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ value   : chr "DESC"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ variants: chr [1:2] "ASC" "DESC"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ allow_na: logi TRUE</span>
+</code></pre></div>
+    </div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

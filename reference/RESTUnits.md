@@ -29,3 +29,13 @@ An object of class `RESTUnits`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+RESTUnits("feet")
+#> <arcgisviz::RESTUnits>
+#>  @ value   : chr "feet"
+#>  @ variants: chr [1:6] "feet" "kilometers" "meters" "miles" "nautical-miles" ...
+#>  @ allow_na: logi TRUE
+```

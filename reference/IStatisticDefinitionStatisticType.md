@@ -33,3 +33,13 @@ An object of class `IStatisticDefinitionStatisticType`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IStatisticDefinitionStatisticType("avg")
+#> <arcgisviz::IStatisticDefinitionStatisticType>
+#>  @ value   : chr "avg"
+#>  @ variants: chr [1:12] "avg" "centroid-aggregate" "convex-hull-aggregate" "count" ...
+#>  @ allow_na: logi TRUE
+```

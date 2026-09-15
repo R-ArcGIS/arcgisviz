@@ -46,8 +46,119 @@ map or by a service <code>url</code>. Built by <code><a href="as_feature_layer.h
     </div>
 
 
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>An object of class <code>IFeatureLayer</code>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="as_feature_layer.html">as_feature_layer()</a></code>, which builds one from a data frame or an
+<code>sf</code> object.</p></div>
+    </div>
 
-  </main></div>
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>species <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span><span class="op">)</span>, mass <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="as_feature_layer.html">as_feature_layer</a></span><span class="op">(</span><span class="va">df</span>, name <span class="op">=</span> <span class="st">"penguins"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;arcgisviz::IFeatureLayer&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ id                   : chr "arcgisviz-layer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ name                 : chr NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ itemId               : chr NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ layerType            : chr "ArcGISFeatureLayer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ maxScale             : num NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ minScale             : num NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ opacity              : num NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ showLegend           : logi NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ title                : chr "penguins"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ visibility           : logi NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ url                  : chr NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ capabilities         : chr NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ definitionEditor     : NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ disablePopup         : logi NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ featureCollection    :List of 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ layers    :List of 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  ..$ :List of 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. ..$ featureSet     :List of 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. ..$ spatialReference: Named list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. ..$ features        :List of 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. ..$ :List of 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. .. ..$ attributes:List of 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. .. .. ..$ mass     : num 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. .. .. ..$ object_id: num 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. .. .. ..$ species  : chr "a"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. ..$ :List of 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. .. ..$ attributes:List of 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. .. .. ..$ mass     : num 5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. .. .. ..$ object_id: num 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. .. .. ..$ species  : chr "b"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. ..$ :List of 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. .. ..$ attributes:List of 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. .. .. ..$ mass     : num 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. .. .. ..$ object_id: num 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. .. .. ..$ species  : chr "c"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. ..$ layerDefinition:List of 7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. ..$ name          : chr "penguins"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. ..$ objectIdField : chr "object_id"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. ..$ fields        :'data.frame':	3 obs. of  6 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. ..$ name    : chr [1:3] "object_id" "species" "mass"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. ..$ type    : chr [1:3] "esriFieldTypeOID" "esriFieldTypeString" "esriFieldTypeDouble"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. ..$ alias   : chr [1:3] "object_id" "species" "mass"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. ..$ length  : logi [1:3] NA NA NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. ..$ editable: logi [1:3] FALSE TRUE TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. .. ..$ nullable: logi [1:3] FALSE TRUE TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. ..$ hasAttachments: logi FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. ..$ maxScale      : num 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. ..$ minScale      : num 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. .. ..$ type          : chr "Table"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. ..$ name           : chr "penguins"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. ..$ title          : chr "penguins"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ showLegend: logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ featureCollectionType: NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ layerDefinition      : NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ mode                 : int NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ popupInfo            : NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ refreshInterval      : num NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ showLabels           : logi NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ visibleLayers        : int(0) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ timeAnimation        : logi NA</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Or by hand, when the pieces are already assembled.</span></span></span>
+<span class="r-in"><span><span class="fu">IFeatureLayer</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  id <span class="op">=</span> <span class="st">"counties"</span>,</span></span>
+<span class="r-in"><span>  name <span class="op">=</span> <span class="st">"Counties"</span>,</span></span>
+<span class="r-in"><span>  layerType <span class="op">=</span> <span class="st">"ArcGISFeatureLayer"</span>,</span></span>
+<span class="r-in"><span>  opacity <span class="op">=</span> <span class="fl">0.8</span>,</span></span>
+<span class="r-in"><span>  visibility <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;arcgisviz::IFeatureLayer&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ id                   : chr "counties"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ name                 : chr "Counties"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ itemId               : chr NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ layerType            : chr "ArcGISFeatureLayer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ maxScale             : num NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ minScale             : num NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ opacity              : num 0.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ showLegend           : logi NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ title                : chr NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ visibility           : logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ url                  : chr NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ capabilities         : chr NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ definitionEditor     : NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ disablePopup         : logi NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ featureCollection    : NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ featureCollectionType: NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ layerDefinition      : NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ mode                 : int NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ popupInfo            : NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ refreshInterval      : num NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ showLabels           : logi NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ visibleLayers        : int(0) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ timeAnimation        : logi NA</span>
+</code></pre></div>
+    </div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

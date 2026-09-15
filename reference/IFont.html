@@ -53,8 +53,62 @@
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
-  </main></div>
+
+<dl><dt id="arg-family">family<a class="anchor" aria-label="anchor" href="#arg-family"></a></dt>
+<dd><p>String.</p></dd>
+
+
+<dt id="arg-size">size<a class="anchor" aria-label="anchor" href="#arg-size"></a></dt>
+<dd><p>Number.</p></dd>
+
+
+<dt id="arg-style">style<a class="anchor" aria-label="anchor" href="#arg-style"></a></dt>
+<dd><p>A <code>IFontStyle</code> enum.</p></dd>
+
+
+<dt id="arg-weight">weight<a class="anchor" aria-label="anchor" href="#arg-weight"></a></dt>
+<dd><p>A <code>IFontWeight</code> enum.</p></dd>
+
+
+<dt id="arg-decoration">decoration<a class="anchor" aria-label="anchor" href="#arg-decoration"></a></dt>
+<dd><p>A <code>IFontDecoration</code> enum.</p></dd>
+
+</dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>An object of class <code>IFont</code>.</p>
+    </div>
+
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">IFont</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  family <span class="op">=</span> <span class="st">"Avenir Next"</span>,</span></span>
+<span class="r-in"><span>  size <span class="op">=</span> <span class="fl">12</span>,</span></span>
+<span class="r-in"><span>  style <span class="op">=</span> <span class="fu"><a href="IFontStyle.html">IFontStyle</a></span><span class="op">(</span><span class="st">"normal"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  weight <span class="op">=</span> <span class="fu"><a href="IFontWeight.html">IFontWeight</a></span><span class="op">(</span><span class="st">"bold"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;arcgisviz::IFont&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ family    : chr "Avenir Next"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ size      : num 12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ style     : &lt;arcgisviz::IFontStyle&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ value   : chr "normal"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ variants: chr [1:3] "italic" "normal" "oblique"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ allow_na: logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ weight    : &lt;arcgisviz::IFontWeight&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ value   : chr "bold"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ variants: chr [1:4] "bold" "bolder" "lighter" "normal"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ allow_na: logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ decoration: &lt;arcgisviz::IFontDecoration&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ value   : chr NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ variants: chr [1:3] "line-through" "none" "underline"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ allow_na: logi TRUE</span>
+</code></pre></div>
+    </div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

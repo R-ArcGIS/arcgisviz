@@ -27,3 +27,13 @@ An object of class `IntlFormatWidth`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IntlFormatWidth("long")
+#> <arcgisviz::IntlFormatWidth>
+#>  @ value   : chr "long"
+#>  @ variants: chr [1:3] "long" "narrow" "short"
+#>  @ allow_na: logi TRUE
+```

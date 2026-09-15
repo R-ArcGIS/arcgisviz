@@ -30,3 +30,13 @@ An object of class `SimpleMarkerSymbolStyle`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+SimpleMarkerSymbolStyle("esriSMSCircle")
+#> <arcgisviz::SimpleMarkerSymbolStyle>
+#>  @ value   : chr "esriSMSCircle"
+#>  @ variants: chr [1:6] "esriSMSCircle" "esriSMSCross" "esriSMSDiamond" ...
+#>  @ allow_na: logi TRUE
+```

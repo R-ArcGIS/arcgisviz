@@ -27,3 +27,13 @@ An object of class `IntlDateTimeFormatOptionsHourCycle`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IntlDateTimeFormatOptionsHourCycle("h11")
+#> <arcgisviz::IntlDateTimeFormatOptionsHourCycle>
+#>  @ value   : chr "h11"
+#>  @ variants: chr [1:4] "h11" "h12" "h23" "h24"
+#>  @ allow_na: logi TRUE
+```

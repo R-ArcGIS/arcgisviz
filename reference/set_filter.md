@@ -22,22 +22,10 @@ set_filter(proxy, ...)
 
 - ...:
 
-  Reserved for methods.
-
-- where:
-
-  default `NULL`. Defines a SQL where clause, such as
-  `"species = 'Adelie'"`. `NULL`, `NA`, or `""` clear it.
-
-- object_ids:
-
-  default `NULL`. Defines which rows to keep, by object id. `NULL` or an
-  empty vector clears them. Charts only.
-
-- layer:
-
-  default `NULL`. Defines which map layer to filter, by name. `NULL`
-  filters every layer. Maps only.
+  Passed to the
+  [ArcProxy](http://r.esri.com/arcgisviz/reference/ArcProxy.md) or
+  [ArcMapProxy](http://r.esri.com/arcgisviz/reference/ArcMapProxy.md)
+  method.
 
 ## Value
 

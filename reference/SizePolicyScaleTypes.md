@@ -27,3 +27,13 @@ An object of class `SizePolicyScaleTypes`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+SizePolicyScaleTypes("linear")
+#> <arcgisviz::SizePolicyScaleTypes>
+#>  @ value   : chr "linear"
+#>  @ variants: chr [1:2] "linear" "logarithmic"
+#>  @ allow_na: logi TRUE
+```

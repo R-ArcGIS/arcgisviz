@@ -30,3 +30,13 @@ An object of class `SimpleLineSymbolStyle`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+SimpleLineSymbolStyle("esriSLSDash")
+#> <arcgisviz::SimpleLineSymbolStyle>
+#>  @ value   : chr "esriSLSDash"
+#>  @ variants: chr [1:6] "esriSLSDash" "esriSLSDashDot" "esriSLSDashDotDot" ...
+#>  @ allow_na: logi TRUE
+```

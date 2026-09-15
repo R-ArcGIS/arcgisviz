@@ -34,3 +34,13 @@ An object of class `Basemaps`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+Basemaps("topo-vector")
+#> <arcgisviz::Basemaps>
+#>  @ value   : chr "topo-vector"
+#>  @ variants: chr [1:20] "topo-vector" "streets-vector" "streets-night-vector" ...
+#>  @ allow_na: logi TRUE
+```

@@ -28,17 +28,41 @@ arc_map_proxy(output_id, session = shiny::getDefaultReactiveDomain())
 
 ## Arguments
 
+- layers:
+
+  List.
+
+- widgets:
+
+  List.
+
+- basemap:
+
+  String.
+
+- center:
+
+  Number or Number.
+
+- zoom:
+
+  Number.
+
+- extent:
+
+  List.
+
+- highlight:
+
+  List.
+
 - output_id:
 
-  Defines which
-  [`arcgisMapOutput()`](http://r.esri.com/arcgisviz/reference/arcgisMapOutput.md)
-  to update.
+  String.
 
 - session:
 
-  default
-  [`shiny::getDefaultReactiveDomain()`](https://rdrr.io/pkg/shiny/man/domains.html).
-  Defines the Shiny session to send through.
+  Any value.
 
 ## Value
 

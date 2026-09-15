@@ -28,3 +28,13 @@ An object of class `IntlDateTimeFormatOptionsMonth`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IntlDateTimeFormatOptionsMonth("2-digit")
+#> <arcgisviz::IntlDateTimeFormatOptionsMonth>
+#>  @ value   : chr "2-digit"
+#>  @ variants: chr [1:5] "2-digit" "long" "narrow" "numeric" "short"
+#>  @ allow_na: logi TRUE
+```

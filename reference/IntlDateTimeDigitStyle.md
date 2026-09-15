@@ -27,3 +27,13 @@ An object of class `IntlDateTimeDigitStyle`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IntlDateTimeDigitStyle("2-digit")
+#> <arcgisviz::IntlDateTimeDigitStyle>
+#>  @ value   : chr "2-digit"
+#>  @ variants: chr [1:2] "2-digit" "numeric"
+#>  @ allow_na: logi TRUE
+```

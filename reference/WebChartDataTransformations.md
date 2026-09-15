@@ -27,3 +27,13 @@ An object of class `WebChartDataTransformations`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+WebChartDataTransformations("none")
+#> <arcgisviz::WebChartDataTransformations>
+#>  @ value   : chr "none"
+#>  @ variants: chr [1:3] "none" "logarithmic" "squareRoot"
+#>  @ allow_na: logi TRUE
+```

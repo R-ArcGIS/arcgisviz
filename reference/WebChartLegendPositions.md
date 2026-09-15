@@ -27,3 +27,13 @@ An object of class `WebChartLegendPositions`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+WebChartLegendPositions("bottom")
+#> <arcgisviz::WebChartLegendPositions>
+#>  @ value   : chr "bottom"
+#>  @ variants: chr [1:4] "bottom" "left" "right" "top"
+#>  @ allow_na: logi TRUE
+```

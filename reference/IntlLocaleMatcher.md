@@ -27,3 +27,13 @@ An object of class `IntlLocaleMatcher`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IntlLocaleMatcher("best fit")
+#> <arcgisviz::IntlLocaleMatcher>
+#>  @ value   : chr "best fit"
+#>  @ variants: chr [1:2] "best fit" "lookup"
+#>  @ allow_na: logi TRUE
+```

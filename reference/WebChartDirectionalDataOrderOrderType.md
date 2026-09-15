@@ -29,3 +29,13 @@ An object of class `WebChartDirectionalDataOrderOrderType`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+WebChartDirectionalDataOrderOrderType("arcgis-charts-category")
+#> <arcgisviz::WebChartDirectionalDataOrderOrderType>
+#>  @ value   : chr "arcgis-charts-category"
+#>  @ variants: chr [1:4] "arcgis-charts-category" "arcgis-charts-mean" ...
+#>  @ allow_na: logi TRUE
+```

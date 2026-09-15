@@ -27,3 +27,13 @@ An object of class `IntlDateTimeFormatLength`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IntlDateTimeFormatLength("full")
+#> <arcgisviz::IntlDateTimeFormatLength>
+#>  @ value   : chr "full"
+#>  @ variants: chr [1:4] "full" "long" "medium" "short"
+#>  @ allow_na: logi TRUE
+```

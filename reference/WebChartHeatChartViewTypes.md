@@ -28,3 +28,13 @@ An object of class `WebChartHeatChartViewTypes`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+WebChartHeatChartViewTypes("SingleCalendarView")
+#> <arcgisviz::WebChartHeatChartViewTypes>
+#>  @ value   : chr "SingleCalendarView"
+#>  @ variants: chr [1:2] "SingleCalendarView" "SequentialCalendarViews"
+#>  @ allow_na: logi TRUE
+```

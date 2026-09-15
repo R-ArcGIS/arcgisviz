@@ -28,3 +28,13 @@ An object of class `IntlNumberFormatOptionsNotation`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IntlNumberFormatOptionsNotation("compact")
+#> <arcgisviz::IntlNumberFormatOptionsNotation>
+#>  @ value   : chr "compact"
+#>  @ variants: chr [1:4] "compact" "engineering" "scientific" "standard"
+#>  @ allow_na: logi TRUE
+```

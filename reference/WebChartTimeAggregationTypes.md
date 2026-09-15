@@ -29,3 +29,13 @@ An object of class `WebChartTimeAggregationTypes`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+WebChartTimeAggregationTypes("equalIntervalsFromEndTime")
+#> <arcgisviz::WebChartTimeAggregationTypes>
+#>  @ value   : chr "equalIntervalsFromEndTime"
+#>  @ variants: chr [1:2] "equalIntervalsFromEndTime" "equalIntervalsFromStartTime"
+#>  @ allow_na: logi TRUE
+```

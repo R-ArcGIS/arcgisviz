@@ -27,3 +27,13 @@ An object of class `IFontWeight`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IFontWeight("bold")
+#> <arcgisviz::IFontWeight>
+#>  @ value   : chr "bold"
+#>  @ variants: chr [1:4] "bold" "bolder" "lighter" "normal"
+#>  @ allow_na: logi TRUE
+```

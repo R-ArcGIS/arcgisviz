@@ -46,8 +46,53 @@ add_layer(), not called directly."></head><body>
     </div>
 
 
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>An object of class <code>MapLayer</code>.</p>
+    </div>
 
-  </main></div>
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">nc</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"shape/nc.shp"</span>, package <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># add_layer() builds one, which is how you should get one.</span></span></span>
+<span class="r-in"><span><span class="va">map</span> <span class="op">&lt;-</span> <span class="fu"><a href="add_layer.html">add_layer</a></span><span class="op">(</span><span class="fu"><a href="arc_map.html">arc_map</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">nc</span>, name <span class="op">=</span> <span class="st">"Counties"</span>, opacity <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">map</span><span class="op">@</span><span class="va">layers</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;arcgisviz::MapLayer&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ data      :Classes ‘sf’ and 'data.frame':	100 obs. of  15 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ AREA     : num  0.114 0.061 0.143 0.07 0.153 0.097 0.062 0.091 0.118 0.124 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ PERIMETER: num  1.44 1.23 1.63 2.97 2.21 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ CNTY_    : num  1825 1827 1828 1831 1832 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ CNTY_ID  : num  1825 1827 1828 1831 1832 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ NAME     : chr  "Ashe" "Alleghany" "Surry" "Currituck" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ FIPS     : chr  "37009" "37005" "37171" "37053" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ FIPSNO   : num  37009 37005 37171 37053 37131 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ CRESS_ID : int  5 3 86 27 66 46 15 37 93 85 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ BIR74    : num  1091 487 3188 508 1421 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ SID74    : num  1 0 5 1 9 7 0 0 4 1 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ NWBIR74  : num  10 10 208 123 1066 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ BIR79    : num  1364 542 3616 830 1606 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ SID79    : num  0 3 6 2 3 5 2 2 2 5 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ NWBIR79  : num  19 12 260 145 1197 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ geometry :sfc_MULTIPOLYGON of length 100; first list element: List of 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  ..$ :List of 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  .. ..$ : num [1:27, 1:2] -81.5 -81.5 -81.6 -81.6 -81.7 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  ..- attr(*, "class")= chr [1:3] "XY" "MULTIPOLYGON" "sfg"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. - attr(*, "sf_column")= chr "geometry"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. - attr(*, "agr")= Factor w/ 3 levels "constant","aggregate",..: NA NA NA NA NA NA NA NA NA NA ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ..  ..- attr(*, "names")= chr [1:14] "AREA" "PERIMETER" "CNTY_" "CNTY_ID" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ name      : chr "Counties"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ color     :List of 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. $ stops: NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ size      : list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ opacity   : num 0.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ visible   : logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ selectable: logi FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ tooltip   : chr(0) </span>
+</code></pre></div>
+    </div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

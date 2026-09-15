@@ -29,3 +29,13 @@ An object of class `WebChartTemporalBinningUnits`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+WebChartTemporalBinningUnits("days")
+#> <arcgisviz::WebChartTemporalBinningUnits>
+#>  @ value   : chr "days"
+#>  @ variants: chr [1:8] "days" "hours" "minutes" "months" "quarters" "seconds" ...
+#>  @ allow_na: logi TRUE
+```

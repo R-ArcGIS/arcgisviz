@@ -27,3 +27,13 @@ An object of class `WebChartTextSymbolVerticalAlignment`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+WebChartTextSymbolVerticalAlignment("baseline")
+#> <arcgisviz::WebChartTextSymbolVerticalAlignment>
+#>  @ value   : chr "baseline"
+#>  @ variants: chr [1:4] "baseline" "bottom" "middle" "top"
+#>  @ allow_na: logi TRUE
+```

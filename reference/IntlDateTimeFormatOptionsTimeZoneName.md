@@ -29,3 +29,13 @@ An object of class `IntlDateTimeFormatOptionsTimeZoneName`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IntlDateTimeFormatOptionsTimeZoneName("long")
+#> <arcgisviz::IntlDateTimeFormatOptionsTimeZoneName>
+#>  @ value   : chr "long"
+#>  @ variants: chr [1:6] "long" "longGeneric" "longOffset" "short" "shortGeneric" ...
+#>  @ allow_na: logi TRUE
+```

@@ -27,3 +27,13 @@ An object of class `IRendererRotationType`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IRendererRotationType("arithmetic")
+#> <arcgisviz::IRendererRotationType>
+#>  @ value   : chr "arithmetic"
+#>  @ variants: chr [1:2] "arithmetic" "geographic"
+#>  @ allow_na: logi TRUE
+```

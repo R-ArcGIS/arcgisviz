@@ -27,3 +27,13 @@ An object of class `ILegendOptionsOrder`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+ILegendOptionsOrder("ascendingValues")
+#> <arcgisviz::ILegendOptionsOrder>
+#>  @ value   : chr "ascendingValues"
+#>  @ variants: chr [1:2] "ascendingValues" "descendingValues"
+#>  @ allow_na: logi TRUE
+```

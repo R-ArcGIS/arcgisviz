@@ -27,3 +27,13 @@ An object of class `WebChartLabelBehavior`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+WebChartLabelBehavior("hide")
+#> <arcgisviz::WebChartLabelBehavior>
+#>  @ value   : chr "hide"
+#>  @ variants: chr [1:4] "hide" "rotate" "stagger" "wrap"
+#>  @ allow_na: logi TRUE
+```

@@ -27,3 +27,13 @@ An object of class `IntlNumberFormatOptionsCompactDisplay`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+IntlNumberFormatOptionsCompactDisplay("long")
+#> <arcgisviz::IntlNumberFormatOptionsCompactDisplay>
+#>  @ value   : chr "long"
+#>  @ variants: chr [1:2] "long" "short"
+#>  @ allow_na: logi TRUE
+```

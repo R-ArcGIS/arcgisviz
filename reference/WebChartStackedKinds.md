@@ -27,3 +27,13 @@ An object of class `WebChartStackedKinds`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+WebChartStackedKinds("sideBySide")
+#> <arcgisviz::WebChartStackedKinds>
+#>  @ value   : chr "sideBySide"
+#>  @ variants: chr [1:3] "sideBySide" "stacked" "stacked100"
+#>  @ allow_na: logi TRUE
+```

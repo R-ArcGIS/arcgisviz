@@ -31,3 +31,13 @@ An object of class `WebChartCalendarDatePartsUnits`.
 - `@allow_na`:
 
   Bool. Whether `NA_character_` is allowed.
+
+## Examples
+
+``` r
+WebChartCalendarDatePartsUnits("dayOfMonth")
+#> <arcgisviz::WebChartCalendarDatePartsUnits>
+#>  @ value   : chr "dayOfMonth"
+#>  @ variants: chr [1:8] "dayOfMonth" "dayOfWeek" "dayOfYear" "hourOfDay" ...
+#>  @ allow_na: logi TRUE
+```

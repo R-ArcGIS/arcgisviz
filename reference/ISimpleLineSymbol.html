@@ -52,8 +52,58 @@
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
-  </main></div>
+
+<dl><dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
+<dd><p>String.</p></dd>
+
+
+<dt id="arg-style">style<a class="anchor" aria-label="anchor" href="#arg-style"></a></dt>
+<dd><p>A <code>SimpleLineSymbolStyle</code> enum.</p></dd>
+
+
+<dt id="arg-color">color<a class="anchor" aria-label="anchor" href="#arg-color"></a></dt>
+<dd><p><code>NULL</code> or a <code>Color</code> object.</p></dd>
+
+
+<dt id="arg-width">width<a class="anchor" aria-label="anchor" href="#arg-width"></a></dt>
+<dd><p>Number.</p></dd>
+
+</dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>An object of class <code>ISimpleLineSymbol</code>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="new_symbol.html">new_symbol()</a></code>, which builds one from friendly names and colours.</p></div>
+    </div>
+
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">ISimpleLineSymbol</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  style <span class="op">=</span> <span class="fu"><a href="SimpleLineSymbolStyle.html">SimpleLineSymbolStyle</a></span><span class="op">(</span><span class="st">"esriSLSDash"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  color <span class="op">=</span> <span class="fu"><a href="Color.html">Color</a></span><span class="op">(</span>r <span class="op">=</span> <span class="fl">51</span>, g <span class="op">=</span> <span class="fl">51</span>, b <span class="op">=</span> <span class="fl">51</span>, a <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  width <span class="op">=</span> <span class="fl">1.5</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;arcgisviz::ISimpleLineSymbol&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ type : chr "esriSLS"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ style: &lt;arcgisviz::SimpleLineSymbolStyle&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ value   : chr "esriSLSDash"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ variants: chr [1:6] "esriSLSDash" "esriSLSDashDot" "esriSLSDashDotDot" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ allow_na: logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ color: &lt;arcgisviz::Color&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ r: num 51</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ g: num 51</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ b: num 51</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  .. @ a: num 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  @ width: num 1.5</span>
+</code></pre></div>
+    </div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
