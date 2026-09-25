@@ -37,24 +37,7 @@ as_feature_layer(df, name = "penguins")
 #>  @ featureCollection    :List of 2
 #>  .. $ layers    :List of 1
 #>  ..  ..$ :List of 4
-#>  ..  .. ..$ featureSet     :List of 2
-#>  ..  .. .. ..$ spatialReference: Named list()
-#>  ..  .. .. ..$ features        :List of 3
-#>  ..  .. .. .. ..$ :List of 1
-#>  ..  .. .. .. .. ..$ attributes:List of 3
-#>  ..  .. .. .. .. .. ..$ mass     : num 1
-#>  ..  .. .. .. .. .. ..$ object_id: num 1
-#>  ..  .. .. .. .. .. ..$ species  : chr "a"
-#>  ..  .. .. .. ..$ :List of 1
-#>  ..  .. .. .. .. ..$ attributes:List of 3
-#>  ..  .. .. .. .. .. ..$ mass     : num 5
-#>  ..  .. .. .. .. .. ..$ object_id: num 2
-#>  ..  .. .. .. .. .. ..$ species  : chr "b"
-#>  ..  .. .. .. ..$ :List of 1
-#>  ..  .. .. .. .. ..$ attributes:List of 3
-#>  ..  .. .. .. .. .. ..$ mass     : num 3
-#>  ..  .. .. .. .. .. ..$ object_id: num 3
-#>  ..  .. .. .. .. .. ..$ species  : chr "c"
+#>  ..  .. ..$ featureSet     : 'json' chr "{\"spatialReference\":{},\"features\":[{\"attributes\":{\"mass\":1.0,\"object_id\":1,\"species\":\"a\"}},{\"att"| __truncated__
 #>  ..  .. ..$ layerDefinition:List of 7
 #>  ..  .. .. ..$ name          : chr "penguins"
 #>  ..  .. .. ..$ objectIdField : chr "object_id"
