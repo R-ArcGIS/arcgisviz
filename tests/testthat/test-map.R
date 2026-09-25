@@ -31,8 +31,13 @@ test_that("a map layer is an IFeatureLayer carrying a feature collection", {
   collection <- layer$featureCollection$layers[[1]]
   expect_identical(collection$layerDefinition$objectIdField, "object_id")
   expect_identical(collection$layerDefinition$geometryType, "esriGeometryPoint")
-  expect_identical(collection$featureSet$geometryType, "esriGeometryPoint")
-  expect_length(collection$featureSet$features, 3)
+  features <- parse_features(layer)
+  expect_identical(features$geometryType, "esriGeometryPoint")
+  expect_length(features$features, 3)
+  expect_identical(
+    vapply(features$features, \(f) f$attributes$object_id, integer(1)),
+    1:3
+  )
 
   # fields must stay an array of objects; the browser maps Field.fromJSON.
   expect_s3_class(collection$layerDefinition$fields, "data.frame")
@@ -258,9 +263,7 @@ test_that("a date tooltip column stays an Esri date field", {
   expect_identical(fields$type[fields$name == "when"], "esriFieldTypeDate")
 
   # Milliseconds from the epoch, which is what the browser has to reformat.
-  attrs <- layer$featureCollection$layers[[1]]$featureSet$features[[
-    1
-  ]]$attributes
+  attrs <- parse_features(layer)$features[[1]]$attributes
   expect_identical(attrs$when, arcgisutils::date_to_ms(dated$when[[1]]))
 })
 

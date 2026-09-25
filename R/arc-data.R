@@ -71,6 +71,28 @@ as_feature_layer <- function(
     drawing_info = drawing_info
   )
 
+  # as_layer() invents or casts the object id column; do it first so the
+  # feature set below carries the same one.
+  if (!oid_field %in% colnames(.data)) {
+    .data[[oid_field]] <- seq_len(nrow(.data))
+  } else if (is.double(.data[[oid_field]])) {
+    .data[[oid_field]] <- as.integer(.data[[oid_field]])
+  }
+
+  # Zero rows: the features travel as a verbatim JSON string instead, so
+  # nothing walks them one list at a time on the way out.
+  layer <- arcgisutils::as_layer(
+    .data[0L, ],
+    name = name,
+    title = title,
+    layer_definition = definition,
+    popup_info = popup_info
+  )
+  layer$featureSet <- structure(
+    arcgisutils::as_esri_featureset(.data),
+    class = "json"
+  )
+
   IFeatureLayer(
     id = id,
     title = title,
@@ -78,15 +100,7 @@ as_feature_layer <- function(
     opacity = if (rlang::is_null(opacity)) NA_real_ else as.double(opacity),
     visibility = if (rlang::is_null(visibility)) NA else visibility,
     featureCollection = arcgisutils::as_feature_collection(
-      layers = list(
-        arcgisutils::as_layer(
-          .data,
-          name = name,
-          title = title,
-          layer_definition = definition,
-          popup_info = popup_info
-        )
-      )
+      layers = list(layer)
     )
   )
 }

@@ -123,7 +123,7 @@ counties <- nc |>
     )
   )
 
-arc_map("gray-vector") |> add_layer(counties)
+arc_map("topo-vector") |> add_layer(counties)
 
 # --- the constructors are friendly all the way down ------------------------
 # No S7 class name, no esri-prefixed enum, no `type =` at a call site.

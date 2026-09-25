@@ -22,7 +22,8 @@ test_that("as_feature_layer() produces the IFeatureLayer shape createModel reads
 
   # `gi` (dist/chunks/index2.js) reads exactly these paths off iLayer.
   fc_layer <- lyr@featureCollection$layers[[1]]
-  expect_length(fc_layer$featureSet$features, 3)
+  expect_s3_class(fc_layer$featureSet, "json")
+  expect_length(parse_features(s7x::as_vector(lyr))$features, 3)
   expect_identical(fc_layer$layerDefinition$objectIdField, "object_id")
   expect_true(nrow(fc_layer$layerDefinition$fields) == 3)
 })
