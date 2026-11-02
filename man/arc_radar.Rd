@@ -2,14 +2,27 @@
 % Please edit documentation in R/arc-chart.R
 \name{arc_radar}
 \alias{arc_radar}
+\alias{set_radar}
 \title{Radar chart}
 \usage{
-arc_radar(.data, x, y)
+arc_radar(.data, x, y, area = NULL, point_size = NULL)
+
+set_radar(chart, ..., area = NULL, point_size = NULL)
 }
 \arguments{
 \item{.data}{Defines which data frame the chart draws its fields from.}
 
 \item{x, y}{Defines which columns supply the bar positions and heights.}
+
+\item{area}{default \code{NULL}. Defines whether the chart fills each shape with
+its line colour at 25\% opacity.}
+
+\item{point_size}{default \code{NULL}. Defines the size, in pixels, of the point
+the chart draws at each value. The client draws them at 4 by default.}
+
+\item{chart}{Defines which chart to modify.}
+
+\item{...}{These dots are for future extensions and must be empty.}
 }
 \value{
 An \code{ArcChart}.
@@ -18,8 +31,13 @@ An \code{ArcChart}.
 Draws a line chart on a circular axis, so the first and last \code{x} values
 meet. Aggregates and groups exactly as \code{\link[=arc_line]{arc_line()}} does.
 }
+\details{
+Use \code{set_radar()} to set the same options on a chart you started with
+\code{\link[=set_type]{set_type()}}.
+}
 \examples{
 df <- data.frame(month = c("jan", "feb", "mar"), rain = c(1, 5, 3))
 
 arc_radar(df, month, rain)
+arc_radar(df, month, rain, area = TRUE, point_size = 8)
 }

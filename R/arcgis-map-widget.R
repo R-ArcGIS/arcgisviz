@@ -26,6 +26,8 @@ NULL
 #' @param widgets default `list()`. Defines the SDK components drawn over the
 #'   map, each a list of `component`, `position`, and `props`. See
 #'   [add_widget()].
+#' @param dependencies default `NULL`. Defines extra HTML dependencies, such
+#'   as the files a GeoParquet layer is read from.
 #' @param width,height default `NULL`. Defines the widget size, passed to
 #'   [htmlwidgets::createWidget()].
 #' @param element_id default `NULL`. Defines the DOM element id to render into.
@@ -42,6 +44,7 @@ arcgis_map <- function(
   selectable = NULL,
   highlight = NULL,
   widgets = list(),
+  dependencies = NULL,
   width = NULL,
   height = NULL,
   element_id = NULL
@@ -68,6 +71,7 @@ arcgis_map <- function(
     height = height,
     package = "arcgisviz",
     elementId = element_id,
+    dependencies = dependencies,
     sizingPolicy = htmlwidgets::sizingPolicy(
       viewer.fill = TRUE,
       browser.fill = TRUE,

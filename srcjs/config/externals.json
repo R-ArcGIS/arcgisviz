@@ -4,6 +4,8 @@
   "@arcgis/map-components": "module https://js.arcgis.com/5.1/map-components/index.js",
   "@arcgis/core/layers/FeatureLayer.js": "module https://js.arcgis.com/5.1/@arcgis/core/layers/FeatureLayer.js",
   "@arcgis/core/rest/support/FeatureSet.js": "module https://js.arcgis.com/5.1/@arcgis/core/rest/support/FeatureSet.js",
+  "@arcgis/core/layers/ParquetLayer.js": "module https://js.arcgis.com/5.1/@arcgis/core/layers/ParquetLayer.js",
+  "@arcgis/core/layers/support/ParquetFilesData.js": "module https://js.arcgis.com/5.1/@arcgis/core/layers/support/ParquetFilesData.js",
   "@arcgis/core/layers/support/Field.js": "module https://js.arcgis.com/5.1/@arcgis/core/layers/support/Field.js",
   "@arcgis/core/PopupTemplate.js": "module https://js.arcgis.com/5.1/@arcgis/core/PopupTemplate.js",
   "@arcgis/core/renderers/support/jsonUtils.js": "module https://js.arcgis.com/5.1/@arcgis/core/renderers/support/jsonUtils.js",

@@ -4,6 +4,8 @@ import "widgets";
 import "@arcgis/map-components";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer.js";
 import FeatureSet from "@arcgis/core/rest/support/FeatureSet.js";
+import ParquetLayer from "@arcgis/core/layers/ParquetLayer.js";
+import ParquetFilesData from "@arcgis/core/layers/support/ParquetFilesData.js";
 import Field from "@arcgis/core/layers/support/Field.js";
 import PopupTemplate from "@arcgis/core/PopupTemplate.js";
 import { fromJSON as rendererFromJSON } from "@arcgis/core/renderers/support/jsonUtils.js";
@@ -64,6 +66,40 @@ function featureLayer(layer) {
   props.popupEnabled = false;
 
   return new FeatureLayer(props);
+}
+
+// The .parquet file is a widget attachment, and its href may be a relative
+// path or an inlined data: URI. ParquetFilesData takes only urls, so either
+// way it is read back as a Blob and handed over as a blob: URL.
+async function parquetLayer(layer) {
+  var href = HTMLWidgets.getAttachmentUrl(layer.attachment, "data");
+  var blob = await (await fetch(href)).blob();
+
+  var props = {
+    id: layer.id,
+    title: layer.title,
+    data: new ParquetFilesData({ urls: [URL.createObjectURL(blob)] }),
+    geometryEncoding: layer.geometryEncoding,
+    geometryType: layer.geometryType,
+    spatialReference: layer.spatialReference,
+    outFields: ["*"],
+    popupEnabled: false,
+  };
+
+  assign(props, {
+    renderer: layer.renderer ? rendererFromJSON(layer.renderer) : undefined,
+    opacity: layer.opacity,
+    visible: layer.visible,
+    popupTemplate: layer.popupInfo
+      ? PopupTemplate.fromJSON(layer.popupInfo)
+      : undefined,
+  });
+
+  return new ParquetLayer(props);
+}
+
+function buildLayer(layer) {
+  return layer.type === "parquet" ? parquetLayer(layer) : featureLayer(layer);
 }
 
 // Only when R sent no view of its own. goTo on the union of what loaded is
@@ -340,7 +376,7 @@ HTMLWidgets.widget({
     }
 
     async function addLayers(list) {
-      var layers = list.map(featureLayer);
+      var layers = await Promise.all(list.map(buildLayer));
       layers.forEach(function (layer) {
         var existing = state.layers[layer.id];
         if (existing) mapEl.map.remove(existing);

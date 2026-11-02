@@ -18,7 +18,10 @@ add_layer(map, .data, ...)
 }
 \description{
 Draws a data frame or \code{sf} object as a client side feature layer. Colour
-takes a bare column name, the same as \code{\link[=set_color]{set_color()}} does on a chart.
+takes a bare column name, the same as \code{\link[=set_color]{set_color()}} does on a chart, and so
+does \code{size}: a bare column scales each marker by its value, one number
+sizes them all the same. \code{size_range} sets the smallest and largest, and
+the value rides the marker's \emph{area}, so a skewed column stays readable.
 }
 \details{
 \code{.data} is either a data frame to build a layer from, or an
@@ -31,6 +34,13 @@ and modifying it, usually with \code{\link[=add_renderer]{add_renderer()}}.
   add_renderer(ISimpleRenderer(symbol = my_symbol)) |>
   (\\(lyr) add_layer(arc_map(), lyr))()
 }\if{html}{\out{</div>}}
+
+\code{format = "parquet"} sends the features as a GeoParquet file instead of
+Esri JSON, which is much faster for large layers. \code{.data} can then be any
+data frame with one geometry column wk can read, such as a
+\code{geoarrow_vctr}, and a geometry with no CRS is taken as longitude and
+latitude. It needs the nanoparquet and wk packages, and is not yet
+available on an \code{\link[=arc_map_proxy]{arc_map_proxy()}}.
 }
 \examples{
 \dontshow{if (rlang::is_installed("sf")) withAutoprint(\{ # examplesIf}
@@ -43,5 +53,9 @@ arc_map("gray-vector") |>
 arc_map() |>
   add_layer(nc, palette = "grey30", opacity = 0.6) |>
   add_layer(sf::st_centroid(nc), color = SID74, size = 8)
+
+# A bare column scales the markers instead, between size_range.
+arc_map() |>
+  add_layer(sf::st_centroid(nc), size = BIR74, size_range = c(4, 30))
 \dontshow{\}) # examplesIf}
 }

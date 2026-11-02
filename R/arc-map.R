@@ -1,4 +1,4 @@
-#' @include arcgis-map-widget.R
+#' @include arcgis-map-widget.R arc-parquet.R
 NULL
 
 library(S7)
@@ -55,7 +55,8 @@ MapLayer := new_class(
     opacity = s7x::class_float,
     visible = s7x::class_boolean,
     selectable = s7x::class_boolean,
-    tooltip = S7::class_character
+    tooltip = S7::class_character,
+    format = s7x::property_scalar(class_character, default = "json")
   )
 )
 
@@ -246,6 +247,13 @@ selectable_ids <- function(layers) {
 #'   add_renderer(ISimpleRenderer(symbol = my_symbol)) |>
 #'   (\(lyr) add_layer(arc_map(), lyr))()
 #' ```
+#'
+#' `format = "parquet"` sends the features as a GeoParquet file instead of
+#' Esri JSON, which is much faster for large layers. `.data` can then be any
+#' data frame with one geometry column wk can read, such as a
+#' `geoarrow_vctr`, and a geometry with no CRS is taken as longitude and
+#' latitude. It needs the nanoparquet and wk packages, and is not yet
+#' available on an [arc_map_proxy()].
 #' @examplesIf rlang::is_installed("sf")
 #' nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
 #'
@@ -278,10 +286,15 @@ S7::method(add_layer, list(ArcMap, S7::class_any)) <- function(
   name = NULL,
   tooltip = NULL,
   selectable = NULL,
+  format = c("json", "parquet"),
   ...
 ) {
   call <- rlang::caller_env()
   check_proxy_layer_name(map, name, call)
+  format <- rlang::arg_match(format, error_call = call)
+  if (format == "parquet") {
+    check_parquet_layer(map, .data, call)
+  }
 
   layer <- MapLayer(
     data = .data,
@@ -290,7 +303,8 @@ S7::method(add_layer, list(ArcMap, S7::class_any)) <- function(
     opacity = if (rlang::is_null(opacity)) NA_real_ else as.double(opacity),
     visible = TRUE,
     selectable = isTRUE(selectable),
-    tooltip = tooltip_columns(rlang::enquo(tooltip), .data, call)
+    tooltip = tooltip_columns(rlang::enquo(tooltip), .data, call),
+    format = format
   )
 
   # Resolved here, not at render, so a bad palette blames this call.
@@ -501,17 +515,35 @@ map_feature_layer <- function(layer, i, call) {
   if (S7::S7_inherits(layer@data, IFeatureLayer)) {
     return(prebuilt_layer(layer, i))
   }
-  geometry <- sf_geometry_type(layer@data, call)
+  parquet <- layer@format == "parquet"
+  geometry <- if (parquet) {
+    wk_geometry_type(layer@data, call)
+  } else {
+    sf_geometry_type(layer@data, call)
+  }
   name <- if (is.na(layer@name)) paste0("layer_", i) else layer@name
+  renderer <- map_renderer(layer, geometry_symbol_map[[geometry]], call)
+  opacity <- if (is.na(layer@opacity)) NULL else layer@opacity
+
+  if (parquet) {
+    return(as_parquet_layer(
+      layer@data,
+      geometry = geometry,
+      title = name,
+      id = map_layer_id(layer, i),
+      renderer = renderer,
+      opacity = opacity,
+      visibility = layer@visible,
+      popup_info = map_popup_info(layer@tooltip, name)
+    ))
+  }
 
   as_feature_layer(
     layer@data,
     name = name,
     id = map_layer_id(layer, i),
-    drawing_info = list(
-      renderer = map_renderer(layer, geometry_symbol_map[[geometry]], call)
-    ),
-    opacity = if (is.na(layer@opacity)) NULL else layer@opacity,
+    drawing_info = list(renderer = renderer),
+    opacity = opacity,
     visibility = layer@visible,
     popup_info = map_popup_info(layer@tooltip, name)
   )
@@ -703,6 +735,10 @@ S7::method(as_widget, ArcMap) <- function(
     selectable = selectable_ids(x@layers),
     highlight = if (rlang::is_empty(x@highlight)) NULL else x@highlight,
     widgets = map_widget_specs(x@widgets),
+    dependencies = lapply(
+      Filter(function(l) S7::S7_inherits(l, ParquetLayer), layers),
+      parquet_dependency
+    ),
     width = width,
     height = height,
     element_id = element_id

@@ -1451,6 +1451,11 @@ split_series <- function(series, split, chart, spec, stat, aggregating) {
         color,
         alpha = chart@alpha
       )
+      # Otherwise deepMerge() leaves the default config's colour on the first
+      # group's points.
+      if (!rlang::is_null(series$markerSymbol)) {
+        series$markerSymbol@color <- color
+      }
       rlang::exec(spec$series_class, !!!series)
     },
     split$levels,
@@ -2047,15 +2052,70 @@ arc_line <- function(.data, x, y, position = NULL) {
 #' Draws a line chart on a circular axis, so the first and last `x` values
 #' meet. Aggregates and groups exactly as [arc_line()] does.
 #'
+#' Use `set_radar()` to set the same options on a chart you started with
+#' [set_type()].
+#'
 #' @inheritParams arc_col
+#' @param chart Defines which chart to modify.
+#' @param ... These dots are for future extensions and must be empty.
+#' @param area default `NULL`. Defines whether the chart fills each shape with
+#'   its line colour at 25% opacity.
+#' @param point_size default `NULL`. Defines the size, in pixels, of the point
+#'   the chart draws at each value. The client draws them at 4 by default.
 #' @return An `ArcChart`.
 #' @examples
 #' df <- data.frame(month = c("jan", "feb", "mar"), rain = c(1, 5, 3))
 #'
 #' arc_radar(df, month, rain)
+#' arc_radar(df, month, rain, area = TRUE, point_size = 8)
 #' @export
-arc_radar <- function(.data, x, y) {
-  arc_chart(.data) |> set_type("radar") |> set_x({{ x }}) |> set_y({{ y }})
+arc_radar <- function(.data, x, y, area = NULL, point_size = NULL) {
+  arc_chart(.data) |>
+    set_type("radar") |>
+    set_x({{ x }}) |>
+    set_y({{ y }}) |>
+    set_radar(area = area, point_size = point_size)
+}
+
+#' @rdname arc_radar
+#' @export
+set_radar <- function(chart, ..., area = NULL, point_size = NULL) {
+  rlang::check_dots_empty()
+  check_chart_type_set(chart)
+  check_chart_type_is(chart, "radar")
+  check_axis_flag(area, "area")
+  check_point_size(point_size)
+
+  opts <- list(showArea = area)
+  if (!rlang::is_null(point_size)) {
+    # No colour: the client falls back to the line's (vF(),
+    # customElement.js:16165), and split_series() sets one per group.
+    opts$markerSymbol <- ISimpleMarkerSymbol(
+      style = SimpleMarkerSymbolStyle("esriSMSCircle"),
+      size = point_size
+    )
+  }
+  chart@series_opts <- merge_opts(chart@series_opts, opts)
+  chart
+}
+
+check_point_size <- function(point_size, call = rlang::caller_env()) {
+  if (
+    rlang::is_null(point_size) ||
+      (rlang::is_scalar_double(point_size) ||
+        rlang::is_scalar_integer(point_size)) &&
+        !is.na(point_size) &&
+        point_size > 0
+  ) {
+    return(invisible(point_size))
+  }
+  cli::cli_abort(
+    c(
+      "{.arg point_size} must be a single positive number.",
+      "x" = "You supplied {.obj_type_friendly {point_size}}."
+    ),
+    call = call
+  )
 }
 
 #' Pie chart

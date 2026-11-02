@@ -26,7 +26,7 @@ ui <- calcite_shell(
     width = "m",
     calcite_panel(
       heading = "Map controls",
-      description = "Every change here goes over the proxy",
+      description = "Sent from R to Maps SDK",
 
       calcite_block(
         heading = "Basemap",
@@ -120,12 +120,12 @@ ui <- calcite_shell(
   panel_end = calcite_shell_panel(
     width = "m",
     calcite_panel(
-      heading = "What the reader did",
-      description = "Every block here is driven by the map, not the controls",
+      heading = "What is available to R",
+      description = "The map controls are sent via websocket.",
 
       calcite_block(
         heading = "Hover",
-        description = "The feature under the pointer",
+        description = "The hovered feature's info.",
         collapsible = TRUE,
         expanded = TRUE,
         icon_start = "cursor",
@@ -134,7 +134,7 @@ ui <- calcite_shell(
 
       calcite_block(
         heading = "Click",
-        description = "Where, and what was there",
+        description = "Only the clicked feature.",
         collapsible = TRUE,
         expanded = TRUE,
         icon_start = "pin",
@@ -143,7 +143,7 @@ ui <- calcite_shell(
 
       calcite_block(
         heading = "View",
-        description = "Debounced 250ms, so a pan is one update",
+        description = "Extent info captured by the map.",
         collapsible = TRUE,
         icon_start = "extent",
         verbatimTextOutput("view")

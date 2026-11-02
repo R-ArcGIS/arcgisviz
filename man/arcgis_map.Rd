@@ -13,6 +13,7 @@ arcgis_map(
   selectable = NULL,
   highlight = NULL,
   widgets = list(),
+  dependencies = NULL,
   width = NULL,
   height = NULL,
   element_id = NULL
@@ -42,6 +43,9 @@ a list of named \code{HighlightOptions}. See \code{\link[=set_highlight]{set_hig
 \item{widgets}{default \code{list()}. Defines the SDK components drawn over the
 map, each a list of \code{component}, \code{position}, and \code{props}. See
 \code{\link[=add_widget]{add_widget()}}.}
+
+\item{dependencies}{default \code{NULL}. Defines extra HTML dependencies, such
+as the files a GeoParquet layer is read from.}
 
 \item{width, height}{default \code{NULL}. Defines the widget size, passed to
 \code{\link[htmlwidgets:createWidget]{htmlwidgets::createWidget()}}.}

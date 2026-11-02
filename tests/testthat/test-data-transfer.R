@@ -1094,6 +1094,47 @@ test_that("a radar chart is a line chart on a circular axis", {
   )
 })
 
+test_that("set_radar() fills every shape, split or not", {
+  plain <- s7x::as_vector(arc_radar(test_df(), category, value)@webchart)
+  expect_null(plain$series[[1]]$showArea)
+
+  filled <- arc_radar(test_df(), category, value, area = TRUE)
+  expect_true(s7x::as_vector(filled@webchart)$series[[1]]$showArea)
+
+  split <- arc_radar(grouped_df(), category, value) |>
+    set_stat("mean") |>
+    set_color(grp) |>
+    set_radar(area = TRUE)
+  series <- s7x::as_vector(split@webchart)$series
+  expect_true(all(vapply(series, function(s) s$showArea, logical(1))))
+
+  expect_error(set_radar(arc_line(test_df(), category, value)), "only applies")
+  expect_error(arc_radar(test_df(), category, value, area = "yes"), "must be")
+})
+
+test_that("set_radar() sizes the points and split_series() colours them", {
+  plain <- arc_radar(test_df(), category, value, point_size = 8)
+  marker <- s7x::as_vector(plain@webchart)$series[[1]]$markerSymbol
+  expect_identical(marker$size, 8)
+  # Unsplit, the client takes the line's colour (vF(), customElement.js).
+  expect_null(marker$color)
+
+  split <- arc_radar(grouped_df(), category, value, point_size = 8) |>
+    set_stat("mean") |>
+    set_color(grp, palette = c("red", "blue"))
+  series <- s7x::as_vector(split@webchart)$series
+  for (s in series) {
+    expect_identical(s$markerSymbol$color, s$lineSymbol$color)
+    expect_identical(s$markerSymbol$size, 8)
+  }
+
+  expect_error(
+    arc_radar(test_df(), category, value, point_size = 0),
+    "positive"
+  )
+  expect_error(set_radar(plain, point_size = "big"), "positive")
+})
+
 test_that("a radar's axes go untitled so the title stays off the plot", {
   # k() (chunks/index.js:253) centres an axis title inside its own axis,
   # which on a circular one is the middle of the chart.
