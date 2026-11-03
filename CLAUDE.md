@@ -316,6 +316,14 @@ non-obvious parts:
   `arcgisutils::as_esri_features()` is the per-feature JSON a future
   batched path would stream (cf. the SDK's large-collection sample, which
   does that via `applyEdits()` on a *live* layer), but nothing needs it yet.
+- **Upstream bug: `createModel()` drops axis bounds.** Setup rebuilds the
+  series and nulls axis 1's `minimum`/`maximum` (`serial-chart-data.js:955`),
+  so `set_axis(limits =)` reached the config but never the chart: a radar
+  centred on the data's minimum instead of 0. `build()`
+  (`srcjs/widgets/arcgisChart.js`) reads the bounds before `createModel()`
+  and restores them through the model's own `setMinBound()`/`setMaxBound()`
+  (`model-with-y-guides.js:168`). Verified in Brave on radar, bar, and
+  gauge. Drop the workaround once the SDK keeps them.
 
 ## Colour (`set_color()`), and the two mechanisms it needs
 

@@ -39,6 +39,26 @@ function deepMerge(target, source) {
   return out;
 }
 
+// Setup rebuilds the series and nulls axis 1's bounds as it goes
+// (serial-chart-data.js:955), so R's limits are read first and restored
+// through the model's own setters (model-with-y-guides.js:168).
+function axisBounds(config) {
+  return (config.axes || []).map(function (axis) {
+    return { minimum: axis.minimum, maximum: axis.maximum };
+  });
+}
+
+function restoreAxisBounds(model, bounds) {
+  bounds.forEach(function (bound, i) {
+    if (typeof bound.minimum === "number" && model.setMinBound) {
+      model.setMinBound(bound.minimum, i);
+    }
+    if (typeof bound.maximum === "number" && model.setMaxBound) {
+      model.setMaxBound(bound.maximum, i);
+    }
+  });
+}
+
 // R keys the lookup by the mark's own x (and y, for a heat cell), so both
 // sides have to stringify it the same way. Dates are refused in R.
 function tooltipKey() {
@@ -195,7 +215,9 @@ HTMLWidgets.widget({
     var state = { iLayer: null, config: null, chartType: null };
 
     async function build(iLayer, config, chartType, tooltip) {
+      var bounds = axisBounds(config);
       var model = await createModel({ iLayer: iLayer, config: config });
+      restoreAxisBounds(model, bounds);
       if (tooltip !== undefined) {
         chartEl.tooltipFormatter = tooltip
           ? tooltipFormatter(chartType, tooltip, axisLabels(config))

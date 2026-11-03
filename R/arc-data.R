@@ -9,6 +9,20 @@ NULL
 # against the layer, so `stat = "count"` can't use the SDK's `"*"` fallback.
 oid_field <- "object_id"
 
+# A list column, such as a geocoder's `extents`, has no Esri field type.
+drop_untyped_columns <- function(.data, call = rlang::caller_env()) {
+  fields <- arcgisutils::as_fields(.data)
+  untyped <- fields$name[is.na(fields$type)]
+  if (rlang::is_empty(untyped)) {
+    return(.data)
+  }
+  cli::cli_inform(
+    "Dropped {.field {untyped}}: {?it has/they have} no Esri field type."
+  )
+  kept <- .data[, !names(.data) %in% untyped, drop = FALSE]
+  check_attribute_columns(kept, call)
+}
+
 # arcgisutils::as_fields() needs at least one non-geometry column and fails
 # with "arguments imply differing number of rows" without one.
 check_attribute_columns <- function(.data, call = rlang::caller_env()) {
@@ -36,7 +50,8 @@ check_attribute_columns <- function(.data, call = rlang::caller_env()) {
 #' is the `iLayer` a chart reads and the layer a map draws. No live feature
 #' service is involved.
 #'
-#' @param .data Defines which data frame or `sf` object to convert.
+#' @param .data Defines which data frame or `sf` object to convert. List
+#'   columns have no Esri field type, so they are dropped with a message.
 #' @param name default `"layer_data"`. Defines what the layer is named.
 #' @param title default `name`. Defines the human readable layer title.
 #' @param id default `"arcgisviz-layer"`. Defines the unique layer id.
@@ -63,6 +78,7 @@ as_feature_layer <- function(
   popup_info = NULL
 ) {
   check_attribute_columns(.data)
+  .data <- drop_untyped_columns(.data)
 
   definition <- arcgisutils::as_layer_definition(
     .data,

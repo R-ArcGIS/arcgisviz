@@ -267,6 +267,23 @@ test_that("a date tooltip column stays an Esri date field", {
   expect_identical(attrs$when, arcgisutils::date_to_ms(dated$when[[1]]))
 })
 
+test_that("a list column is dropped rather than failing the layer", {
+  skip_if_not_installed("sf")
+  # The shape arcgisgeocode::find_address_candidates() returns.
+  geocoded <- sf::st_transform(test_points(), "ESRI:102100")
+  geocoded$extents <- lapply(1:3, \(i) {
+    c(xmin = i, ymin = i, xmax = i, ymax = i)
+  })
+
+  expect_message(
+    layer <- sent_layer(add_layer(arc_map(), geocoded, palette = "Orange 5")),
+    "extents"
+  )
+  fields <- layer$featureCollection$layers[[1]]$layerDefinition$fields
+  expect_false("extents" %in% fields$name)
+  expect_length(parse_features(layer)$features, 3)
+})
+
 test_that("a REST discriminator defaults rather than being restated", {
   # A renderer built by hand and handed to add_layer() would otherwise
   # serialize without the `type` jsonUtils.fromJSON() dispatches on.

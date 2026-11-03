@@ -16,7 +16,8 @@ as_feature_layer(
 )
 }
 \arguments{
-\item{.data}{Defines which data frame or \code{sf} object to convert.}
+\item{.data}{Defines which data frame or \code{sf} object to convert. List
+columns have no Esri field type, so they are dropped with a message.}
 
 \item{name}{default \code{"layer_data"}. Defines what the layer is named.}
 
